@@ -7,6 +7,7 @@
  * Or gate:
  * out = 1 if (a == 1 or b == 1)
  *       0 otherwise
+ * a OR b = NOT(NOT(a) AND NOT(b))
  */
 
 CHIP Or {
@@ -14,5 +15,8 @@ CHIP Or {
     OUT out;
 
     PARTS:
-    // Put your code here:
+    Not(in=a ,out=notA );
+    Not(in=b ,out=notB );
+    And(a=notA ,b=notB,out=notAAndNotB );
+    Not(in=notAAndNotB ,out=out );
 }

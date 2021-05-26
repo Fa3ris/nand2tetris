@@ -6,6 +6,8 @@
 /**
  * Not gate:
  * out = not in
+ * NOT a = a NAND a
+ * ¬a = a NAND a
  */
 
 CHIP Not {
@@ -13,5 +15,5 @@ CHIP Not {
     OUT out;
 
     PARTS:
-    // Put your code here:
+    Nand(a=in ,b=in ,out=out );
 }

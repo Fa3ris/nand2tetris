@@ -7,6 +7,7 @@
  * And gate: 
  * out = 1 if (a == 1 and b == 1)
  *       0 otherwise
+ * a AND b = (a NAND b) NAND (a NAND b)
  */
 
 CHIP And {
@@ -14,5 +15,6 @@ CHIP And {
     OUT out;
 
     PARTS:
-    // Put your code here:
+    Nand(a=a ,b=b ,out=aNandB );
+    Nand(a=aNandB ,b=aNandB ,out=out );
 }

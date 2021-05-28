@@ -9,6 +9,8 @@
  *                            {0, in, 0, 0, 0, 0, 0, 0} if sel == 001
  *                            etc.
  *                            {0, 0, 0, 0, 0, 0, 0, in} if sel == 111
+
+ * compare msb sel[2] then compare two lsb sel[0..1]
  */
 
 CHIP DMux8Way {
@@ -16,5 +18,7 @@ CHIP DMux8Way {
     OUT a, b, c, d, e, f, g, h;
 
     PARTS:
-    // Put your code here:
+    DMux(in=in, sel=sel[2], a=inABCD, b=inEFGH);
+    DMux4Way(in=inABCD, sel=sel[0..1], a=a, b=b, c=c, d=d);
+    DMux4Way(in=inEFGH, sel=sel[0..1], a=e, b=f, c=g, d=h);
 }

@@ -9,6 +9,8 @@
  *                {0, in, 0, 0} if sel == 01
  *                {0, 0, in, 0} if sel == 10
  *                {0, 0, 0, in} if sel == 11
+
+ * compare msb sel[1] then compare lsb sel[0]
  */
 
 CHIP DMux4Way {
@@ -16,5 +18,7 @@ CHIP DMux4Way {
     OUT a, b, c, d;
 
     PARTS:
-    // Put your code here:
+    DMux(in=in, sel=sel[1], a=inAB, b=inCD);
+    DMux(in=inAB, sel=sel[0], a=a, b=b);
+    DMux(in=inCD, sel=sel[0], a=c, b=d);
 }

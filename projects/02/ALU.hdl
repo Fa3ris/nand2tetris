@@ -68,13 +68,19 @@ CHIP ALU {
     Not16(in=fXY, out=notFXY);
     Mux16(a=fXY, b=notFXY, sel=no, out=preOut);
 
-    // if (out < 0) set ng = 1
-    And16(a=preOut, b=true, out=out, out[15]=ng, out[0..7]=out07, out[8..15]=out815);
+    
+    And16(a=preOut, b=true,
+     out=out,
+     out[15]=ng,                        // if (out < 0) set ng = 1 => check MSB
+     out[0..7]=out07, out[8..15]=out815);
 
     // if (out == 0) set zr = 1
-    Or8Way(in=out07, out=zr1);
-    Or8Way(in=out815, out=zr2);
-    Or(a=zr1, b=zr2, out=zr);
+    // Or(all bits)
+    Or8Way(in=out07, out=or07);
+    Or8Way(in=out815, out=or815);
+    Or(a=or07, b=or815, out=notZr);
+    // inverse result
+    Not(in=notZr, out=zr);
 
 
 }

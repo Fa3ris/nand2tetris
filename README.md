@@ -89,19 +89,21 @@ Mux(x1, x2) on MSB of sel
 ```
 DMux(in) on MSB of sel
     if 0 then 
-        y1 = a-b
+        y1 = in is directed to either a or b
     else
-        y2 = c-d
+        y2 = in is directed to either c or d
+
 Dmux(y1) on LSB of sel
     if 0 then
-        output on a
+        in is directed to a
     else
-        output on  b
+        in is directed to b
+
 Dmux(y2) on LSB of sel
     if 0 then
-        output on  c
+        in is directed to c
     else
-        output on  d
+        in is directed to d
 ```
 ## DMux 8-way
 ```
@@ -113,27 +115,29 @@ Dmux(y2) on LSB of sel
 ```
 DMux(in) on MSB of sel
     if 0 then
-        y1 = a-b-c-d
+        y1 = in is directed to either a, b, c or d
     else
-        y2 = e-f-g- h
+        y2 = in is directed to either e, f, g or h
+
 DMux4(y1) on 2 LSB of sel
     if 00
-        output on a
+        in is directed to a
     else if 01
-        output on b
+        in is directed to b
     else if 10
-        output on c
+        in is directed to c
     else
-        output on d
+        in is directed to d
+
 DMux4(y2) on 2 LSB of sel
     if 00
-        output on e
+        in is directed to e
     else if 01
-        output on f
+        in is directed to f
     else if 10
-        output on g
+        in is directed to g
     else
-        output on h
+        in is directed to h
 ```
 # Project 2
 
@@ -183,32 +187,73 @@ carry = carry1 or carry2 = 1 or 0 = 1
 Adder with constant 1
 ## ALU
 ### 2's complement: ~x
-**x + ~x = 2^n** by definition
-
-**~x = 1 + Not(x)**
-
-**~x = Not(x + 2^n - 1)**
-
-**~x = Not(x + 11...11)** (same as above)
-
+#### Definition
 ```
-~x = 2's complement of x
-~x = 2^n - x, n = word size
+x + ~x = 2^n
+x + ~x = (1)00...00 = 1 bit of overflow followed by n zeros
 
-We prove
-(2^n - 1) - x = (11...11) - x = Not(x) (flip all bits)
+with n = word size = number of bits
+```
+#### Properties 1: values range
+```
+let n = word size
+
+we have 2^n values = number of permutations of the bits
+
+process x => ~x
+flip all bits (Not)
+add 1
+
+max = 2^(n-1) - 1 = 011...111
+min = -2^(n-1) = 100...00
+
+0 = 00...00
+1 = 00...01
+-1 = 111...11
+
+so we have 1 more negative number = the most negative number = MNN
+~MNN = 2^n - MNN 
+     = 2^n + 2^(n-1) 
+     = (1)00...00 + 100...00 
+     = 100...000 = MNN
+
+for n = 4
+max = 2^3 - 1 = 7 = 0111
+min = -2^3 = -8 = 1000
+
+SHAPE
+
+The codes of all positive numbers begin with a 0.
+
+The codes of all negative numbers begin with a 1.
+```
+#### Properties 2: shape
+```
+MSB of positive numbers = 0
+MSB of negative numbers = 1
+```
+#### Properties 3: equations
+```
+~x = 1 + Not(x)
+
+~x = Not(x + 2^n - 1)
+
+~x = Not(x + 11...11) (same as above)
+```
+```
+Proof ~x = 1 + Not(x)
+
+First we prove (2^n - 1) - x = Not(x)
+because (2^n - 1) - x = (11...11) - x = Not(x) (flip all bits)
 
 so 
-~x = 2^n - x = 1 + (2^n - 1) - x = 1 + Not(x)
+~x = 2^n - x = 1 + [(2^n - 1) - x] = 1 + Not(x)
 
-also
-x + ~x = 2^n = (1)00...00 = 1 bit of overflow followed by 0s
 ```
 
 ```
-Not(x + 2^n - 1) = ~x
+Proof ~x = Not(x + 2^n - 1)
 
-proof
 let Y = x + 2^n - 1
 
 Not(Y) = ~Y - 1 // because ~Y = 1 + Not(Y) 
@@ -216,6 +261,16 @@ Not(Y) = ~Y - 1 // because ~Y = 1 + Not(Y)
        = -x // replace Y by expression
 ```
 
+### If p then x else y
+compute x and y and let pass chosen value with Mux whose sel input is p
+
+
+### check is negative
+
+MSB is 1
+
+### check is zero
+Or(all bits) == 0
 
 
 

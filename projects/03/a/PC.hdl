@@ -9,6 +9,24 @@
  * else if (load[t] == 1)  out[t+1] = in[t]
  * else if (inc[t] == 1)   out[t+1] = out[t] + 1  (integer addition)
  * else                    out[t+1] = out[t]
+
+priority order
+    reset
+        then load 
+            then inc
+
+    which value goes through multiplexor depending on sel[3] = inc|load|reset
+   inc|load|reset
+   a 000 whatever - nothing will be remembered
+   b 001 reset
+   c 010 load
+   d 011 reset
+   e 100 inc
+   f 101 reset
+   g 110 load
+   h 111 reset
+
+    reset OR load OR inc = register must remember input
  */
 
 CHIP PC {
@@ -16,5 +34,9 @@ CHIP PC {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+    Inc16(in=loopBack, out=incremented);
+    Mux8Way16(b=false, c=in, d=false, e=incremented, f=false, g=in, h=false, sel[2]=inc, sel[1]=load, sel[0]=reset, out=mux);
+    Or(a=load, b=inc, out=loadOrInc);
+    Or(a=loadOrInc, b=reset, out=loadOrIncOrReset);
+    Register(in=mux, load=loadOrIncOrReset, out=out, out=loopBack);
 }

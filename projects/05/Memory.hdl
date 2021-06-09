@@ -20,6 +20,17 @@
  * map. Access to address 0x6000 results in accessing the keyboard 
  * memory map. The behavior in these addresses is described in the 
  * Screen and Keyboard chip specifications given in the book.
+
+    RAM16K => address MSB = 00 or 01
+        0 = 0x0000 = (0)|00|0 0...0
+    16383 = 0x3FFF = (0)|01|1 1...1
+
+    SCREEN => address MSB = 10
+    16384 = 0x4000 = (0)|10|0 0...0
+    24575 = 0x5FFF = (0)|10|1 1...1
+
+    KBD => address MSB = 11
+    24576 = 0x6000 = (0)|11|0 0...0
  */
 
 CHIP Memory {
@@ -27,5 +38,20 @@ CHIP Memory {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+    // load input to RAM or SCREEN
+    // check address MSB
+    // 0 = RAM
+    // 1 = SCREEN
+    
+    Not(in=address[14], out=notAddrMSB);
+    And(a=load, b=notAddrMSB, out=loadRAM);
+    RAM16K(in=in, load=loadRAM, address=address[0..13], out=ramOut);
+    
+    And(a=load, b=address[14], out=loadScreen);
+    Screen(in=in, load=loadScreen, address=address[0..12], out=screenOut);
+
+    Keyboard(out=kbdOut);
+
+    // select output
+    Mux4Way16(a=ramOut, b=ramOut, c=screenOut, d=kbdOut, sel=address[13..14], out=out);
 }

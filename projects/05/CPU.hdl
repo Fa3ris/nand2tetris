@@ -23,6 +23,37 @@
  * to their new values only in the next time step. If reset==1 then the 
  * CPU jumps to address 0 (i.e. pc is set to 0 in next time step) rather 
  * than to the address resulting from executing the current instruction. 
+
+    A-instruction opcode==0
+    @5 0|000000000000101 = opcode|address to point
+
+    C-instruction opcode==1
+    D=D+1;JMP = dest=compute;jmp 1|11|0011111|010|111 = opcode|padding(unused)|ALU-control bits|destination load bits|jump bits
+                                                         15      14 13         12 11 10 9 8 7 6      5 4 3              2 1 0
+
+    ALU-control bits = a c1 c2 c3 c4 c5 c6
+                      12 11 10  9  8  7  6
+        a==0 compute with A
+        a==1 compute with M
+
+    destination load bits = d1 d2 d3
+                             5  4  3
+        d1==1 store in A
+        d2==1 store in D
+        d3==1 store in M
+
+    jump bits = j1 j2 j3
+                 2  1  0
+        null 0 0 0 no jump
+        JGT 0 0 1 if out>0 jump
+        JEQ 0 1 0 if out=0 jump
+        JGE 0 1 1 if out≥0 jump
+        JLT 1 0 0 if out<0 jump
+        JNE 1 0 1 if out≠0 jump
+        JLE 1 1 0 if out≤0 jump
+        JMP 1 1 1 unconditional jump
+
+
  */
 
 CHIP CPU {
@@ -33,11 +64,159 @@ CHIP CPU {
                          // program (reset==1) or continue executing
                          // the current program (reset==0).
 
-    OUT outM[16],        // M value output
+    OUT outM[16],        // M value output = M
         writeM,          // Write to M? 
-        addressM[15],    // Address in data memory (of M)
+        addressM[15],    // Address in data memory (of M) = A = where to write M
         pc[15];          // address of next instruction
 
     PARTS:
-    // Put your code here:
+
+
+    /*
+        if (MSB instruction) == 0 
+            A-instruction
+            use instruction as new register address
+
+        else C-instruction
+            use computed result to set new register address A=comp;jmp based on instruction
+
+    */
+    Mux16(
+        a=instruction, // used if A-instruction
+        b=computedA, // used if C-instruction
+        sel=instruction[15], // MSB indicates A- or C-instruction
+        out=inA
+    );
+
+    Not(in=instruction[15], out=isAInstr);
+
+    // C-instruction AND d1
+    And(
+        a=instruction[15], // C-instruction
+        b=instruction[5], // d1
+        out=loadComputedA
+    );
+
+    // loadA = A-instruction OR (C-instruction AND dest A)
+    Or(a=isAInstr, b=loadComputedA, out=loadA);
+
+    ARegister(
+        in=inA,
+        load=loadA,
+        out=outA,
+        out[0..14]=addressM // update pointed address
+    );
+
+    // loadD = C-instruction AND d2
+    And(
+        a=instruction[15], // C-instruction
+        b=instruction[4], // d2
+        out=loadD
+    );
+
+    DRegister(
+        in=computedD,
+        load=loadD,
+        out=outD
+    );
+
+    // use A or M for computation
+    /* 
+        if a==0 
+            use A
+        else use M
+    */
+    Mux16(
+        a=outA, // A
+        b=inM, // M
+        sel=instruction[12], // a
+        out=muxAM);
+
+    // x = outD
+    // y = muxAM
+    ALU(x=outD, 
+        y=muxAM, 
+        zx=instruction[11], // c1
+        nx=instruction[10], // c2
+        zy=instruction[9], // c3
+        ny=instruction[8], // c4
+        f=instruction[7], // c5
+        no=instruction[6], // c6
+        out=computedA, // redirect to A
+        out=computedD, // redirect to D
+        out=outM, // redirect to M
+        out=outJmp, // redirect to control jump
+        zr=isZero, // check for jump
+        ng=isNeg); // check for jump
+
+    // write to M if C-instruction AND dest points to M
+    And(
+        a=instruction[15], // C-instruction
+        b=instruction[3], // d3
+        out=writeM
+    );
+
+    And(
+        a=isNeg,
+        b=instruction[2], // j1
+        out=jmpIfNeg
+    );
+
+    And(
+        a=isZero,
+        b=instruction[1], // j2
+        out=jmpIfZero
+    );
+
+    Not(in=isNeg, out=notNeg);
+    Not(in=isZero, out=notZero);
+    And(a=notNeg, b=notZero, out=isPos);
+    
+    And(
+        a=isPos,
+        b=instruction[0], // j3
+        out=jmpIfPos
+    );
+
+    Or(a=jmpIfNeg, b=jmpIfZero, out=jmpIfZeroOrNeg);
+
+    Or(a=jmpIfZeroOrNeg, b=jmpIfPos, out=jmpIfPosOrZeroOrNeg);
+
+    And(a=jmpIfPosOrZeroOrNeg, b=instruction[15], out=loadPC);
+
+    /*
+        order of precedence reset > load > inc
+
+        load if C-instruction and
+            outJmp respects jmpCondition
+
+        j1 matches isPos
+        j2 matches isZero
+        j3 matches isNeg
+
+        j1 & isNeg = jump if Neg and result is Neg = jn
+        j2 & isZero = jump if Zero and result is Zero = jz
+        j3 & isPos = jump if Pos and result is Pos = jp
+
+        loadPC = jn OR jz OR jp
+
+            j1 j2 j3
+        null 0 0 0 no jump
+        JGT 0 0 1 if out > 0 jump  isPos set not(isZero) And not(isNeg)
+        JEQ 0 1 0 if out = 0 jump  isZero set
+        JGE 0 1 1 if out ≥ 0 jump  isZero Or isPos set
+        JLT 1 0 0 if out < 0 jump  isNeg set
+        JNE 1 0 1 if out ≠ 0 jump  isNeg or isPos set
+        JLE 1 1 0 if out ≤ 0 jump  isZero Or isNeg set
+        JMP 1 1 1 Unconditional jump either is set
+
+    */
+    PC(
+        reset=reset,
+
+        in=outA, // used if load set
+        load=loadPC,
+
+        inc=true, // always at least increase counter
+        out[0..14]=pc);
 }

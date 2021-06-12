@@ -1,1 +1,8 @@
 tools/bin/*.dat
+
+# IntelliJ
+.idea
+*.iml
+
+# Maven
+target

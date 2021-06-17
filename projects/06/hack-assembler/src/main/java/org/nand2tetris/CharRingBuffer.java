@@ -3,7 +3,7 @@ package org.nand2tetris;
 import java.io.IOException;
 import java.io.Reader;
 
-public class CharRingBuffer {
+public class CharRingBuffer implements CharBuffer {
 
   private int size = 0;
   private final int capacity;
@@ -25,22 +25,6 @@ public class CharRingBuffer {
     fillBuffer();
   }
 
-  public CharRingBuffer(Reader reader) {
-    this(reader, defaultCapacity);
-  }
-
-  public int size() {
-    return size;
-  }
-
-  public boolean isFull() {
-    return size >= capacity;
-  }
-
-  public boolean isEmpty() {
-    return size <= 0;
-  }
-
   private void fillBuffer() {
     int nCharRead;
     try {
@@ -59,6 +43,24 @@ public class CharRingBuffer {
     }
   }
 
+  public CharRingBuffer(Reader reader) {
+    this(reader, defaultCapacity);
+  }
+
+  public int size() {
+    return size;
+  }
+
+  public boolean isFull() {
+    return size >= capacity;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return size <= 0;
+  }
+
+  @Override
   public char read() {
     char cRead = read0();
     if (!eof) {
@@ -67,6 +69,7 @@ public class CharRingBuffer {
     return cRead;
   }
 
+  @Override
   public char peek() {
     return readChar();
   }
@@ -89,14 +92,6 @@ public class CharRingBuffer {
     return chars[head];
   }
 
-  private int charFromReader() {
-    try {
-      return reader.read();
-    } catch (IOException e) {
-      throw new FileReadingException(e);
-    }
-  }
-
   private void write0() {
     if (isFull()) {
       throw new IllegalStateException("queue is full: " + size);
@@ -113,6 +108,14 @@ public class CharRingBuffer {
       if (tailOverflow) {
         tail = 0;
       }
+    }
+  }
+
+  private int charFromReader() {
+    try {
+      return reader.read();
+    } catch (IOException e) {
+      throw new FileReadingException(e);
     }
   }
 

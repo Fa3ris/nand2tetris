@@ -20,6 +20,8 @@ public enum TokenType {
   A, D, M, AM, AD, MD, AMD,
   JEQ, JGE, JGT ,JLE, JLT, JMP, JNE,
 
+  NULL,
+
   /**
    * @deprecated not used
    */

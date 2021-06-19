@@ -5,6 +5,8 @@ import lombok.Value;
 @Value
 public class Token {
 
+  public static Token NULL = new Token(TokenType.NULL, "null");
+
   TokenType type;
 
   String value;

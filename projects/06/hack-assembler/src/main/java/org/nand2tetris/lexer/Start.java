@@ -70,8 +70,7 @@ public class Start implements State {
 
     /* stay in Start */
     if (Character.isWhitespace(inputChar)) {
-      stateMachine.writeToToken();
-//      stateMachine.read(); // remove from buffer
+      stateMachine.read(); // remove from buffer
       return;
     }
 

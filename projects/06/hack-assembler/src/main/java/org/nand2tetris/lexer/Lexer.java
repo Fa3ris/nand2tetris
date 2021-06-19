@@ -104,17 +104,16 @@ public class Lexer implements TokenStream, StateMachine {
 
   @Override
   public Token peekToken() {
+    if (tokens.isEmpty()) {
+      readToken();
+    }
     return tokens.peek();
   }
 
   @Override
   public Token nextToken() {
-    if (EOF) {
-      return EOFToken();
-    }
     readToken();
-    Token token = tokens.poll();
-    return token;
+    return tokens.poll();
   }
 
   private void readToken() {

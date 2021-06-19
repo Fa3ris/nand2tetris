@@ -40,6 +40,24 @@ public class LexerTest {
   }
 
   @Test
+  public void peek() throws Exception {
+    String test = "";
+    setupLexer(test);
+    assertPeekTokenIsSameType(TokenType.EOF);
+
+    test = "D=D+A\n";
+    setupLexer(test);
+    assertPeekTokenIsSameType(TokenType.D);
+  }
+
+  private void assertPeekTokenIsSameType(TokenType type) {
+    for (int i = 0; i < 4; i++) {
+      peekToken();
+      assertTokenOfType(type);
+    }
+  }
+
+  @Test
   public void lineCommentIgnored() throws Exception {
     String oneLine = "// This file is part of www.nand2tetris.org";
 
@@ -179,6 +197,13 @@ public class LexerTest {
 
   private void nextToken() {
     token = lexer.nextToken();
+    if (printToken) {
+      System.out.println(token);
+    }
+  }
+
+  private void peekToken() {
+    token = lexer.peekToken();
     if (printToken) {
       System.out.println(token);
     }

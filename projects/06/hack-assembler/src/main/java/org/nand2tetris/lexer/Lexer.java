@@ -32,27 +32,39 @@ public class Lexer implements TokenStream, StateMachine {
   public void setEndToken(TokenType type) {
 
     String tokenValue = stringBuffer.toString();
-    boolean isIdentifier = TokenType.IDENTIFIER == type;
-    if (isIdentifier) {
+    type = updateType(type, tokenValue);
+
+    boolean notWhiteSpace = TokenType.WHITE_SPACE != type;
+    boolean notLineComment = TokenType.LINE_COMMENT != type;
+    boolean validTokenToReturn = notWhiteSpace && notLineComment;
+    if (validTokenToReturn) {
+      Token token = new Token(type, tokenValue);
+      tokens.offer(token);
+      // break from while loop
+      endState = true;
+    }
+
+    /* reset stringBuffer */
+    stringBuffer.setLength(0);
+    /* reset state */
+    state = StateHelper.START;
+  }
+
+  private TokenType updateType(TokenType type, final String tokenValue) {
+    if (TokenType.IDENTIFIER == type) {
       TokenType keywordType = KeywordTable.lookup(tokenValue);
       if (keywordType != null) {
         type = keywordType;
       }
     }
+    return type;
+  }
 
-    boolean notWhiteSpace = TokenType.WHITE_SPACE != type;
-    boolean notLineComment = TokenType.LINE_COMMENT != type;
-    if (notWhiteSpace && notLineComment) {
-      Token token = new Token(type, tokenValue);
-      tokens.offer(token);
-    }
-
-    /* reset stringBuffer */
-    stringBuffer.setLength(0);
-    state = StateHelper.START;
-
-    // break from while loop
-    endState = true;
+  @Override
+  public char read() {
+    char cRead = buffer.read();
+    checkEOF();
+    return cRead;
   }
 
   @Override
@@ -60,24 +72,34 @@ public class Lexer implements TokenStream, StateMachine {
     return buffer.peek();
   }
 
-
   @Override
   public void writeToToken() {
     char cRead = buffer.read();
     stringBuffer.append(cRead);
+    checkEOF();
+  }
 
-    if (EOF = buffer.isEmpty() && stringBuffer.length() > 0) {
-      setEndToken(state.getTokenType());
+  private void checkEOF() {
+    EOF = buffer.isEmpty();
+    if (shouldCloseToken()) {
+      closeToken();
     }
+  }
+
+  private boolean shouldCloseToken() {
+    return EOF && stringBuffer.length() > 0;
+  }
+
+  private void closeToken() {
+    setEndToken(state.getTokenType());
   }
 
   @Override
   public void writeSingleCharToken(TokenType type) {
     char cRead = buffer.read();
     stringBuffer.append(cRead);
-
     setEndToken(type);
-
+    checkEOF();
   }
 
   @Override
@@ -87,22 +109,25 @@ public class Lexer implements TokenStream, StateMachine {
 
   @Override
   public Token nextToken() {
+    if (EOF) {
+      return EOFToken();
+    }
     readToken();
     Token token = tokens.poll();
     return token;
   }
 
   private void readToken() {
+    endState = false;
     while (!EOF && !endState) {
       state.handle(this);
     }
-    checkEOF();
-    endState = false;
+    if (EOF) {
+      tokens.offer(EOFToken());
+    }
   }
 
-  private void checkEOF() {
-    if (EOF) {
-      tokens.offer(new Token(TokenType.EOF, "eof"));
-    }
+  private Token EOFToken() {
+    return new Token(TokenType.EOF, "EOF");
   }
 }

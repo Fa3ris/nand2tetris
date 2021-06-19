@@ -2,6 +2,8 @@ package org.nand2tetris.lexer;
 
 public interface StateMachine {
 
+  char read();
+
   char peek();
 
   void writeToToken();

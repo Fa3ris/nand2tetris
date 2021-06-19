@@ -20,6 +20,10 @@ public class LexerTest {
 
   private Lexer lexer;
 
+  private Token token;
+
+  private boolean printToken = true;
+
   @Before
   public void setupMock() throws Exception {
     Mockito.when(buffer.peek()).then((InvocationOnMock invocation) -> queue.peek());
@@ -37,9 +41,17 @@ public class LexerTest {
 
   @Test
   public void lineCommentIgnored() throws Exception {
-    String test = "// This file is part of www.nand2tetris.org";
-    setupLexer(test);
-    assertNextTokenOfType(TokenType.EOF);
+    String oneLine = "// This file is part of www.nand2tetris.org";
+
+    String twoLines = "// This file is part of www.nand2tetris.org\n"
+        + "// and the book \"The Elements of Computing Systems\"";
+
+    String[] comments = new String[] {oneLine, twoLines};
+    for (String comment : comments) {
+      setupLexer(comment);
+      assertNextTokenOfType(TokenType.EOF);
+
+    }
   }
 
   @Test
@@ -47,19 +59,32 @@ public class LexerTest {
     String test = "A";
     setupLexer(test);
     assertNextTokenOfType(TokenType.A);
+    assertTokenValue(test);
     assertNextTokenOfType(TokenType.EOF);
 
     test = "JGT";
     setupLexer(test);
     assertNextTokenOfType(TokenType.JGT);
+    assertTokenValue(test);
     assertNextTokenOfType(TokenType.EOF);
   }
 
   @Test
-  public void PLUS() throws Exception {
+  public void operator() throws Exception {
     String test = "+";
     setupLexer(test);
     assertNextTokenOfType(TokenType.PLUS);
+    assertTokenValue(test);
+
+    test = "|";
+    setupLexer(test);
+    assertNextTokenOfType(TokenType.BIT_OR);
+    assertTokenValue(test);
+
+    test = "=";
+    setupLexer(test);
+    assertNextTokenOfType(TokenType.ASSIGN);
+    assertTokenValue(test);
   }
 
   @Test
@@ -70,20 +95,112 @@ public class LexerTest {
     for (String ws: whiteSpaces) {
       setupLexer(ws);
       assertNextTokenOfType(TokenType.EOF);
+      assertTokenValue("EOF");
     }
   }
 
   @Test
   public void identifier() throws Exception {
-    String test = "foo";
+
+    String[] identifiers = new String[] {"foo", "BAR", "   BAR   ", "_toto", "_123", "_bar123"};
+
+    for (String ws: identifiers) {
+      setupLexer(ws);
+      assertNextTokenOfType(TokenType.IDENTIFIER);
+      assertTokenValue(ws.trim());
+    }
+  }
+
+  @Test
+  public void integer() throws Exception {
+
+    String[] integers = new String[] {"123", "000112321313"};
+
+    for (String integer: integers) {
+      setupLexer(integer);
+      assertNextTokenOfType(TokenType.INTEGER);
+      assertTokenValue(integer);
+    }
+
+  }
+
+  @Test
+  public void labelDeclaration() throws Exception {
+    String test = "(LOOP)";
     setupLexer(test);
-    assertNextTokenOfType(TokenType.IDENTIFIER);
+    assertNextTokenOfType(TokenType.OPEN_PAREN);
+    assertNextTokenOfTypeAndValue(TokenType.IDENTIFIER, "LOOP");
+    assertNextTokenOfType(TokenType.CLOSE_PAREN);
+  }
+
+  @Test
+  public void compound() throws Exception {
+    String test = "// This file is part of www.nand2tetris.org\n"
+        + "// and the book \"The Elements of Computing Systems\"\n"
+        + "// by Nisan and Schocken, MIT Press.\n"
+        + "// File name: projects/06/add/Add.asm\n"
+        + "\n"
+        + "// Computes R0 = 2 + 3  (R0 refers to RAM[0])\n"
+        + "\n"
+        + "@2\n"
+        + "D=A\n"
+        + "@3\n"
+        + "D=D+A\n"
+        + "@0\n"
+        + "M=D";
+
+    setupLexer(test);
+
+    assertNextTokenOfType(TokenType.AT);
+    assertNextTokenOfTypeAndValue(TokenType.INTEGER, "2");
+
+    assertNextTokenOfType(TokenType.D);
+    assertNextTokenOfType(TokenType.ASSIGN);
+    assertNextTokenOfType(TokenType.A);
+
+    assertNextTokenOfType(TokenType.AT);
+    assertNextTokenOfTypeAndValue(TokenType.INTEGER, "3");
+
+    assertNextTokenOfType(TokenType.D);
+    assertNextTokenOfType(TokenType.ASSIGN);
+    assertNextTokenOfType(TokenType.D);
+    assertNextTokenOfType(TokenType.PLUS);
+    assertNextTokenOfType(TokenType.A);
+
+    assertNextTokenOfType(TokenType.AT);
+    assertNextTokenOfTypeAndValue(TokenType.INTEGER, "0");
+
+    assertNextTokenOfType(TokenType.M);
+    assertNextTokenOfType(TokenType.ASSIGN);
+    assertNextTokenOfType(TokenType.D);
+
+    assertNextTokenOfType(TokenType.EOF);
+  }
+
+  private void nextToken() {
+    token = lexer.nextToken();
+    if (printToken) {
+      System.out.println(token);
+    }
+  }
+
+  private void assertNextTokenOfTypeAndValue(TokenType expectedType, String expectedValue) {
+    nextToken();
+    assertTokenOfType(expectedType);
+    assertTokenValue(expectedValue);
+  }
+
+  private void assertTokenOfType(TokenType expectedType) {
+    assertEquals(expectedType, token.getType());
+  }
+
+  private void assertTokenValue(String expectedValue) {
+    assertEquals(expectedValue, token.getValue());
   }
 
   private void assertNextTokenOfType(TokenType expectedType) {
-    Token token = lexer.nextToken();
-    System.out.println(token);
-    assertEquals(expectedType, token.getType());
+    nextToken();
+    assertTokenOfType(expectedType);
   }
 
   private void setupLexer(String str) {

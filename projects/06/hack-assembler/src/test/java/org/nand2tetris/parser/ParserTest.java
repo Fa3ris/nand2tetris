@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
+import org.nand2tetris.helper.ParserTestHelper;
 import org.nand2tetris.lexer.Token;
 import org.nand2tetris.lexer.TokenStream;
 import org.nand2tetris.lexer.TokenType;
@@ -27,45 +28,6 @@ public class ParserTest {
 
   private final Token at = new Token(TokenType.AT, "@");
 
-  private final Token A = new Token(TokenType.A, "A");
-  private final Token D = new Token(TokenType.D, "D");
-  private final Token M = new Token(TokenType.M, "M");
-
-  private final Token zero = new Token(TokenType.INTEGER, "0");
-  private final Token one = new Token(TokenType.INTEGER, "1");
-  private final Token R0 = new Token(TokenType.IDENTIFIER, "R0");
-
-  private final Token openParen = new Token(TokenType.OPEN_PAREN, "(");
-  private final Token label = new Token(TokenType.IDENTIFIER, "FOO");
-  private final Token closeParen = new Token(TokenType.CLOSE_PAREN, ")");
-
-  private final Token MD = new Token(TokenType.MD, "MD");
-  private final Token AM = new Token(TokenType.AM, "AM");
-  private final Token AD = new Token(TokenType.AD, "AD");
-  private final Token AMD = new Token(TokenType.AMD, "AMD");
-
-  private final Token assign = new Token(TokenType.ASSIGN, "=");
-
-  private final Token plus = new Token(TokenType.PLUS, "+");
-  private final Token minus = new Token(TokenType.MINUS, "-");
-
-  private final Token bitAnd = new Token(TokenType.BIT_AND, "&");
-  private final Token bitOr = new Token(TokenType.BIT_OR, "|");
-
-  private final Token not = new Token(TokenType.NOT, "!");
-
-  private final Token semicolon = new Token(TokenType.SEMI_COLON, ";");
-
-  private final Token jeq = new Token(TokenType.JEQ, "JEQ");
-  private final Token jne = new Token(TokenType.JNE, "JNE");
-  private final Token jgt = new Token(TokenType.JGT, "JGT");
-  private final Token jge = new Token(TokenType.JGE, "JGE");
-  private final Token jlt = new Token(TokenType.JLT, "JLT");
-  private final Token jle = new Token(TokenType.JLE, "JLE");
-  private final Token jmp = new Token(TokenType.JMP, "JMP");
-
-  private final Token eof = new Token(TokenType.EOF, "EOF");
-
   @Before
   public void setUp() throws Exception {
     Mockito.when(stream.peekToken()).then((InvocationOnMock invocation) -> tokens.peek());
@@ -74,187 +36,191 @@ public class ParserTest {
 
   @Test
   public void parseAInstruction() throws Exception {
-    List<Node> instructions = parseInstructions(at, one, eof);
-    assertIsAInstruction(instructions.get(0), one);
+    List<Node> instructions = parseInstructions(at, ParserTestHelper.one, ParserTestHelper.eof);
+    ParserTestHelper.assertIsAInstruction(instructions.get(0), ParserTestHelper.one);
 
-    instructions = parseInstructions(at, R0, eof);
-    assertIsAInstruction(instructions.get(0), R0);
+    instructions = parseInstructions(at, ParserTestHelper.R0, ParserTestHelper.eof);
+    ParserTestHelper.assertIsAInstruction(instructions.get(0), ParserTestHelper.R0);
   }
 
   @Test
   public void parseLabelDefinition() throws Exception {
-    List<Node> instructions = parseInstructions(openParen, label, closeParen, eof);
-    assertIsLabelDefinition(instructions.get(0), label.getValue());
+    List<Node> instructions = parseInstructions(ParserTestHelper.openParen, ParserTestHelper.label, ParserTestHelper.closeParen, ParserTestHelper.eof);
+    ParserTestHelper.assertIsLabelDefinition(instructions.get(0), ParserTestHelper.label.getValue());
   }
 
   @Test
   public void parseDestCompJmp() throws Exception {
-    List<Node> instructions = parseInstructions(A, assign, D, plus, A, semicolon, jeq, eof);
+    List<Node> instructions = parseInstructions(ParserTestHelper.A, ParserTestHelper.assign, ParserTestHelper.D, ParserTestHelper.plus, ParserTestHelper.A, ParserTestHelper.semicolon, ParserTestHelper.jeq, ParserTestHelper.eof);
 
     assertTrue(instructions.get(0) instanceof CInstruction);
     CInstruction cInstruction = (CInstruction) instructions.get(0);
 
     Node dest = cInstruction.getDest();
-    assertIsFactor(dest, A);
+    ParserTestHelper.assertIsFactor(dest, ParserTestHelper.A);
 
     Node jmp = cInstruction.getJmp();
-    assertIsFactor(jmp, jeq);
+    ParserTestHelper.assertIsFactor(jmp, ParserTestHelper.jeq);
 
     Node comp = cInstruction.getComp();
-    assertIsBinaryOp(comp, Plus.class, new Factor(D), new Factor(A));
+    ParserTestHelper.assertIsBinaryOp(comp, Plus.class, new Factor(ParserTestHelper.D), new Factor(ParserTestHelper.A));
   }
 
   @Test
   public void parseCompOnly() throws Exception {
-    List<Node> instructions = parseInstructions(A, minus, one, eof);
+    List<Node> instructions = parseInstructions(ParserTestHelper.A, ParserTestHelper.minus, ParserTestHelper.one, ParserTestHelper.eof);
 
     assertTrue(instructions.get(0) instanceof CInstruction);
     CInstruction cInstruction = (CInstruction) instructions.get(0);
 
     Node dest = cInstruction.getDest();
-    assertIsFactor(dest, Token.NULL);
+    ParserTestHelper.assertIsFactor(dest, Token.NULL);
 
     Node jmp = cInstruction.getJmp();
-    assertIsFactor(jmp, Token.NULL);
+    ParserTestHelper.assertIsFactor(jmp, Token.NULL);
 
     Node comp = cInstruction.getComp();
-    assertIsBinaryOp(comp, Minus.class, new Factor(A), new Factor(one));
+    ParserTestHelper.assertIsBinaryOp(comp, Minus.class, new Factor(ParserTestHelper.A), new Factor(
+        ParserTestHelper.one));
   }
 
 
   @Test
   public void parseDestComp() throws Exception {
-    List<Node> instructions = parseInstructions(MD, assign, D, bitAnd, M, eof);
+    List<Node> instructions = parseInstructions(ParserTestHelper.MD, ParserTestHelper.assign, ParserTestHelper.D, ParserTestHelper.bitAnd, ParserTestHelper.M, ParserTestHelper.eof);
 
     assertTrue(instructions.get(0) instanceof CInstruction);
     CInstruction cInstruction = (CInstruction) instructions.get(0);
 
     Node dest = cInstruction.getDest();
-    assertIsFactor(dest, MD);
+    ParserTestHelper.assertIsFactor(dest, ParserTestHelper.MD);
 
     Node jmp = cInstruction.getJmp();
-    assertIsFactor(jmp, Token.NULL);
+    ParserTestHelper.assertIsFactor(jmp, Token.NULL);
 
     Node comp = cInstruction.getComp();
-    assertIsBinaryOp(comp, BitAnd.class, new Factor(D), new Factor(M));
+    ParserTestHelper.assertIsBinaryOp(comp, BitAnd.class, new Factor(ParserTestHelper.D), new Factor(
+        ParserTestHelper.M));
   }
 
   @Test
   public void parseCompJmp() throws Exception {
-    List<Node> instructions = parseInstructions(D, bitAnd, M, semicolon, jne, eof);
+    List<Node> instructions = parseInstructions(ParserTestHelper.D, ParserTestHelper.bitAnd, ParserTestHelper.M, ParserTestHelper.semicolon, ParserTestHelper.jne, ParserTestHelper.eof);
 
     assertTrue(instructions.get(0) instanceof CInstruction);
     CInstruction cInstruction = (CInstruction) instructions.get(0);
 
     Node dest = cInstruction.getDest();
-    assertIsFactor(dest, Token.NULL);
+    ParserTestHelper.assertIsFactor(dest, Token.NULL);
 
     Node jmp = cInstruction.getJmp();
-    assertIsFactor(jmp, jne);
+    ParserTestHelper.assertIsFactor(jmp, ParserTestHelper.jne);
 
     Node comp = cInstruction.getComp();
-    assertIsBinaryOp(comp, BitAnd.class, new Factor(D), new Factor(M));
+    ParserTestHelper.assertIsBinaryOp(comp, BitAnd.class, new Factor(ParserTestHelper.D), new Factor(
+        ParserTestHelper.M));
   }
 
   @Test
   public void parseNotExpression() throws Exception {
-    Token[] tokens = new Token[]{A, D, M};
+    Token[] tokens = new Token[]{ParserTestHelper.A, ParserTestHelper.D, ParserTestHelper.M};
 
     for (Token token : tokens) {
-      List<Node> instructions = parseInstructions(not, token, eof);
+      List<Node> instructions = parseInstructions(ParserTestHelper.not, token, ParserTestHelper.eof);
 
       assertTrue(instructions.get(0) instanceof CInstruction);
       CInstruction cInstruction = (CInstruction) instructions.get(0);
 
       Node dest = cInstruction.getDest();
-      assertIsFactor(dest, Token.NULL);
+      ParserTestHelper.assertIsFactor(dest, Token.NULL);
 
       Node jmp = cInstruction.getJmp();
-      assertIsFactor(jmp, Token.NULL);
+      ParserTestHelper.assertIsFactor(jmp, Token.NULL);
 
       Node comp = cInstruction.getComp();
-      assertIsUnary(comp, Not.class, new Factor(token));
+      ParserTestHelper.assertIsUnary(comp, Not.class, new Factor(token));
 
     }
   }
 
   @Test
   public void parseNegateExpression() throws Exception {
-    Token[] tokens = new Token[]{A, D, M, one};
+    Token[] tokens = new Token[]{ParserTestHelper.A, ParserTestHelper.D, ParserTestHelper.M, ParserTestHelper.one};
     for (Token token : tokens) {
 
-      List<Node> instructions = parseInstructions(minus, token, eof);
+      List<Node> instructions = parseInstructions(
+          ParserTestHelper.minus, token, ParserTestHelper.eof);
 
       assertTrue(instructions.get(0) instanceof CInstruction);
       CInstruction cInstruction = (CInstruction) instructions.get(0);
 
       Node dest = cInstruction.getDest();
-      assertIsFactor(dest, Token.NULL);
+      ParserTestHelper.assertIsFactor(dest, Token.NULL);
 
       Node jmp = cInstruction.getJmp();
-      assertIsFactor(jmp, Token.NULL);
+      ParserTestHelper.assertIsFactor(jmp, Token.NULL);
 
       Node comp = cInstruction.getComp();
-      assertIsUnary(comp, Negate.class, new Factor(token));
+      ParserTestHelper.assertIsUnary(comp, Negate.class, new Factor(token));
     }
   }
 
   @Test
   public void parsePossibleDest() throws Exception {
-    Token[] tokens = new Token[]{A, D, M, AM, AD, MD, AMD};
+    Token[] tokens = new Token[]{ParserTestHelper.A, ParserTestHelper.D, ParserTestHelper.M, ParserTestHelper.AM, ParserTestHelper.AD, ParserTestHelper.MD, ParserTestHelper.AMD};
 
     for (Token token : tokens) {
 
-      List<Node> instructions = parseInstructions(token, assign, D, bitAnd, M, eof);
+      List<Node> instructions = parseInstructions(token, ParserTestHelper.assign, ParserTestHelper.D, ParserTestHelper.bitAnd, ParserTestHelper.M, ParserTestHelper.eof);
 
       assertTrue(instructions.get(0) instanceof CInstruction);
       CInstruction cInstruction = (CInstruction) instructions.get(0);
 
       Node dest = cInstruction.getDest();
-      assertIsFactor(dest, token);
+      ParserTestHelper.assertIsFactor(dest, token);
     }
 
-    List<Node> instructions = parseInstructions(D, bitAnd, M, eof);
+    List<Node> instructions = parseInstructions(ParserTestHelper.D, ParserTestHelper.bitAnd, ParserTestHelper.M, ParserTestHelper.eof);
 
     assertTrue(instructions.get(0) instanceof CInstruction);
     CInstruction cInstruction = (CInstruction) instructions.get(0);
 
     Node dest = cInstruction.getDest();
-    assertIsFactor(dest, Token.NULL);
+    ParserTestHelper.assertIsFactor(dest, Token.NULL);
 
   }
 
   @Test
   public void parsePossibleJmp() throws Exception {
-    Token[] tokens = new Token[]{jgt, jeq, jge, jlt, jne, jle, jmp};
+    Token[] tokens = new Token[]{ParserTestHelper.jgt, ParserTestHelper.jeq, ParserTestHelper.jge, ParserTestHelper.jlt, ParserTestHelper.jne, ParserTestHelper.jle, ParserTestHelper.jmp};
     for (Token token : tokens) {
-      List<Node> instructions = parseInstructions(D, bitAnd, M, semicolon, token, eof);
+      List<Node> instructions = parseInstructions(ParserTestHelper.D, ParserTestHelper.bitAnd, ParserTestHelper.M, ParserTestHelper.semicolon, token, ParserTestHelper.eof);
 
       assertTrue(instructions.get(0) instanceof CInstruction);
       CInstruction cInstruction = (CInstruction) instructions.get(0);
 
       Node jmp = cInstruction.getJmp();
-      assertIsFactor(jmp, token);
+      ParserTestHelper.assertIsFactor(jmp, token);
     }
   }
 
   @Test
   public void parseConstantExpression() throws Exception {
-    Token[] constants = new Token[]{zero, one, A, D, M};
+    Token[] constants = new Token[]{ParserTestHelper.zero, ParserTestHelper.one, ParserTestHelper.A, ParserTestHelper.D, ParserTestHelper.M};
     for (Token constant : constants) {
-      List<Node> instructions = parseInstructions(constant, eof);
+      List<Node> instructions = parseInstructions(constant, ParserTestHelper.eof);
 
       assertTrue(instructions.get(0) instanceof CInstruction);
       CInstruction cInstruction = (CInstruction) instructions.get(0);
 
       Node dest = cInstruction.getDest();
-      assertIsFactor(dest, Token.NULL);
+      ParserTestHelper.assertIsFactor(dest, Token.NULL);
 
       Node jmp = cInstruction.getJmp();
-      assertIsFactor(jmp, Token.NULL);
+      ParserTestHelper.assertIsFactor(jmp, Token.NULL);
 
       Node comp = cInstruction.getComp();
-      assertIsIdentityOperation(comp, new Factor(constant));
+      ParserTestHelper.assertIsIdentityOperation(comp, new Factor(constant));
     }
 
   }
@@ -262,81 +228,82 @@ public class ParserTest {
   @Test
   public void parseMinus() throws Exception {
 
-    for (Token factor2 : new Token[]{one, A, M}) {
-      List<Node> instructions = parseInstructions(D, minus, factor2, eof);
+    for (Token factor2 : new Token[]{ParserTestHelper.one, ParserTestHelper.A, ParserTestHelper.M}) {
+      List<Node> instructions = parseInstructions(ParserTestHelper.D, ParserTestHelper.minus, factor2, ParserTestHelper.eof);
 
       assertTrue(instructions.get(0) instanceof CInstruction);
       CInstruction cInstruction = (CInstruction) instructions.get(0);
 
       Node comp = cInstruction.getComp();
-      assertIsBinaryOp(comp, Minus.class, new Factor(D), new Factor(factor2));
+      ParserTestHelper.assertIsBinaryOp(comp, Minus.class, new Factor(ParserTestHelper.D), new Factor(factor2));
     }
 
-    for (Token factor1 : new Token[]{A, M}) {
+    for (Token factor1 : new Token[]{ParserTestHelper.A, ParserTestHelper.M}) {
 
-      for (Token factor2 : new Token[]{one, D}) {
-        List<Node> instructions = parseInstructions(factor1, minus, factor2, eof);
+      for (Token factor2 : new Token[]{ParserTestHelper.one, ParserTestHelper.D}) {
+        List<Node> instructions = parseInstructions(factor1, ParserTestHelper.minus, factor2, ParserTestHelper.eof);
 
         assertTrue(instructions.get(0) instanceof CInstruction);
         CInstruction cInstruction = (CInstruction) instructions.get(0);
 
         Node comp = cInstruction.getComp();
-        assertIsBinaryOp(comp, Minus.class, new Factor(factor1), new Factor(factor2));
+        ParserTestHelper.assertIsBinaryOp(comp, Minus.class, new Factor(factor1), new Factor(factor2));
       }
     }
   }
 
   @Test
   public void parsePlus() throws Exception {
-    for (Token factor1 : new Token[]{D, A, M}) {
-      List<Node> instructions = parseInstructions(factor1, plus, one, eof);
+    for (Token factor1 : new Token[]{ParserTestHelper.D, ParserTestHelper.A, ParserTestHelper.M}) {
+      List<Node> instructions = parseInstructions(factor1, ParserTestHelper.plus, ParserTestHelper.one, ParserTestHelper.eof);
 
       assertTrue(instructions.get(0) instanceof CInstruction);
       CInstruction cInstruction = (CInstruction) instructions.get(0);
 
       Node comp = cInstruction.getComp();
-      assertIsBinaryOp(comp, Plus.class, new Factor(factor1), new Factor(one));
+      ParserTestHelper.assertIsBinaryOp(comp, Plus.class, new Factor(factor1), new Factor(
+          ParserTestHelper.one));
     }
 
-    for (Token factor2 : new Token[]{A, M}) {
-      List<Node> instructions = parseInstructions(D, plus, factor2, eof);
+    for (Token factor2 : new Token[]{ParserTestHelper.A, ParserTestHelper.M}) {
+      List<Node> instructions = parseInstructions(ParserTestHelper.D, ParserTestHelper.plus, factor2, ParserTestHelper.eof);
 
       assertTrue(instructions.get(0) instanceof CInstruction);
       CInstruction cInstruction = (CInstruction) instructions.get(0);
 
       Node comp = cInstruction.getComp();
-      assertIsBinaryOp(comp, Plus.class, new Factor(D), new Factor(factor2));
+      ParserTestHelper.assertIsBinaryOp(comp, Plus.class, new Factor(ParserTestHelper.D), new Factor(factor2));
     }
   }
 
   @Test
   public void parseLogical() throws Exception {
 
-    for (Token factor2 : new Token[]{A, M}) {
-      List<Node> instructions = parseInstructions(D, bitAnd, factor2, eof);
+    for (Token factor2 : new Token[]{ParserTestHelper.A, ParserTestHelper.M}) {
+      List<Node> instructions = parseInstructions(ParserTestHelper.D, ParserTestHelper.bitAnd, factor2, ParserTestHelper.eof);
 
       assertTrue(instructions.get(0) instanceof CInstruction);
       CInstruction cInstruction = (CInstruction) instructions.get(0);
 
       Node comp = cInstruction.getComp();
-      assertIsBinaryOp(comp, BitAnd.class, new Factor(D), new Factor(factor2));
+      ParserTestHelper.assertIsBinaryOp(comp, BitAnd.class, new Factor(ParserTestHelper.D), new Factor(factor2));
     }
 
-    for (Token factor2 : new Token[]{A, M}) {
-      List<Node> instructions = parseInstructions(D, bitOr, factor2, eof);
+    for (Token factor2 : new Token[]{ParserTestHelper.A, ParserTestHelper.M}) {
+      List<Node> instructions = parseInstructions(ParserTestHelper.D, ParserTestHelper.bitOr, factor2, ParserTestHelper.eof);
 
       assertTrue(instructions.get(0) instanceof CInstruction);
       CInstruction cInstruction = (CInstruction) instructions.get(0);
 
       Node comp = cInstruction.getComp();
-      assertIsBinaryOp(comp, BitOr.class, new Factor(D), new Factor(factor2));
+      ParserTestHelper.assertIsBinaryOp(comp, BitOr.class, new Factor(ParserTestHelper.D), new Factor(factor2));
     }
   }
 
 
   @Test
   public void stopWhenEOF() throws Exception {
-    List<Node> children = parseInstructions(eof);
+    List<Node> children = parseInstructions(ParserTestHelper.eof);
     System.out.println(children);
     assertTrue(children.isEmpty());
   }
@@ -353,44 +320,4 @@ public class ParserTest {
     return instructions;
   }
 
-  private void assertIsAInstruction(Node node, Token expectedToken) {
-    assertTrue(node instanceof AInstruction);
-    AInstruction aInstruction = (AInstruction) node;
-    assertEquals(expectedToken, aInstruction.getAddress());
-  }
-
-  private void assertIsLabelDefinition(Node node, String expectedLabel) {
-    assertTrue(node instanceof LabelDefinition);
-    LabelDefinition LabelDef = (LabelDefinition) node;
-    assertEquals(expectedLabel, LabelDef.getLabel());
-  }
-
-  private void assertIsBinaryOp(
-      Node node,
-      Class<? extends BinaryOperation> binaryClass,
-      Factor expectedF1, Factor expectedF2) {
-    assertTrue(binaryClass.isInstance(node));
-    BinaryOperation binaryOperation = (BinaryOperation) node;
-    assertEquals(expectedF1, binaryOperation.getFactor1());
-    assertEquals(expectedF2, binaryOperation.getFactor2());
-  }
-
-  private void assertIsUnary(Node node, Class<? extends UnaryOperation> unaryClass,
-      Factor expectedFactor) {
-    assertTrue(unaryClass.isInstance(node));
-    UnaryOperation binaryOperation = (UnaryOperation) node;
-    assertEquals(expectedFactor, binaryOperation.getFactor());
-  }
-
-  private void assertIsIdentityOperation(Node node, Factor expectedFactor) {
-    assertTrue(node instanceof IdentityOperation);
-    IdentityOperation operation = (IdentityOperation) node;
-    assertEquals(expectedFactor, operation.getFactor());
-  }
-
-  private void assertIsFactor(Node node, Token expectedToken) {
-    assertTrue(node instanceof Factor);
-    Factor factor = (Factor) node;
-    assertEquals(expectedToken, factor.getToken());
-  }
 }

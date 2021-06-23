@@ -23,7 +23,7 @@ public class Identifier implements State {
   }
 
   public boolean isValidInsideChar(char input) {
-    return Character.isLetterOrDigit(input) || input == '_';
+    return Character.isLetterOrDigit(input) || input == '_' || input == '.' || input == '$';
   }
 
   public static boolean isValidFirstChar(char input) {

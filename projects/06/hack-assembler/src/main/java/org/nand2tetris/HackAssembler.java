@@ -18,8 +18,8 @@ import org.nand2tetris.parser.resolver.Resolver;
 
 public class HackAssembler {
 
-  private org.nand2tetris.parser.Parser parser = new Parser();
-  private Resolver resolver = new Resolver();
+  private final org.nand2tetris.parser.Parser parser = new Parser();
+  private final Resolver resolver = new Resolver();
 
   public void assemble(Path path) throws IOException {
     Reader reader = Files.newBufferedReader(path);
@@ -36,10 +36,6 @@ public class HackAssembler {
         pw.println(generator.nextCode());
       }
     }
-//    BufferedWriter bw = Files.newBufferedWriter(outputPath);
-//    PrintWriter pw = new PrintWriter(bw);
-//    pw.println("Coco");
-//    pw.flush();
   }
 
   private Path outputPath(Path path) {
@@ -56,8 +52,6 @@ public class HackAssembler {
       System.out.println("missing file path");
       System.exit(0);
     }
-
-
 
     Path path = Paths.get(args[0]);
     HackAssembler hackAssembler = new HackAssembler();

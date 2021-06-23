@@ -12,9 +12,6 @@ public class LineComment implements State {
       stateMachine.setEndToken(tokenType);
     } else {
       stateMachine.writeToToken();
-//      if (stateMachine.eof()) {
-//        stateMachine.setEndToken(TokenType.LINE_COMMENT);
-//      }
     }
 
   }

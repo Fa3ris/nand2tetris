@@ -38,7 +38,7 @@ public class CodeGenerator {
   }
 
   public boolean hasNextCode() {
-    return lit.hasNext();
+    return currentInstruction != null;
   }
 
   public String nextCode() {
@@ -415,6 +415,7 @@ public class CodeGenerator {
   }
 
   private void advanceToNextInstruction() {
+    currentInstruction = null;
     while (lit.hasNext()) {
       Node node = lit.next();
       if (node instanceof AInstruction || node instanceof CInstruction) {

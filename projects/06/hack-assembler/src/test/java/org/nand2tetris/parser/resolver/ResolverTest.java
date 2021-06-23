@@ -36,7 +36,7 @@ public class ResolverTest {
     System.out.println(ast.instructions());
 
     SymbolTable table = resolver.resolveSymbols(ast);
-    assertEquals(4, (int) table.lookup(label));
+    assertEquals(2, (int) table.lookup(label));
   }
 
   @Test
@@ -53,7 +53,7 @@ public class ResolverTest {
     System.out.println(ast.instructions());
 
     SymbolTable table = resolver.resolveSymbols(ast);
-    assertEquals(2, (int) table.lookup(label));
+    assertEquals(0, (int) table.lookup(label));
   }
 
   @Test
@@ -75,7 +75,7 @@ public class ResolverTest {
     System.out.println(ast.instructions());
 
     SymbolTable table = resolver.resolveSymbols(ast);
-    assertEquals(2, (int) table.lookup(label));
+    assertEquals(0, (int) table.lookup(label));
   }
 
   @Test
@@ -150,7 +150,7 @@ public class ResolverTest {
     System.out.println(ast.instructions());
 
     SymbolTable table = resolver.resolveSymbols(ast);
-    assertEquals(5, (int) table.lookup(label));
+    assertEquals(3, (int) table.lookup(label));
     assertEquals(16, (int) table.lookup(label2));
   }
 

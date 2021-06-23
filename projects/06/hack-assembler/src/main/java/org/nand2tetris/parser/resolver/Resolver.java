@@ -18,9 +18,11 @@ public class Resolver {
   }
 
   private void resolveLabels(AST ast, SymbolTable table) {
-    int instructionCount = 0;
+    int instructionCount = -1;
     for (Node instruction : ast.instructions()) {
-      instructionCount++;
+      if (!(instruction instanceof LabelDefinition)) {
+        instructionCount++;
+      }
       if (instruction instanceof LabelDefinition) {
         LabelDefinition definition = (LabelDefinition) instruction;
         table.addLabel(definition.getLabel(), instructionCount + 1);

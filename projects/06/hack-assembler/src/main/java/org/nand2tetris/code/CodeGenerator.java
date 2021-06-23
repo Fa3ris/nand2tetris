@@ -23,13 +23,13 @@ import org.nand2tetris.parser.UnexpectedTokenException;
 
 public class CodeGenerator {
 
-  private SymbolTable symbolTable;
-  private ListIterator<Node> lit;
+  private final SymbolTable symbolTable;
+  private final ListIterator<Node> lit;
   private Node currentInstruction;
 
-  private static int compCodeSize = 7;
-  private static int destCodeSize = 3;
-  private static int jmpCodeSize = 3;
+  private static final int compCodeSize = 7;
+  private static final int destCodeSize = 3;
+  private static final int jmpCodeSize = 3;
 
   public CodeGenerator(AST ast, SymbolTable symbolTable) {
     lit = ast.instructions().listIterator();
@@ -424,6 +424,4 @@ public class CodeGenerator {
       }
     }
   }
-
-
 }

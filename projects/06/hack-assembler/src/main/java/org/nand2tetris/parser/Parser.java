@@ -84,24 +84,6 @@ public class Parser {
     return labelDefinition;
   }
 
-  /*
-    dest = parseDest() // scan first token only and check if valid destination
-    if (dest == null) // invalid destination
-      dest = NULL_DEST_NODE
-      cmp = parseCmp() // parse as cmp expression
-    else
-        if (scanToken() == '=') // assignment present
-          readToken()
-          cmp = parseCmp() // cmp follows
-        else // no assignment - first expression is cmp
-          cmp = dest
-    if (scanToken() == ';') // jmp condition present
-      jmp = parseJmp()
-    else
-      jmp = NULL_JMP_NODE
-
-    return CInstruction(dest, comp, jmp)
-   */
   private Node parseCInstruction() {
     Factor dest = parseDest();
 
@@ -178,7 +160,6 @@ public class Parser {
     }
   }
 
-  // same as Comp
   /*
   example
   E -> T { +|- T}
@@ -186,30 +167,12 @@ public class Parser {
   F -> ID | INT | (E) | -F
 
   for Hack language
-  EBF
+  EBNF
   [ ] == optional
   { } == zero or more times
 
   E -> F { +|-|&|'|' F} | !F
   F -> 0 | 1 | A | D | M
-
-  if (scanToken == '!')
-    readToken
-    factor = parseFactor()
-    return Not(factor)
-  if (scanToken == '-')
-    readToken
-    factor = parseFactor()
-    return Negate(factor)
-  else
-    factor = parseFactor()
-    if (scanToken == binary operator)
-      operator = readToken()
-      factor2 = parseFactor()
-      return BinaryOp(operator, factor, factor2;
-    else
-      return factor
-
    */
   private Node parseComp() {
     Token scanned = tokenStream.peekToken();

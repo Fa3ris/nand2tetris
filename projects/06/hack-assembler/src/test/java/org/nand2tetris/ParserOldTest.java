@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,32 +15,32 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class ParserTest {
+public class ParserOldTest {
 
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   private final static String ADD = "Add.asm";
 
-  private Parser parser;
+  private ParserOld parserOld;
 
   private Path addPath;
 
   @Before
   public void setUp() throws Exception {
     addPath = getPathFromResource(ADD);
-    parser = new Parser();
+    parserOld = new ParserOld();
   }
 
   @After
   public void tearDown() throws Exception {
-    parser.clean();
+    parserOld.clean();
   }
 
   @Test
   public void getLines() throws Exception {
-    parser.parse(addPath);
-    List<String> lines = parser.getLines();
+    parserOld.parse(addPath);
+    List<String> lines = parserOld.getLines();
 
     assertEquals(13, lines.size());
 
@@ -56,9 +55,9 @@ public class ParserTest {
 
   @Test
   public void hasMoreCommand() throws Exception {
-    parser.parse(addPath);
-    assertTrue(parser.hasMoreCommand());
-    assertEquals("@2", parser.getCurrentLine());
+    parserOld.parse(addPath);
+    assertTrue(parserOld.hasMoreCommand());
+    assertEquals("@2", parserOld.getCurrentLine());
   }
 
   @Test
@@ -66,8 +65,8 @@ public class ParserTest {
     final File tempFile = temporaryFolder.newFile("a.txt");
     Path path = tempFile.toPath();
     Files.write(path, Collections.singleton("@2"));
-    parser.parse(path);
-    assertEquals("@2", parser.getCurrentLine());
+    parserOld.parse(path);
+    assertEquals("@2", parserOld.getCurrentLine());
   }
 
   @Test
@@ -75,8 +74,8 @@ public class ParserTest {
     final File tempFile = temporaryFolder.newFile("l.txt");
     Path path = tempFile.toPath();
     Files.write(path, Collections.singleton("(LABEL)"));
-    parser.parse(path);
-    assertEquals("(LABEL)", parser.getCurrentLine());
+    parserOld.parse(path);
+    assertEquals("(LABEL)", parserOld.getCurrentLine());
   }
 
   @Test
@@ -84,8 +83,8 @@ public class ParserTest {
     final File tempFile = temporaryFolder.newFile("c.txt");
     Path path = tempFile.toPath();
     Files.write(path, Collections.singleton("D=A"));
-    parser.parse(path);
-    assertEquals("D=A", parser.getCurrentLine());
+    parserOld.parse(path);
+    assertEquals("D=A", parserOld.getCurrentLine());
   }
 
   private Path getPathFromResource(String resourceName) throws Exception {

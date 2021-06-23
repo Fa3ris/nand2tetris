@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.util.List;
 import lombok.Getter;
 
-public class Parser {
+public class ParserOld {
 
   private Path srcPath;
 

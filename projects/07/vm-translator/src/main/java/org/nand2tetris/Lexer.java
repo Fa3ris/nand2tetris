@@ -61,8 +61,8 @@ public class Lexer {
       { State.COMMENT, State.COMMENT, State.COMMENT,  State.END,     State.COMMENT, State.END},    // COMMENT
   };
 
-  private State transition(State state, InputType input) {
-    return transitions[state.rowIndex][input.colIndex];
+  private State transition() {
+    return transitions[state.rowIndex][inputType.colIndex];
   }
 
   public Token next() throws IOException {
@@ -78,59 +78,58 @@ public class Lexer {
   private void findNextToken() throws IOException {
 
     while (true) {
-
       if (reader.eof()) { // EOF reached
         inputType = InputType.EOF;
-
-        State newState = transition(state, inputType);
-
-        switch (newState) {
-          case START: // no current token being constructed
-            token = Token.EOF;
-            return;
-          case END: // token completed
-            completeToken();
-            if (!nextTokenFound) {
-              token = Token.EOF;
-            }
-            return;
-          case ILLEGAL: // uncompleted token
-          default:
-            throw new IllegalStateException("state " + state + " input: EOF");
+        State newState = transition();
+        handleEOFState(newState);
+        if (!nextTokenFound) {
+          token = Token.EOF;
         }
-
+        return;
       } else { // next char available
-
         setInputType();
-
-        State newState = transition(state, inputType);
-
-        switch (newState) {
-          case START: // ignore white space
-            reader.read();
-            break;
-          case END:
-            completeToken();
-            if (nextTokenFound) {
-              nextTokenFound = false;
-              return;
-            } else {
-              resetToStartState();
-            }
-            break;
-          case ILLEGAL:
-            throw new IllegalStateException("state " + state + " input " + reader.peek());
-          default:
-            state = newState;
-            lexemeBuffer.append(reader.read());
+        State newState = transition();
+        handleState(newState);
+        if (nextTokenFound) {
+          nextTokenFound = false;
+          return;
         }
       }
     }
   }
 
+  private void handleEOFState(State newState) {
+    switch (newState) {
+      case START: // no current token being constructed
+        nextTokenFound = false;
+        return;
+      case END: // token completed
+        completeToken();
+        return;
+      case ILLEGAL: // uncompleted token
+      default:
+        throw new IllegalStateException("state " + state + " input: EOF");
+    }
+  }
+
+  private void handleState(State newState) throws IOException {
+    switch (newState) {
+      case START: // ignore white space
+        reader.read();
+        break;
+      case END:
+        completeToken();
+        break;
+      case ILLEGAL:
+        throw new IllegalStateException("state " + state + " input " + reader.peek());
+      default:
+        state = newState;
+        lexemeBuffer.append(reader.read());
+    }
+  }
+
   private void completeToken() {
     String lexeme = lexemeBuffer.toString();
-    System.out.println(lexeme);
     switch (state) {
       case INT:
         token = new Token(TokenType.INTEGER, lexeme);
@@ -142,10 +141,7 @@ public class Lexer {
         nextTokenFound = true;
         break;
     }
-    resetToStartState();
-  }
-
-  private void resetToStartState() {
+    // reset
     lexemeBuffer.setLength(0);
     state = State.START;
   }

@@ -16,17 +16,18 @@ M=D
 0;JMP
 @R15
 M=D
-@SP
-AM=M-1
-D=M
-A=A-1
-D=M-D
+// eq
+@SP 
+AM=M-1 // A = --SP
+D=M // D = *SP
+A=A-1 // A--
+D=M-D // D = *(SP - 1) - D
 M=0
 @END_EQ
-D;JNE
-@SP
-A=M-1
-M=-1
+D;JNE // if D = 0 finish
+@SP // else
+A=M-1 // A = SP - 1
+M=-1 // *(SP - 1) = -1
 (END_EQ)
 @R15
 A=M
@@ -158,12 +159,13 @@ D=A
 0;JMP
 (RET_ADDRESS_CALL0)
 (ball.new)
+// push constant 15
 @15
-D=A
+D=A // D = 15
 @SP
-AM=M+1
-A=A-1
-M=D
+AM=M+1 // A = ++SP
+A=A-1 // A = SP - 1
+M=D // *(SP - 1) = D
 @1
 D=A
 @R13

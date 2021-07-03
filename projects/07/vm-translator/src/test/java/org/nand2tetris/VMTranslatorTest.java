@@ -37,6 +37,36 @@ public class VMTranslatorTest {
     translate("stack/push-constant.vm");
   }
 
+  @Test
+  public void eq() throws Exception {
+    translate("relational/eq.vm");
+  }
+
+  @Test
+  public void lt() throws Exception {
+    translate("relational/lt.vm");
+  }
+
+  @Test
+  public void gt() throws Exception {
+    translate("relational/gt.vm");
+  }
+
+  @Test
+  public void and() throws Exception {
+    translate("logical/and.vm");
+  }
+
+  @Test
+  public void or() throws Exception {
+    translate("logical/or.vm");
+  }
+
+  @Test
+  public void not() throws Exception {
+    translate("logical/not.vm");
+  }
+
   private void translate(String pathStr) throws Exception {
     Path path = getPath(pathStr);
     translator.translate(path);

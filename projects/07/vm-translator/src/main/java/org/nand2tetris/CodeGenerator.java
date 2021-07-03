@@ -8,9 +8,13 @@ public class CodeGenerator {
 
   private final Lexer lexer;
 
-  private StackOpGenerator stackOpGenerator = new StackOpGenerator();
+  private final StackOpGenerator stackOpGenerator = new StackOpGenerator();
 
-  private ArithmeticOpGenerator arithmeticOpGenerator = new ArithmeticOpGenerator();
+  private final ArithmeticOpGenerator arithmeticOpGenerator = new ArithmeticOpGenerator();
+
+  private final RelationalOpGenerator relationalOpGenerator = new RelationalOpGenerator();
+
+  private final LogicalOpGenerator logicalOpGenerator = new LogicalOpGenerator();
 
   public CodeGenerator(Lexer lexer) {
     this.lexer = lexer;
@@ -33,14 +37,18 @@ public class CodeGenerator {
         return arithmeticOpGenerator.neg();
 
       case EQ:
+        return relationalOpGenerator.eq();
       case LT:
+        return relationalOpGenerator.lt();
       case GT:
-        return relationalOp();
+        return relationalOpGenerator.gt();
 
       case AND:
+        return logicalOpGenerator.and();
       case OR:
+        return logicalOpGenerator.or();
       case NOT:
-        return logicalOp();
+        return logicalOpGenerator.not();
 
       case EOF:
         return Collections.emptyList();
@@ -57,14 +65,6 @@ public class CodeGenerator {
         Token value = lexer.next();
         return stackOpGenerator.push(segment, value);
     }
-    return Collections.emptyList();
-  }
-
-  private List<String> logicalOp() {
-    return Collections.emptyList();
-  }
-
-  private List<String> relationalOp() {
     return Collections.emptyList();
   }
 

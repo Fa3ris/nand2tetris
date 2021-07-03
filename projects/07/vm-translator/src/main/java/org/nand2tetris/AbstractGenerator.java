@@ -26,6 +26,11 @@ public abstract class AbstractGenerator {
     incM("M+1"),
     decM("M-1"),
     minusM("-M"),
+    Zero("0"),
+    minusOne("-1"),
+    DAndM("D&M"),
+    DOrM("D|M"),
+    notM("!M"),
     ;
 
     final String value;
@@ -36,7 +41,9 @@ public abstract class AbstractGenerator {
   }
 
   protected enum Jmp {
-    JEQ("JEQ"),
+    JNE("JNE"),
+    JLE("JLE"),
+    JGE("JGE"),
     ;
 
     final String value;

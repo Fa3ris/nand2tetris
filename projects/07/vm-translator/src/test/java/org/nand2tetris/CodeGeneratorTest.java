@@ -2,13 +2,15 @@ package org.nand2tetris;
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class CodeGeneratorTest {
 
-  private List<String> instructions;
+  private List<String> instructions = new ArrayList<>();
 
   @Test
   public void pushConstant_size() throws Exception {
@@ -144,6 +146,17 @@ public class CodeGeneratorTest {
   }
 
   @Test
+  public void eq_eq() throws Exception {
+    generate("eq eq");
+
+    assertNthInstructionIs(7, "@EQ_END_0");
+    assertNthInstructionIs(12, "(EQ_END_0)");
+
+    assertNthInstructionIs(20, "@EQ_END_1");
+    assertNthInstructionIs(25, "(EQ_END_1)");
+  }
+
+  @Test
   public void lt_size() throws Exception {
     generate("lt");
     assertInstructionsSize(12);
@@ -164,6 +177,17 @@ public class CodeGeneratorTest {
     assertNthInstructionIs(10, "A=M-1");
     assertNthInstructionIs(11, "M=-1");
     assertNthInstructionIs(12, "(LT_END_0)");
+  }
+
+  @Test
+  public void lt_lt() throws Exception {
+    generate("lt lt");
+
+    assertNthInstructionIs(7, "@LT_END_0");
+    assertNthInstructionIs(12, "(LT_END_0)");
+
+    assertNthInstructionIs(20, "@LT_END_1");
+    assertNthInstructionIs(25, "(LT_END_1)");
   }
 
   @Test
@@ -189,6 +213,17 @@ public class CodeGeneratorTest {
     assertNthInstructionIs(12, "(GT_END_0)");
   }
 
+  @Test
+  public void gt_gt() throws Exception {
+    generate("gt gt");
+
+    assertNthInstructionIs(7, "@GT_END_0");
+    assertNthInstructionIs(12, "(GT_END_0)");
+
+    assertNthInstructionIs(20, "@GT_END_1");
+    assertNthInstructionIs(25, "(GT_END_1)");
+  }
+
   private void printInstructions() {
     for (String instruction : instructions) {
       System.out.println(instruction);
@@ -200,7 +235,10 @@ public class CodeGeneratorTest {
   }
 
   private void assertInstructionsSize(int expectedSize) {
-    Assert.assertEquals(expectedSize, instructions.size() - 1); // do not count first line comment
+    List<String> withoutLineComment = instructions.stream()
+        .filter(value -> !value.startsWith("//")) // do not count line comments
+        .collect(Collectors.toList());
+    Assert.assertEquals(expectedSize, withoutLineComment.size());
   }
 
   private void generate(String command) throws Exception {
@@ -211,7 +249,10 @@ public class CodeGeneratorTest {
     CharReader buffer = new CharReader(reader);
     Lexer lexer = new Lexer(buffer, new SymbolTable());
     CodeGenerator generator = new CodeGenerator(lexer);
-    instructions = generator.nextInstructions();
+    List<String> newInstruct;
+    while (!(newInstruct = generator.nextInstructions()).isEmpty()) {
+      instructions.addAll(newInstruct);
+    }
     printInstructions();
   }
 

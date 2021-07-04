@@ -27,7 +27,7 @@ public class CodeGenerator {
       case PUSH:
         return push();
       case POP:
-        return stackOp();
+        return pop();
 
       case ADD:
         return arithmeticOpGenerator.add();
@@ -62,14 +62,34 @@ public class CodeGenerator {
     Token segment = lexer.next();
     switch (segment.getType()) {
       case CONSTANT:
+      case LOCAL:
+      case ARGUMENT:
+      case THIS:
+      case THAT:
+      case TEMP:
+      case POINTER:
+      case STATIC:
         Token value = lexer.next();
         return stackOpGenerator.push(segment, value);
     }
-    return Collections.emptyList();
+    throw new IllegalStateException("invalid segment for push instruction " + segment);
   }
 
-  private List<String> stackOp() {
-    return Collections.emptyList();
+  private List<String> pop() throws IOException {
+    Token segment = lexer.next();
+    switch (segment.getType()) {
+      case LOCAL:
+      case ARGUMENT:
+      case THIS:
+      case THAT:
+      case TEMP:
+      case POINTER:
+      case STATIC:
+        Token value = lexer.next();
+        return stackOpGenerator.pop(segment, value);
+
+    }
+    throw new IllegalStateException("invalid segment for pop instruction " + segment);
   }
 
 }

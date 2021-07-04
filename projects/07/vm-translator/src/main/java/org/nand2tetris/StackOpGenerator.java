@@ -16,8 +16,26 @@ public class StackOpGenerator extends AbstractGenerator {
       case THAT:
         return pushSegment(segment, value);
       case TEMP:
+        return pushTemp(value);
     }
     return Collections.emptyList();
+  }
+
+  private final int tempBase = 5;
+
+  private List<String> pushTemp(Token value) {
+    int offset = Integer.parseInt(value.getLexeme());
+    String address = String.valueOf(tempBase + offset);
+
+    return Arrays.asList(
+        lineComment(String.format("push temp %s", offset)),
+        loadAddress(address) + inlineComment(String.format("A = %s + %s", tempBase, offset)),
+        destComp(Dest.D, Comp.M) + inlineComment(String.format("D = *(%s + %s)", tempBase, offset)),
+        loadSP(),
+        destComp(Dest.AM, Comp.incM) + inlineComment("A = ++SP"),
+        destComp(Dest.A, Comp.decA) + inlineComment("A = SP - 1"),
+        destComp(Dest.M, Comp.D) + inlineComment(String.format("*(SP - 1) = *(%s + %s)", tempBase, offset))
+    );
   }
 
   private List<String> pushSegment(Token segmentToken, Token value) {

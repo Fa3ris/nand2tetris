@@ -324,6 +324,26 @@ public class CodeGeneratorTest {
     assertNthInstructionIs(12, "M=D");
   }
 
+  @Test
+  public void pushTemp_size() throws Exception {
+    generate("push temp 3");
+    assertInstructionsSize(6);
+  }
+
+  @Test
+  public void pushTemp() throws Exception {
+    int value = 4;
+    generate(String.format("push temp %s", value));
+    int expectedAddress = 5 + value;
+    assertNthInstructionIs(1, "@" + expectedAddress);
+    assertNthInstructionIs(2, "D=M");
+    assertNthInstructionIs(3, "@SP");
+    assertNthInstructionIs(4, "AM=M+1");
+    assertNthInstructionIs(5, "A=A-1");
+    assertNthInstructionIs(6, "M=D");
+  }
+
+
   private void printInstructions() {
     for (String instruction : instructions) {
       System.out.println(instruction);

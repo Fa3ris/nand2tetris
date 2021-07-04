@@ -343,6 +343,24 @@ public class CodeGeneratorTest {
     assertNthInstructionIs(6, "M=D");
   }
 
+  @Test
+  public void popTemp_size() throws Exception {
+    generate("pop temp 3");
+    assertInstructionsSize(5);
+  }
+
+  @Test
+  public void popTemp() throws Exception {
+    int value = 4;
+    generate(String.format("pop temp %s", value));
+    int expectedAddress = 5 + value;
+    assertNthInstructionIs(1, "@SP");
+    assertNthInstructionIs(2, "AM=M-1");
+    assertNthInstructionIs(3, "D=M");
+    assertNthInstructionIs(4, "@" + expectedAddress);
+    assertNthInstructionIs(5, "M=D");
+  }
+
 
   private void printInstructions() {
     for (String instruction : instructions) {

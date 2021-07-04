@@ -78,6 +78,8 @@ public abstract class AbstractGenerator {
     return loadAddress("SP");
   }
 
+  protected final String loadR13() { return loadAddress("R13"); }
+
   protected final String loadLocal() {
     return loadAddress("LCL");
   }

@@ -274,6 +274,56 @@ public class CodeGeneratorTest {
     assertNthInstructionIs(9, "M=D");
   }
 
+  @Test
+  public void popSegment_size() throws Exception {
+    String[] segments = new String[]{"local", "argument", "this", "that"};
+    for (String segment : segments) {
+      generate(String.format("pop %s 86", segment));
+      assertInstructionsSize(12);
+      instructions.clear();
+    }
+  }
+
+  @Test
+  public void popSegment_offset() throws Exception {
+    String value = "22";
+    generate(String.format("pop local %s", value));
+    assertNthInstructionIs(3, "@" + value);
+  }
+
+  @Test
+  public void popSegment_Label() throws Exception {
+    Map<String, String> segmentToLabel = new HashMap<>();
+    segmentToLabel.put("local", "LCL");
+    segmentToLabel.put("argument", "ARG");
+    segmentToLabel.put("this", "THIS");
+    segmentToLabel.put("that", "THAT");
+
+    for (Entry<String, String> entry: segmentToLabel.entrySet()) {
+      generate(String.format("pop %s 10", entry.getKey()));
+      assertNthInstructionIs(1, "@" + entry.getValue());
+      instructions.clear();
+    }
+  }
+
+  @Test
+  public void popSegment() throws Exception {
+    String value = "99";
+    generate(String.format("pop local %s", value));
+    assertNthInstructionIs(1, "@LCL");
+    assertNthInstructionIs(2, "D=M");
+    assertNthInstructionIs(3, "@" + value);
+    assertNthInstructionIs(4, "D=D+A");
+    assertNthInstructionIs(5, "@R13");
+    assertNthInstructionIs(6, "M=D");
+    assertNthInstructionIs(7, "@SP");
+    assertNthInstructionIs(8, "AM=M-1");
+    assertNthInstructionIs(9, "D=M");
+    assertNthInstructionIs(10, "@R13");
+    assertNthInstructionIs(11, "A=M");
+    assertNthInstructionIs(12, "M=D");
+  }
+
   private void printInstructions() {
     for (String instruction : instructions) {
       System.out.println(instruction);

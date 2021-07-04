@@ -31,6 +31,7 @@ public abstract class AbstractGenerator {
     DAndM("D&M"),
     DOrM("D|M"),
     notM("!M"),
+    DPlusA("D+A"),
     ;
 
     final String value;

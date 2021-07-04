@@ -3,7 +3,10 @@ package org.nand2tetris;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
@@ -222,6 +225,53 @@ public class CodeGeneratorTest {
 
     assertNthInstructionIs(20, "@GT_END_1");
     assertNthInstructionIs(25, "(GT_END_1)");
+  }
+
+  @Test
+  public void pushSegment_size() throws Exception {
+    String[] segments = new String[]{"local", "argument", "this", "that"};
+    for (String segment : segments) {
+      generate(String.format("push %s 10", segment));
+      assertInstructionsSize(9);
+      instructions.clear();
+    }
+  }
+
+  @Test
+  public void pushSegment_Label() throws Exception {
+    Map<String, String> segmentToLabel = new HashMap<>();
+    segmentToLabel.put("local", "LCL");
+    segmentToLabel.put("argument", "ARG");
+    segmentToLabel.put("this", "THIS");
+    segmentToLabel.put("that", "THAT");
+
+    for (Entry<String, String> entry: segmentToLabel.entrySet()) {
+      generate(String.format("push %s 10", entry.getKey()));
+      assertNthInstructionIs(1, "@" + entry.getValue());
+      instructions.clear();
+    }
+  }
+
+  @Test
+  public void pushSegment_offset() throws Exception {
+    String value = "22";
+    generate(String.format("push local %s", value));
+    assertNthInstructionIs(3, "@" + value);
+  }
+
+  @Test
+  public void pushSegment() throws Exception {
+    String value = "99";
+    generate(String.format("push local %s", value));
+    assertNthInstructionIs(1, "@LCL");
+    assertNthInstructionIs(2, "D=M");
+    assertNthInstructionIs(3, "@" + value);
+    assertNthInstructionIs(4, "A=D+A");
+    assertNthInstructionIs(5, "D=M");
+    assertNthInstructionIs(6, "@SP");
+    assertNthInstructionIs(7, "AM=M+1");
+    assertNthInstructionIs(8, "A=A-1");
+    assertNthInstructionIs(9, "M=D");
   }
 
   private void printInstructions() {

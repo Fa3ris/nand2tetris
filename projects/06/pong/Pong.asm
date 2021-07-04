@@ -230,15 +230,16 @@ D=M
 @R13
 A=M
 M=D
+// push argument 3
 @ARG
-D=M
+D=M // D = ARG
 @3
-A=D+A
-D=M
+A=D+A // A = ARG + 3
+D=M // D = *(ARG + 3)
 @SP
-AM=M+1
-A=A-1
-M=D
+AM=M+1 // A = ++SP
+A=A-1 // A = SP - 1
+M=D // *(SP - 1) = *(ARG + 3)
 @6
 D=A
 @SP
@@ -1853,18 +1854,19 @@ D=A
 AM=M+1
 A=A-1
 M=D
+// pop this 14
 @THIS
 D=M
 @14
 D=D+A
 @R13
-M=D
+M=D // R13 = THIS + 14
 @SP
-AM=M-1
-D=M
+AM=M-1 // A = --SP
+D=M // D = *SP
 @R13
 A=M
-M=D
+M=D // *(THIS + 14) = *SP
 @THIS
 D=M
 @13

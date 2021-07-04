@@ -83,8 +83,24 @@ public class StackOpGenerator extends AbstractGenerator {
       case THIS:
       case THAT:
         return popSegment(segment, value);
+      case TEMP:
+        return popTemp(value);
     }
     return Collections.emptyList();
+  }
+
+  private List<String> popTemp(Token value) {
+    int offset = Integer.parseInt(value.getLexeme());
+    String address = String.valueOf(tempBase + offset);
+
+    return Arrays.asList(
+        lineComment(String.format("pop temp %s", offset)),
+        loadSP(),
+        destComp(Dest.AM, Comp.decM) + inlineComment("A = --SP"),
+        destComp(Dest.D, Comp.M) + inlineComment("D = *SP"),
+        loadAddress(address) + inlineComment(String.format("A = %s + %s", tempBase, offset)),
+        destComp(Dest.M, Comp.D) + inlineComment(String.format("*(%s + %s) = *SP", tempBase, offset))
+    );
   }
 
   private List<String> popSegment(Token segmentToken, Token value) {

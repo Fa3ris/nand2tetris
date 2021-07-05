@@ -142,8 +142,23 @@ public class StackOpGenerator extends AbstractGenerator {
         return popTemp(value);
       case POINTER:
         return popPointer(value);
+      case STATIC:
+        return popStatic(value);
     }
     return Collections.emptyList();
+  }
+
+  private List<String> popStatic(Token value) {
+    String label = staticLabel(value);
+
+    return Arrays.asList(
+        lineComment(String.format("pop pointer %s", value.getLexeme())),
+        loadSP(),
+        destComp(Dest.AM, Comp.decM) + inlineComment("A = --SP"),
+        destComp(Dest.D, Comp.M) + inlineComment("D = *SP"),
+        loadAddress(label),
+        destComp(Dest.M, Comp.D) + inlineComment(String.format("%s = *SP", label))
+    );
   }
 
   private List<String> popPointer(Token value) {

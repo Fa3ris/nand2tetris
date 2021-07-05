@@ -361,6 +361,35 @@ public class CodeGeneratorTest {
     assertNthInstructionIs(5, "M=D");
   }
 
+  @Test
+  public void pushPointer_size() throws Exception {
+    generate("push pointer 0");
+    assertInstructionsSize(6);
+  }
+
+  @Test
+  public void pushPointer_label() throws Exception {
+    Map<String, String> segmentToLabel = new HashMap<>();
+    segmentToLabel.put("0", "THIS");
+    segmentToLabel.put("1", "THAT");
+
+    for (Entry<String, String> entry: segmentToLabel.entrySet()) {
+      generate(String.format("push pointer %s", entry.getKey()));
+      assertNthInstructionIs(1, "@" + entry.getValue());
+      instructions.clear();
+    }
+  }
+
+  @Test
+  public void pushPointer() throws Exception {
+    generate("push pointer 0");
+    assertNthInstructionIs(1, "@THIS");
+    assertNthInstructionIs(2, "D=M");
+    assertNthInstructionIs(3, "@SP");
+    assertNthInstructionIs(4, "AM=M+1");
+    assertNthInstructionIs(5, "A=A-1");
+    assertNthInstructionIs(6, "M=D");
+  }
 
   private void printInstructions() {
     for (String instruction : instructions) {

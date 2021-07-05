@@ -6,6 +6,8 @@ import java.util.List;
 
 public class StackOpGenerator extends AbstractGenerator {
 
+  private final int tempBase = 5;
+
   public List<String> push(Token segment, Token value) {
     switch (segment.getType()) {
       case CONSTANT:
@@ -17,11 +19,40 @@ public class StackOpGenerator extends AbstractGenerator {
         return pushSegment(segment, value);
       case TEMP:
         return pushTemp(value);
+      case POINTER:
+        return pushPointer(value);
     }
     return Collections.emptyList();
   }
 
-  private final int tempBase = 5;
+  private List<String> pushPointer(Token value) {
+    String label = pointerLabel(value);
+
+    return Arrays.asList(
+        lineComment(String.format("push pointer %s", value.getLexeme())),
+        loadAddress(label),
+        destComp(Dest.D, Comp.M) + inlineComment("D = " + label),
+        loadSP(),
+        destComp(Dest.AM, Comp.incM) + inlineComment("A = ++SP"),
+        destComp(Dest.A, Comp.decA) + inlineComment("A = SP - 1"),
+        destComp(Dest.M, Comp.D) + inlineComment(String.format("*(SP - 1) = %s", label))
+    );
+  }
+
+  private String pointerLabel(Token value) {
+    String label;
+    switch (value.getLexeme()) {
+      case "0":
+        label = "THIS";
+        break;
+      case "1":
+        label = "THAT";
+        break;
+      default:
+        throw new IllegalArgumentException("cannot resolve as pointer label " + value);
+    }
+    return label;
+  }
 
   private List<String> pushTemp(Token value) {
     int offset = Integer.parseInt(value.getLexeme());

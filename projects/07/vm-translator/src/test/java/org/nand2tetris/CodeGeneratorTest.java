@@ -391,6 +391,35 @@ public class CodeGeneratorTest {
     assertNthInstructionIs(6, "M=D");
   }
 
+  @Test
+  public void popPointer_size() throws Exception {
+    generate("pop pointer 0");
+    assertInstructionsSize(5);
+  }
+
+  @Test
+  public void popPointer_label() throws Exception {
+    Map<String, String> segmentToLabel = new HashMap<>();
+    segmentToLabel.put("0", "THIS");
+    segmentToLabel.put("1", "THAT");
+
+    for (Entry<String, String> entry: segmentToLabel.entrySet()) {
+      generate(String.format("pop pointer %s", entry.getKey()));
+      assertNthInstructionIs(4, "@" + entry.getValue());
+      instructions.clear();
+    }
+  }
+
+  @Test
+  public void popPointer() throws Exception {
+    generate("pop pointer 0");
+    assertNthInstructionIs(1, "@SP");
+    assertNthInstructionIs(2, "AM=M-1");
+    assertNthInstructionIs(3, "D=M");
+    assertNthInstructionIs(4, "@THIS");
+    assertNthInstructionIs(5, "M=D");
+  }
+
   private void printInstructions() {
     for (String instruction : instructions) {
       System.out.println(instruction);

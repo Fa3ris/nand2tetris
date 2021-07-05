@@ -3,10 +3,14 @@ package org.nand2tetris;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import lombok.Setter;
 
 public class StackOpGenerator extends AbstractGenerator {
 
   private final int tempBase = 5;
+
+  @Setter
+  private String baseName = "DEFAULT";
 
   public List<String> push(Token segment, Token value) {
     switch (segment.getType()) {
@@ -21,8 +25,28 @@ public class StackOpGenerator extends AbstractGenerator {
         return pushTemp(value);
       case POINTER:
         return pushPointer(value);
+      case STATIC:
+        return pushStatic(value);
     }
     return Collections.emptyList();
+  }
+
+  private List<String> pushStatic(Token value) {
+    String label = staticLabel(value);
+
+    return Arrays.asList(
+        lineComment(String.format("push static %s", value.getLexeme())),
+        loadAddress(label),
+        destComp(Dest.D, Comp.M) + inlineComment("D = " + label),
+        loadSP(),
+        destComp(Dest.AM, Comp.incM) + inlineComment("A = ++SP"),
+        destComp(Dest.A, Comp.decA) + inlineComment("A = SP - 1"),
+        destComp(Dest.M, Comp.D) + inlineComment(String.format("*(SP - 1) = %s", label))
+    );
+  }
+
+  private String staticLabel(Token value) {
+    return String.format("%s.%s", baseName, value.getLexeme());
   }
 
   private List<String> pushPointer(Token value) {

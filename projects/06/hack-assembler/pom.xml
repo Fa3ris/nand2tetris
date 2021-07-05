@@ -6,7 +6,7 @@
 
   <groupId>org.nand2tetris</groupId>
   <artifactId>hack-assembler</artifactId>
-  <version>1.0</version>
+  <version>1.1-SNAPSHOT</version>
 
   <name>hack-assembler</name>
   <!-- FIXME change it to the project's website -->

@@ -446,6 +446,29 @@ public class CodeGeneratorTest {
     assertNthInstructionIs(6, "M=D");
   }
 
+  @Test
+  public void popStatic_size() throws Exception {
+    generate("pop static 0");
+    assertInstructionsSize(5);
+  }
+
+  @Test
+  public void popStatic_label() throws Exception {
+    String fileName = "Foo";
+    String value = "0";
+    generate("pop static " + value, fileName);
+    assertNthInstructionIs(4, String.format("@%s.%s", fileName, value));
+  }
+
+  @Test
+  public void popStatic() throws Exception {
+    generate("pop static 10", "Baz");
+    assertNthInstructionIs(1, "@SP");
+    assertNthInstructionIs(2, "AM=M-1");
+    assertNthInstructionIs(3, "D=M");
+    assertNthInstructionIs(4, "@Baz.10");
+    assertNthInstructionIs(5, "M=D");
+  }
 
   private void printInstructions() {
     for (String instruction : instructions) {

@@ -1,5 +1,6 @@
 package org.nand2tetris;
 
+import com.sun.org.apache.bcel.internal.classfile.Code;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -420,6 +421,32 @@ public class CodeGeneratorTest {
     assertNthInstructionIs(5, "M=D");
   }
 
+  @Test
+  public void pushStatic_size() throws Exception {
+    generate("push static 0");
+    assertInstructionsSize(6);
+  }
+
+  @Test
+  public void pushStatic_label() throws Exception {
+    String fileName = "Foo";
+    String value = "0";
+    generate("push static " + value, fileName);
+    assertNthInstructionIs(1, String.format("@%s.%s", fileName, value));
+  }
+
+  @Test
+  public void pushStatic() throws Exception {
+    generate("push static 1", "Bar");
+    assertNthInstructionIs(1, "@Bar.1");
+    assertNthInstructionIs(2, "D=M");
+    assertNthInstructionIs(3, "@SP");
+    assertNthInstructionIs(4, "AM=M+1");
+    assertNthInstructionIs(5, "A=A-1");
+    assertNthInstructionIs(6, "M=D");
+  }
+
+
   private void printInstructions() {
     for (String instruction : instructions) {
       System.out.println(instruction);
@@ -438,18 +465,28 @@ public class CodeGeneratorTest {
   }
 
   private void generate(String command) throws Exception {
-    generate(new StringReader(command));
+    CodeGenerator generator = generator(new StringReader(command));
+    generateInstructions(generator);
   }
 
-  private void generate(Reader reader) throws Exception {
+  private void generate(String command, String staticFileName) throws Exception {
+    CodeGenerator generator = generator(new StringReader(command));
+    generator.setBaseName(staticFileName);
+    generateInstructions(generator);
+  }
+
+  private CodeGenerator generator(Reader reader) throws Exception {
     CharReader buffer = new CharReader(reader);
     Lexer lexer = new Lexer(buffer, new SymbolTable());
     CodeGenerator generator = new CodeGenerator(lexer);
+    return generator;
+  }
+
+  private void generateInstructions(CodeGenerator generator) throws Exception {
     List<String> newInstruct;
     while (!(newInstruct = generator.nextInstructions()).isEmpty()) {
       instructions.addAll(newInstruct);
     }
     printInstructions();
   }
-
 }

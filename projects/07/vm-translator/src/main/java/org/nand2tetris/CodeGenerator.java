@@ -20,6 +20,10 @@ public class CodeGenerator {
     this.lexer = lexer;
   }
 
+  public void setBaseName(String baseName) {
+    stackOpGenerator.setBaseName(baseName);
+  }
+
   public List<String> nextInstructions() throws IOException {
     Token next = lexer.next();
 

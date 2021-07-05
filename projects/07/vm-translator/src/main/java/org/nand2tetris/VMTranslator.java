@@ -16,6 +16,7 @@ public class VMTranslator {
     CharReader buffer = new CharReader(reader);
     Lexer lexer = new Lexer(buffer, new SymbolTable());
     CodeGenerator generator = new CodeGenerator(lexer);
+    generator.setBaseName(fileBaseName(path));
 
     Path outputPath = outputPath(path);
     try (BufferedWriter bw = Files.newBufferedWriter(outputPath);
@@ -31,12 +32,16 @@ public class VMTranslator {
   }
 
   private Path outputPath(Path path) {
-    String fileName = path.getFileName().toString();
-    int lastDot = fileName.lastIndexOf(".");
-    String outputFile = fileName.substring(0, lastDot) + ".asm";
+    String outputFile = fileBaseName(path) + ".asm";
     Path outPath = path.getParent().resolve(outputFile);
     System.out.println(outPath.toAbsolutePath());
     return outPath;
+  }
+
+  private String fileBaseName(Path path) {
+    String fileName = path.getFileName().toString();
+    int lastDot = fileName.lastIndexOf(".");
+    return fileName.substring(0, lastDot);
   }
 
   public static void main(String[] args) throws IOException {

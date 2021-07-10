@@ -10,7 +10,8 @@ public class Lexer {
     SLASH(2),
     EOL(3), // end of line
     WS(4), // white space except EOL
-    EOF(5);
+    ID_SPECIAL_CHAR(5),
+    EOF(6);
 
     final int colIndex;
     InputType(int colIndex) {
@@ -53,12 +54,12 @@ public class Lexer {
   private final StringBuffer lexemeBuffer = new StringBuffer();
 
   private final State[][] transitions = {
-      // CHAR          DIGIT          SLASH           EOL            WS             EOF
-      { State.ID,      State.INT,     State.SLASH,    State.START,   State.START,   State.START }, // START
-      { State.ID,      State.ILLEGAL, State.ILLEGAL,  State.END,     State.END,     State.END },   // ID
-      { State.ILLEGAL, State.INT,     State.END,      State.END,     State.END,     State.END },   // INT
-      { State.ILLEGAL, State.ILLEGAL, State.COMMENT,  State.ILLEGAL, State.ILLEGAL, State.ILLEGAL},// SLASH
-      { State.COMMENT, State.COMMENT, State.COMMENT,  State.END,     State.COMMENT, State.END},    // COMMENT
+      // CHAR          DIGIT          SLASH           EOL            WS             ID_SPECIAL_CHAR    EOF
+      { State.ID,      State.INT,     State.SLASH,    State.START,   State.START,   State.ID,          State.START }, // START
+      { State.ID,      State.ILLEGAL, State.ILLEGAL,  State.END,     State.END,     State.ID,          State.END },   // ID
+      { State.ILLEGAL, State.INT,     State.END,      State.END,     State.END,     State.ILLEGAL,     State.END },   // INT
+      { State.ILLEGAL, State.ILLEGAL, State.COMMENT,  State.ILLEGAL, State.ILLEGAL, State.ILLEGAL,     State.ILLEGAL},// SLASH
+      { State.COMMENT, State.COMMENT, State.COMMENT,  State.END,     State.COMMENT, State.COMMENT,     State.END},    // COMMENT
   };
 
   private State transition() {
@@ -137,7 +138,11 @@ public class Lexer {
         break;
       case ID:
         TokenType tokenType = symbolTable.lookup(lexeme);
-        token = Token.get(tokenType);
+        if (tokenType == TokenType.IDENTIFIER) {
+          token = new Token(tokenType, lexeme);
+        } else {
+          token = Token.get(tokenType);
+        }
         nextTokenFound = true;
         break;
     }
@@ -165,10 +170,16 @@ public class Lexer {
         inputType = InputType.WS;
       } else if (input == '/') {
         inputType = InputType.SLASH;
+      } else if (isValidIdSpecChar(input)) {
+        inputType = InputType.ID_SPECIAL_CHAR;
       } else {
         throw new IllegalArgumentException(String.valueOf(input));
       }
     }
+  }
+
+  private boolean isValidIdSpecChar(char input) {
+    return input == '_';
   }
 
 }

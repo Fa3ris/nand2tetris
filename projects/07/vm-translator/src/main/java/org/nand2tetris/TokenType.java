@@ -28,5 +28,8 @@ public enum TokenType {
   THIS,
   THAT,
   POINTER,
-  TEMP
+  TEMP,
+
+  LABEL_DEFINITION,
+  IDENTIFIER,
 }

@@ -38,10 +38,16 @@ public class SymbolTable {
     table.put("temp", TokenType.TEMP);
     table.put("pointer", TokenType.POINTER);
     table.put("constant", TokenType.CONSTANT);
+
+    table.put("label", TokenType.LABEL_DEFINITION);
   }
 
   public TokenType lookup(String identifier) {
-    return table.get(identifier);
+    TokenType type = table.get(identifier);
+    if (type == null) {
+      type = TokenType.IDENTIFIER;
+    }
+    return type;
   }
 
 }

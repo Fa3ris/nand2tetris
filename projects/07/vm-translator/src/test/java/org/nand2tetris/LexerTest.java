@@ -102,4 +102,21 @@ public class LexerTest {
     assertEquals(eof, lexer.next());
   }
 
+  @Test
+  public void labelDeclaration() throws Exception {
+
+    SymbolTable table = new SymbolTable();
+    Reader r = new StringReader("label LOOP_START");
+    CharReader reader = new CharReader(r);
+    Lexer lexer = new Lexer(reader, table);
+
+    Token label = new Token(TokenType.LABEL_DEFINITION, "LABEL");
+    Token labelName = new Token(TokenType.IDENTIFIER, "LOOP_START");
+    Token eof = new Token(TokenType.EOF, "EOF");
+
+    assertEquals(label, lexer.next());
+    assertEquals(labelName, lexer.next());
+    assertEquals(eof, lexer.next());
+  }
+
 }

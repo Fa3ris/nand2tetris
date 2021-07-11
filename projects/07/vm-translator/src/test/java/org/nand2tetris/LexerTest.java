@@ -136,4 +136,20 @@ public class LexerTest {
     assertEquals(eof, lexer.next());
   }
 
+  @Test
+  public void ifGoto() throws Exception {
+    SymbolTable table = new SymbolTable();
+    Reader r = new StringReader("if-goto LOOP_START");
+    CharReader reader = new CharReader(r);
+    Lexer lexer = new Lexer(reader, table);
+
+    Token goTo = new Token(TokenType.IF_GOTO, "IF-GOTO");
+    Token labelName = new Token(TokenType.IDENTIFIER, "LOOP_START");
+    Token eof = new Token(TokenType.EOF, "EOF");
+
+    assertEquals(goTo, lexer.next());
+    assertEquals(labelName, lexer.next());
+    assertEquals(eof, lexer.next());
+  }
+
 }

@@ -41,6 +41,7 @@ public class SymbolTable {
 
     table.put("label", TokenType.LABEL_DEFINITION);
     table.put("goto", TokenType.GOTO);
+    table.put("if-goto", TokenType.IF_GOTO);
   }
 
   public TokenType lookup(String identifier) {

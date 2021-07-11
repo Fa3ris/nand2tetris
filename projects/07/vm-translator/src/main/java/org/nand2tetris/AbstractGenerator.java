@@ -45,6 +45,7 @@ public abstract class AbstractGenerator {
     JNE("JNE"),
     JLE("JLE"),
     JGE("JGE"),
+    JMP("JMP"),
     ;
 
     final String value;

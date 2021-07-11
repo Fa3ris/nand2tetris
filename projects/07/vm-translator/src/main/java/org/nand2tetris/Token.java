@@ -37,6 +37,7 @@ public class Token {
   private final static Token CONSTANT = new Token(TokenType.CONSTANT, "CONSTANT");
 
   private final static Token LABEL = new Token(TokenType.LABEL_DEFINITION, "LABEL");
+  private final static Token GOTO = new Token(TokenType.GOTO, "GOTO");
 
   private static final Map<TokenType, Token> table = new HashMap<>();
 
@@ -66,6 +67,7 @@ public class Token {
     table.put(TokenType.POINTER, POINTER);
     table.put(TokenType.TEMP, TEMP);
     table.put(TokenType.LABEL_DEFINITION, LABEL);
+    table.put(TokenType.GOTO, GOTO);
   }
 
   public static Token get(TokenType type) {

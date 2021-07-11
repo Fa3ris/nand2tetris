@@ -119,4 +119,21 @@ public class LexerTest {
     assertEquals(eof, lexer.next());
   }
 
+  @Test
+  public void goTo() throws Exception {
+
+    SymbolTable table = new SymbolTable();
+    Reader r = new StringReader("goto MAIN_LOOP_START");
+    CharReader reader = new CharReader(r);
+    Lexer lexer = new Lexer(reader, table);
+
+    Token goTo = new Token(TokenType.GOTO, "GOTO");
+    Token labelName = new Token(TokenType.IDENTIFIER, "MAIN_LOOP_START");
+    Token eof = new Token(TokenType.EOF, "EOF");
+
+    assertEquals(goTo, lexer.next());
+    assertEquals(labelName, lexer.next());
+    assertEquals(eof, lexer.next());
+  }
+
 }

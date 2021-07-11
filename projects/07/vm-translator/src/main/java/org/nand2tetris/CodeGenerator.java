@@ -16,6 +16,8 @@ public class CodeGenerator {
 
   private final LogicalOpGenerator logicalOpGenerator = new LogicalOpGenerator();
 
+  private final BranchingOpGenerator branchingOpGenerator = new BranchingOpGenerator();
+
   public CodeGenerator(Lexer lexer) {
     this.lexer = lexer;
   }
@@ -53,6 +55,9 @@ public class CodeGenerator {
         return logicalOpGenerator.or();
       case NOT:
         return logicalOpGenerator.not();
+      case LABEL_DEFINITION:
+        Token labelNameToken = lexer.next();
+        return branchingOpGenerator.label(labelNameToken);
 
       case EOF:
         return Collections.emptyList();

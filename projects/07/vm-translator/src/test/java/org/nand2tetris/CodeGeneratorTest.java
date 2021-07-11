@@ -469,6 +469,19 @@ public class CodeGeneratorTest {
     assertNthInstructionIs(5, "M=D");
   }
 
+  @Test
+  public void label_size() throws Exception {
+    generate("label FOO");
+    assertInstructionsSize(1);
+  }
+
+  @Test
+  public void label() throws Exception {
+    String label = "BAR";
+    generate("label " + label);
+    assertNthInstructionIs(1, "(" + label + ")");
+  }
+
   private void printInstructions() {
     for (String instruction : instructions) {
       System.out.println(instruction);

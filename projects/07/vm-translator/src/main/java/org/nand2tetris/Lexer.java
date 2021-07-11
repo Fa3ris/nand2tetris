@@ -179,7 +179,7 @@ public class Lexer {
   }
 
   private boolean isValidIdSpecChar(char input) {
-    return input == '_';
+    return input == '_' || input == '-';
   }
 
 }

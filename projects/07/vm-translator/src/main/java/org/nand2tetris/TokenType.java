@@ -34,4 +34,5 @@ public enum TokenType {
   IDENTIFIER,
 
   GOTO,
+  IF_GOTO,
 }

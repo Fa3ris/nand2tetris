@@ -496,6 +496,23 @@ public class CodeGeneratorTest {
     assertNthInstructionIs(2, "0;JMP");
   }
 
+  @Test
+  public void if_goto_size() throws Exception {
+    generate("if-goto LOOP_START");
+    assertInstructionsSize(5);
+  }
+
+  @Test
+  public void if_goto() throws Exception {
+    String label = "BAR";
+    generate("if-goto " + label);
+    assertNthInstructionIs(1, "@SP");
+    assertNthInstructionIs(2, "AM=M-1");
+    assertNthInstructionIs(3, "D=M");
+    assertNthInstructionIs(4, "@" + label);
+    assertNthInstructionIs(5, "D;JNE");
+  }
+
   private void printInstructions() {
     for (String instruction : instructions) {
       System.out.println(instruction);

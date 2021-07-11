@@ -22,4 +22,16 @@ public class BranchingOpGenerator extends AbstractGenerator {
         compJmp(Comp.Zero, Jmp.JMP) + inlineComment("jump to " + label)
     ));
   }
+
+  public List<String> IfGoto(Token labelToken) {
+    String label = labelToken.getLexeme();
+    return Collections.unmodifiableList(Arrays.asList(
+        lineComment("if-goto " + label),
+        loadSP(),
+        destComp(Dest.AM, Comp.decM) + inlineComment("A = --SP"),
+        destComp(Dest.D, Comp.M) + inlineComment("D = *SP"),
+        loadAddress(label),
+        compJmp(Comp.D, Jmp.JNE) + inlineComment("if D then jump to " + label)
+    ));
+  }
 }

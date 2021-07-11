@@ -64,6 +64,12 @@ public class CodeGenerator {
         return branchingOpGenerator.goTo(labelNameToken);
       }
 
+      case IF_GOTO: {
+        Token labelNameToken = lexer.next();
+        return branchingOpGenerator.IfGoto(labelNameToken);
+      }
+
+
       case EOF:
         return Collections.emptyList();
 

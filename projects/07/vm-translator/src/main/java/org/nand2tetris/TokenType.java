@@ -32,4 +32,6 @@ public enum TokenType {
 
   LABEL_DEFINITION,
   IDENTIFIER,
+
+  GOTO,
 }

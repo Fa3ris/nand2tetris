@@ -55,9 +55,14 @@ public class CodeGenerator {
         return logicalOpGenerator.or();
       case NOT:
         return logicalOpGenerator.not();
-      case LABEL_DEFINITION:
+      case LABEL_DEFINITION: {
         Token labelNameToken = lexer.next();
         return branchingOpGenerator.label(labelNameToken);
+      }
+      case GOTO: {
+        Token labelNameToken = lexer.next();
+        return branchingOpGenerator.goTo(labelNameToken);
+      }
 
       case EOF:
         return Collections.emptyList();

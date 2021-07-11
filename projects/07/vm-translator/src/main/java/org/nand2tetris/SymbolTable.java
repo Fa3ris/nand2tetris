@@ -40,6 +40,7 @@ public class SymbolTable {
     table.put("constant", TokenType.CONSTANT);
 
     table.put("label", TokenType.LABEL_DEFINITION);
+    table.put("goto", TokenType.GOTO);
   }
 
   public TokenType lookup(String identifier) {

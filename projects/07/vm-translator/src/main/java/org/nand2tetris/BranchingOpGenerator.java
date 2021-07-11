@@ -13,4 +13,13 @@ public class BranchingOpGenerator extends AbstractGenerator {
         defineLabel(label)
     ));
   }
+
+  public List<String> goTo(Token labelToken) {
+    String label = labelToken.getLexeme();
+    return Collections.unmodifiableList(Arrays.asList(
+        lineComment("goto " + label),
+        loadAddress(label),
+        compJmp(Comp.Zero, Jmp.JMP) + inlineComment("jump to " + label)
+    ));
+  }
 }

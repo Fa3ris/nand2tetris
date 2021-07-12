@@ -35,4 +35,8 @@ public enum TokenType {
 
   GOTO,
   IF_GOTO,
+
+  RETURN,
+  FUNCTION,
+  CALL,
 }

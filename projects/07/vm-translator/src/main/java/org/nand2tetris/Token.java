@@ -40,6 +40,10 @@ public class Token {
   private final static Token GOTO = new Token(TokenType.GOTO, "GOTO");
   private final static Token IF_GOTO = new Token(TokenType.IF_GOTO, "IF-GOTO");
 
+  private final static Token RETURN = new Token(TokenType.RETURN, "RETURN");
+  private final static Token FUNCTION = new Token(TokenType.FUNCTION, "FUNCTION");
+  private final static Token CALL = new Token(TokenType.CALL, "CALL");
+
   private static final Map<TokenType, Token> table = new HashMap<>();
 
   static {
@@ -70,6 +74,9 @@ public class Token {
     table.put(TokenType.LABEL_DEFINITION, LABEL);
     table.put(TokenType.GOTO, GOTO);
     table.put(TokenType.IF_GOTO, IF_GOTO);
+    table.put(TokenType.RETURN, RETURN);
+    table.put(TokenType.FUNCTION, FUNCTION);
+    table.put(TokenType.CALL, CALL);
   }
 
   public static Token get(TokenType type) {

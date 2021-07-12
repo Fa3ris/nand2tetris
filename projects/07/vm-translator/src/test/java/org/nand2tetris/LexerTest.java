@@ -143,13 +143,64 @@ public class LexerTest {
     CharReader reader = new CharReader(r);
     Lexer lexer = new Lexer(reader, table);
 
-    Token goTo = new Token(TokenType.IF_GOTO, "IF-GOTO");
+    Token ifGoTo = new Token(TokenType.IF_GOTO, "IF-GOTO");
     Token labelName = new Token(TokenType.IDENTIFIER, "LOOP_START");
     Token eof = new Token(TokenType.EOF, "EOF");
 
-    assertEquals(goTo, lexer.next());
+    assertEquals(ifGoTo, lexer.next());
     assertEquals(labelName, lexer.next());
     assertEquals(eof, lexer.next());
   }
+
+  @Test
+  public void returnCommand() throws Exception {
+    SymbolTable table = new SymbolTable();
+    Reader r = new StringReader("return");
+    CharReader reader = new CharReader(r);
+    Lexer lexer = new Lexer(reader, table);
+
+    Token returnToken = new Token(TokenType.RETURN, "RETURN");
+    Token eof = new Token(TokenType.EOF, "EOF");
+
+    assertEquals(returnToken, lexer.next());
+    assertEquals(eof, lexer.next());
+  }
+
+  @Test
+  public void functionCommand() throws Exception {
+    SymbolTable table = new SymbolTable();
+    Reader r = new StringReader("function SimpleFunction.test 2");
+    CharReader reader = new CharReader(r);
+    Lexer lexer = new Lexer(reader, table);
+
+    Token function = new Token(TokenType.FUNCTION, "FUNCTION");
+    Token label = new Token(TokenType.IDENTIFIER, "SimpleFunction.test");
+    Token nVars = new Token(TokenType.INTEGER, "2");
+    Token eof = new Token(TokenType.EOF, "EOF");
+
+    assertEquals(function, lexer.next());
+    assertEquals(label, lexer.next());
+    assertEquals(nVars, lexer.next());
+    assertEquals(eof, lexer.next());
+  }
+
+  @Test
+  public void call() throws Exception {
+    SymbolTable table = new SymbolTable();
+    Reader r = new StringReader("call Main.fibonacci 1");
+    CharReader reader = new CharReader(r);
+    Lexer lexer = new Lexer(reader, table);
+
+    Token callToken = new Token(TokenType.CALL, "CALL");
+    Token label = new Token(TokenType.IDENTIFIER, "Main.fibonacci");
+    Token nArgs = new Token(TokenType.INTEGER, "1");
+    Token eof = new Token(TokenType.EOF, "EOF");
+
+    assertEquals(callToken, lexer.next());
+    assertEquals(label, lexer.next());
+    assertEquals(nArgs, lexer.next());
+    assertEquals(eof, lexer.next());
+  }
+
 
 }

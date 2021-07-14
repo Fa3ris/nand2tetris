@@ -32,6 +32,7 @@ public abstract class AbstractGenerator {
     DOrM("D|M"),
     notM("!M"),
     DPlusA("D+A"),
+    decD("D-1"),
     ;
 
     final String value;
@@ -46,6 +47,7 @@ public abstract class AbstractGenerator {
     JLE("JLE"),
     JGE("JGE"),
     JMP("JMP"),
+    JEQ("JEQ"),
     ;
 
     final String value;

@@ -18,6 +18,8 @@ public class CodeGenerator {
 
   private final BranchingOpGenerator branchingOpGenerator = new BranchingOpGenerator();
 
+  private final FunctionOpGenerator functionOpGenerator = new FunctionOpGenerator();
+
   public CodeGenerator(Lexer lexer) {
     this.lexer = lexer;
   }
@@ -68,6 +70,11 @@ public class CodeGenerator {
         Token labelNameToken = lexer.next();
         return branchingOpGenerator.IfGoto(labelNameToken);
       }
+
+      case FUNCTION:
+        Token functionName = lexer.next();
+        Token nVars = lexer.next();
+        return functionOpGenerator.declareFunction(functionName, nVars);
 
 
       case EOF:

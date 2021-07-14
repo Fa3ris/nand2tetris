@@ -15,6 +15,8 @@ public class CodeGeneratorTest {
 
   private List<String> instructions = new ArrayList<>();
 
+  private boolean removeLineComments = false;
+
   @Test
   public void pushConstant_size() throws Exception {
     generate("push constant 22");
@@ -547,6 +549,46 @@ public class CodeGeneratorTest {
     assertInstructionsSize(40);
   }
 
+  @Test
+  public void return_instructions() throws Exception {
+    removeLineComments = true;
+    generate("return");
+    int i = -1;
+    // save endFramce
+    assertNthInstructionIs(++i, "@LCL");
+    assertNthInstructionIs(++i, "D=M");
+    assertNthInstructionIs(++i, "@R13");
+    assertNthInstructionIs(++i, "M=D");
+    // save ret addr
+    assertNthInstructionIs(++i, "@5");
+    assertNthInstructionIs(++i, "D=D-A");
+    assertNthInstructionIs(++i, "@R14");
+    assertNthInstructionIs(++i, "M=D");
+    // *ARG = pop()
+    assertNthInstructionIs(++i, "@SP");
+    assertNthInstructionIs(++i, "AM=M-1");
+    assertNthInstructionIs(++i, "D=M");
+    assertNthInstructionIs(++i, "@ARG");
+    assertNthInstructionIs(++i, "A=M");
+    assertNthInstructionIs(++i, "M=D");
+    // SP = ARG + 1
+    assertNthInstructionIs(++i, "D=A+1");
+    assertNthInstructionIs(++i, "@SP");
+    assertNthInstructionIs(++i, "M=D");
+    // restore segment pointers
+    for (String label: new String[] {"THAT", "THIS", "ARG", "LCL"}) {
+        assertNthInstructionIs(++i, "@R13");
+        assertNthInstructionIs(++i, "AM=M-1");
+        assertNthInstructionIs(++i, "D=M");
+        assertNthInstructionIs(++i, "@" + label);
+        assertNthInstructionIs(++i, "M=D");
+    }
+    // goto ret address
+    assertNthInstructionIs(37, "@R14");
+    assertNthInstructionIs(38, "A=M");
+    assertNthInstructionIs(39, "0;JMP");
+  }
+
   private void printInstructions() {
     for (String instruction : instructions) {
       System.out.println(instruction);
@@ -587,6 +629,15 @@ public class CodeGeneratorTest {
     while (!(newInstruct = generator.nextInstructions()).isEmpty()) {
       instructions.addAll(newInstruct);
     }
+    if (removeLineComments) {
+      removeInstructionsLineComment();
+    }
     printInstructions();
+  }
+
+  private void removeInstructionsLineComment() {
+    instructions = instructions.stream()
+        .filter(value -> !value.startsWith("//")) // do not count line comments
+        .collect(Collectors.toList());
   }
 }

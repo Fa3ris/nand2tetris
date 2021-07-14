@@ -91,6 +91,11 @@ public abstract class AbstractGenerator {
     return loadAddress("R" + val);
   }
 
+  protected final String LCL = "LCL";
+  protected final String THIS = "THIS";
+  protected final String THAT = "THAT";
+  protected final String ARG = "ARG";
+
   protected final String loadLocal() {
     return loadAddress("LCL");
   }

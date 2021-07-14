@@ -513,6 +513,34 @@ public class CodeGeneratorTest {
     assertNthInstructionIs(5, "D;JNE");
   }
 
+  @Test
+  public void function_size() throws Exception {
+    String functionName = "SimpleFunction.test";
+    String nVars = "2";
+    generate(String.format("function %s %s", functionName, nVars));
+    assertInstructionsSize(13);
+  }
+
+  @Test
+  public void function_instructions() throws Exception {
+    String functionName = "SimpleFunction.foo";
+    String nVars = "5";
+    generate(String.format("function %s %s", functionName, nVars));
+    assertNthInstructionIs(1, "@" + nVars);
+    assertNthInstructionIs(2, "D=A");
+    assertNthInstructionIs(3, "(SimpleFunction.foo_INIT_LOOP)");
+    assertNthInstructionIs(4, "@SimpleFunction.foo_INIT_END");
+    assertNthInstructionIs(5, "D;JEQ");
+    assertNthInstructionIs(6, "@SP");
+    assertNthInstructionIs(7, "AM=M+1");
+    assertNthInstructionIs(8, "A=A-1");
+    assertNthInstructionIs(9, "M=0");
+    assertNthInstructionIs(10, "D=D-1");
+    assertNthInstructionIs(11, "@SimpleFunction.foo_INIT_LOOP");
+    assertNthInstructionIs(12, "0;JMP");
+    assertNthInstructionIs(13, "(SimpleFunction.foo_INIT_END)");
+  }
+
   private void printInstructions() {
     for (String instruction : instructions) {
       System.out.println(instruction);

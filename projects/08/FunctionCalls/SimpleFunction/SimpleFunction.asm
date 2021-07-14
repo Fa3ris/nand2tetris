@@ -75,43 +75,52 @@ D=M	// D = *SP
 A=A-1	// A = SP - 1
 M=M-D	// *(SP - 1) = *(SP - 1) - D
 // return
+// save endFrame
 @LCL
 D=M	// D = LCL
 @R13
 M=D	// endFrame = LCL
+// save return address
 @5
 D=D-A	// D = LCL - 5
 @R14
 M=D	// retAddr = LCL - 5
+// put return value at ARG[0]
 @SP
 AM=M-1	// A = --SP
 D=M	// D = *SP
 @ARG
 A=M	// A = ARG
 M=D	// *ARG = *SP
+// restore SP
 D=A+1	// D = ARG + 1
 @SP
 M=D	// SP = ARG + 1
+// restore THAT
 @R13
 AM=M-1	// A = --endFrame
 D=M	// D = *endFrame
 @THAT
 M=D	// THAT = *endFrame
+// restore THIS
 @R13
 AM=M-1	// A = --endFrame
 D=M	// D = *endFrame
 @THIS
 M=D	// THIS = *endFrame
+// restore ARG
 @R13
 AM=M-1	// A = --endFrame
 D=M	// D = *endFrame
 @ARG
 M=D	// ARG = *endFrame
+// restore LCL
 @R13
 AM=M-1	// A = --endFrame
 D=M	// D = *endFrame
 @LCL
 M=D	// LCL = *endFrame
+// goto return address
 @R14
 A=M	// A = retAddr
 0;JMP	//  goto retAddr

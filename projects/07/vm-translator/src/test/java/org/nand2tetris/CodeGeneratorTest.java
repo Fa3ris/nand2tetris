@@ -541,6 +541,12 @@ public class CodeGeneratorTest {
     assertNthInstructionIs(13, "(SimpleFunction.foo_INIT_END)");
   }
 
+  @Test
+  public void return_size() throws Exception {
+    generate("return");
+    assertInstructionsSize(40);
+  }
+
   private void printInstructions() {
     for (String instruction : instructions) {
       System.out.println(instruction);

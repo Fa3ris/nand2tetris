@@ -76,6 +76,9 @@ public class CodeGenerator {
         Token nVars = lexer.next();
         return functionOpGenerator.declareFunction(functionName, nVars);
 
+      case RETURN:
+        return functionOpGenerator.returnCommand();
+
 
       case EOF:
         return Collections.emptyList();

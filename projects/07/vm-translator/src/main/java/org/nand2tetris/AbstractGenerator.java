@@ -33,6 +33,8 @@ public abstract class AbstractGenerator {
     notM("!M"),
     DPlusA("D+A"),
     decD("D-1"),
+    DMinusA("D-A"),
+    incA("A+1"),
     ;
 
     final String value;
@@ -81,7 +83,13 @@ public abstract class AbstractGenerator {
     return loadAddress("SP");
   }
 
-  protected final String loadR13() { return loadAddress("R13"); }
+  protected final String loadR13() { return loadRegister("13"); }
+
+  protected final String loadR14() { return loadRegister("14"); }
+
+  private String loadRegister(String val) {
+    return loadAddress("R" + val);
+  }
 
   protected final String loadLocal() {
     return loadAddress("LCL");

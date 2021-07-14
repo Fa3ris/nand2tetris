@@ -56,7 +56,7 @@ public class Lexer {
   private final State[][] transitions = {
       // CHAR          DIGIT          SLASH           EOL            WS             ID_SPECIAL_CHAR    EOF
       { State.ID,      State.INT,     State.SLASH,    State.START,   State.START,   State.ID,          State.START }, // START
-      { State.ID,      State.ILLEGAL, State.ILLEGAL,  State.END,     State.END,     State.ID,          State.END },   // ID
+      { State.ID,      State.ID,      State.ILLEGAL,  State.END,     State.END,     State.ID,          State.END },   // ID
       { State.ILLEGAL, State.INT,     State.END,      State.END,     State.END,     State.ILLEGAL,     State.END },   // INT
       { State.ILLEGAL, State.ILLEGAL, State.COMMENT,  State.ILLEGAL, State.ILLEGAL, State.ILLEGAL,     State.ILLEGAL},// SLASH
       { State.COMMENT, State.COMMENT, State.COMMENT,  State.END,     State.COMMENT, State.COMMENT,     State.END},    // COMMENT

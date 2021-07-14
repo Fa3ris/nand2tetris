@@ -202,5 +202,17 @@ public class LexerTest {
     assertEquals(eof, lexer.next());
   }
 
+  @Test
+  public void idWithNumber() throws Exception {
+    SymbolTable table = new SymbolTable();
+    Reader r = new StringReader("Sys.add12");
+    CharReader reader = new CharReader(r);
+    Lexer lexer = new Lexer(reader, table);
+
+    Token id = new Token(TokenType.IDENTIFIER, "Sys.add12");
+
+    assertEquals(id, lexer.next());
+  }
+
 
 }

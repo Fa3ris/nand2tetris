@@ -520,14 +520,16 @@ public class CodeGeneratorTest {
     String functionName = "SimpleFunction.test";
     String nVars = "2";
     generate(String.format("function %s %s", functionName, nVars));
-    assertInstructionsSize(13);
+    assertInstructionsSize(14);
   }
 
   @Test
   public void function_instructions() throws Exception {
+    removeLineComments = true;
     String functionName = "SimpleFunction.foo";
     String nVars = "5";
     generate(String.format("function %s %s", functionName, nVars));
+    assertNthInstructionIs(0, String.format("(%s)", functionName));
     assertNthInstructionIs(1, "@" + nVars);
     assertNthInstructionIs(2, "D=A");
     assertNthInstructionIs(3, "(SimpleFunction.foo_INIT_LOOP)");
@@ -546,7 +548,7 @@ public class CodeGeneratorTest {
   @Test
   public void return_size() throws Exception {
     generate("return");
-    assertInstructionsSize(40);
+    assertInstructionsSize(41);
   }
 
   @Test
@@ -561,7 +563,8 @@ public class CodeGeneratorTest {
     assertNthInstructionIs(++i, "M=D");
     // save ret addr
     assertNthInstructionIs(++i, "@5");
-    assertNthInstructionIs(++i, "D=D-A");
+    assertNthInstructionIs(++i, "A=D-A");
+    assertNthInstructionIs(++i, "D=M");
     assertNthInstructionIs(++i, "@R14");
     assertNthInstructionIs(++i, "M=D");
     // *ARG = pop()
@@ -584,9 +587,16 @@ public class CodeGeneratorTest {
         assertNthInstructionIs(++i, "M=D");
     }
     // goto ret address
-    assertNthInstructionIs(37, "@R14");
-    assertNthInstructionIs(38, "A=M");
-    assertNthInstructionIs(39, "0;JMP");
+    assertNthInstructionIs(++i, "@R14");
+    assertNthInstructionIs(++i, "A=M");
+    assertNthInstructionIs(++i, "0;JMP");
+  }
+
+  @Test
+  public void call_size() throws Exception {
+    removeLineComments = true;
+    generate("call Sys.add12 1");
+    assertInstructionsSize(41);
   }
 
   private void printInstructions() {

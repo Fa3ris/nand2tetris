@@ -71,13 +71,20 @@ public class CodeGenerator {
         return branchingOpGenerator.IfGoto(labelNameToken);
       }
 
-      case FUNCTION:
+      case FUNCTION: {
         Token functionName = lexer.next();
         Token nVars = lexer.next();
         return functionOpGenerator.declareFunction(functionName, nVars);
+      }
 
       case RETURN:
         return functionOpGenerator.returnCommand();
+
+      case CALL: {
+        Token functionName = lexer.next();
+        Token nArgs = lexer.next();
+        return functionOpGenerator.callFunction(functionName, nArgs);
+      }
 
 
       case EOF:

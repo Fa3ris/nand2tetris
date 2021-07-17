@@ -68,7 +68,7 @@ public class CodeGenerator {
 
       case IF_GOTO: {
         Token labelNameToken = lexer.next();
-        return branchingOpGenerator.IfGoto(labelNameToken);
+        return branchingOpGenerator.ifGoto(labelNameToken);
       }
 
       case FUNCTION: {

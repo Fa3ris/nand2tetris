@@ -9,7 +9,6 @@ public class FunctionOpGenerator extends AbstractGenerator {
   private final String[] restorationOrder = new String[] {THAT, THIS, ARG, LCL};
   private final String[] saveOrder = new String[] {LCL, ARG, THIS, THAT};
 
-  private final String GLOBAL_SCOPE = "GLOBAL";
   private String function = GLOBAL_SCOPE;
   private int call = 0;
 

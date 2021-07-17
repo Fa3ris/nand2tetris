@@ -59,6 +59,8 @@ public abstract class AbstractGenerator {
     }
   }
 
+  protected final String GLOBAL_SCOPE = "GLOBAL";
+
   protected final String destComp(Dest dest, Comp comp) {
     return dest.value + "=" + comp.value;
   }

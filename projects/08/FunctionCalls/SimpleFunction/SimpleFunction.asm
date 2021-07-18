@@ -1,4 +1,5 @@
 // function SimpleFunction.test 2
+(SimpleFunction.test)
 @2
 D=A	// D = 2
 (SimpleFunction.test_INIT_LOOP)
@@ -82,9 +83,10 @@ D=M	// D = LCL
 M=D	// endFrame = LCL
 // save return address
 @5
-D=D-A	// D = LCL - 5
+A=D-A	// A = LCL - 5
+D=M	// D = *(LCL - 5)
 @R14
-M=D	// retAddr = LCL - 5
+M=D	// retAddr = *(LCL - 5)
 // put return value at ARG[0]
 @SP
 AM=M-1	// A = --SP

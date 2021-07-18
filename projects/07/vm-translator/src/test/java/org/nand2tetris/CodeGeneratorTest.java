@@ -481,7 +481,7 @@ public class CodeGeneratorTest {
   public void label() throws Exception {
     String label = "BAR";
     generate("label " + label);
-    assertNthInstructionIs(1, "(" + label + ")");
+    assertNthInstructionIs(1, "(GLOBAL$" + label + ")");
   }
 
   @Test
@@ -494,7 +494,7 @@ public class CodeGeneratorTest {
   public void goTo() throws Exception {
     String label = "BAR";
     generate("goto " + label);
-    assertNthInstructionIs(1, "@" + label);
+    assertNthInstructionIs(1, "@GLOBAL$" + label);
     assertNthInstructionIs(2, "0;JMP");
   }
 
@@ -511,7 +511,7 @@ public class CodeGeneratorTest {
     assertNthInstructionIs(1, "@SP");
     assertNthInstructionIs(2, "AM=M-1");
     assertNthInstructionIs(3, "D=M");
-    assertNthInstructionIs(4, "@" + label);
+    assertNthInstructionIs(4, "@GLOBAL$" + label);
     assertNthInstructionIs(5, "D;JNE");
   }
 

@@ -1,3 +1,55 @@
+// bootstrap
+@256
+D=A
+@SP
+M=D	// SP = 256
+// call Sys.init 0
+// save GLOBAL$ret.0
+@GLOBAL$ret.0
+D=A
+@SP
+AM=M+1	// A = ++SP
+A=A-1	// A = SP - 1
+M=D	// *(SP - 1) = GLOBAL$ret.0
+// save LCL
+@LCL
+D=M
+@SP
+AM=M+1	// A = ++SP
+A=A-1	// A = SP - 1
+M=D	// *(SP - 1) = LCL
+// save ARG
+@ARG
+D=M
+@SP
+AM=M+1	// A = ++SP
+A=A-1	// A = SP - 1
+M=D	// *(SP - 1) = ARG
+// save THIS
+@THIS
+D=M
+@SP
+AM=M+1	// A = ++SP
+A=A-1	// A = SP - 1
+M=D	// *(SP - 1) = THIS
+// save THAT
+@THAT
+D=M
+@SP
+AM=M+1	// A = ++SP
+A=A-1	// A = SP - 1
+M=D	// *(SP - 1) = THAT
+@SP
+D=M	// D = SP
+@LCL
+M=D	// LCL = SP
+@5
+D=D-A	// D = SP - (5 + 0)
+@ARG
+M=D	// ARG = SP - (5 + 0)
+@Sys.init
+0;JMP	// goto Sys.init
+(GLOBAL$ret.0)
 // function Sys.init 0
 (Sys.init)
 @0

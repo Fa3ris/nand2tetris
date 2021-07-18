@@ -6,7 +6,7 @@ import java.util.List;
 
 public class CodeGenerator {
 
-  private final Lexer lexer;
+  private Lexer lexer;
 
   private final StackOpGenerator stackOpGenerator = new StackOpGenerator();
 
@@ -20,11 +20,13 @@ public class CodeGenerator {
 
   private final FunctionOpGenerator functionOpGenerator = new FunctionOpGenerator();
 
-  public CodeGenerator() {
-    lexer = null;
-  }
+  public CodeGenerator() {}
 
   public CodeGenerator(Lexer lexer) {
+    this.lexer = lexer;
+  }
+
+  public void setLexer(Lexer lexer) {
     this.lexer = lexer;
   }
 

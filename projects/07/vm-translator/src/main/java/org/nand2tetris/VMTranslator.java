@@ -14,6 +14,7 @@ public class VMTranslator {
 
   private final SymbolTable symbolTable = new SymbolTable();
   private final FilePathProvider filePathProvider = new FilePathProvider();
+  private final CodeGenerator codeGenerator = new CodeGenerator();
 
   public void translate(Path path) throws IOException {
 
@@ -27,9 +28,8 @@ public class VMTranslator {
       List<Path> sourceFilePaths = filePathProvider.getSourceFilePaths();
       long sysVmFileCount = sourceFilePaths.stream().filter(isSysVmFile()).count();
       if (sysVmFileCount == 1) {
-        CodeGenerator bootstrapGenerator = new CodeGenerator();
         System.out.println("bootstrap");
-        List<String> bootstrap = bootstrapGenerator.bootstrap();
+        List<String> bootstrap = codeGenerator.bootstrap();
         for (String instruction : bootstrap) {
           pw.println(instruction);
         }
@@ -40,8 +40,9 @@ public class VMTranslator {
         try (Reader srcReader = Files.newBufferedReader(sourceFilePath)) {
           CharReader srcBuffer = new CharReader(srcReader);
           Lexer srcLexer = new Lexer(srcBuffer, symbolTable);
-          CodeGenerator codeGenerator = new CodeGenerator(srcLexer);
-          codeGenerator.setBaseName(fileBaseName(sourceFilePath));
+          codeGenerator.setLexer(srcLexer);
+          String fileBaseName = fileBaseName(sourceFilePath);
+          codeGenerator.setBaseName(fileBaseName);
           List<String> instructions;
           while (!(instructions = codeGenerator.nextInstructions()).isEmpty()) {
             for (String instruction : instructions) {
@@ -51,7 +52,6 @@ public class VMTranslator {
         }
       }
     }
-
   }
 
   private Predicate<Path> isSysVmFile() {

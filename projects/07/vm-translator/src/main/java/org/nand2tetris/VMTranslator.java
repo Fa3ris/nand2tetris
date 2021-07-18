@@ -11,31 +11,37 @@ import java.util.List;
 
 public class VMTranslator {
 
-  public void translate(Path path) throws IOException {
-    Reader reader = Files.newBufferedReader(path);
-    CharReader buffer = new CharReader(reader);
-    Lexer lexer = new Lexer(buffer, new SymbolTable());
-    CodeGenerator generator = new CodeGenerator(lexer);
-    generator.setBaseName(fileBaseName(path));
+  private final SymbolTable symbolTable = new SymbolTable();
+  private final FilePathProvider filePathProvider = new FilePathProvider();
 
-    Path outputPath = outputPath(path);
+  public void translate(Path path) throws IOException {
+
+    filePathProvider.setInputPath(path);
+
+    Path outputPath = filePathProvider.getOutputFilePath();
+    String outPathMsg = String.format("write result to %s", outputPath);
+    System.out.println(outPathMsg);
     try (BufferedWriter bw = Files.newBufferedWriter(outputPath);
         PrintWriter pw = new PrintWriter(bw)) {
-      List<String> instructions;
-      while (!(instructions = generator.nextInstructions()).isEmpty()) {
-        for (String instruction : instructions) {
-          pw.println(instruction);
+      List<Path> sourceFilePaths = filePathProvider.getSourceFilePaths();
+      for (Path sourceFilePath : sourceFilePaths) {
+        String processSrcPathMsg = String.format("translate file %s", sourceFilePath);
+        System.out.println(processSrcPathMsg);
+        try (Reader srcReader = Files.newBufferedReader(sourceFilePath)) {
+          CharReader srcBuffer = new CharReader(srcReader);
+          Lexer srcLexer = new Lexer(srcBuffer, symbolTable);
+          CodeGenerator codeGenerator = new CodeGenerator(srcLexer);
+          codeGenerator.setBaseName(fileBaseName(sourceFilePath));
+          List<String> instructions;
+          while (!(instructions = codeGenerator.nextInstructions()).isEmpty()) {
+            for (String instruction : instructions) {
+              pw.println(instruction);
+            }
+          }
         }
       }
     }
 
-  }
-
-  private Path outputPath(Path path) {
-    String outputFile = fileBaseName(path) + ".asm";
-    Path outPath = path.getParent().resolve(outputFile);
-    System.out.println(outPath.toAbsolutePath());
-    return outPath;
   }
 
   private String fileBaseName(Path path) {
@@ -46,14 +52,13 @@ public class VMTranslator {
 
   public static void main(String[] args) throws IOException {
     if (args.length == 0) {
-      System.out.println("missing file path");
+      System.err.println("missing file path");
       System.exit(0);
     }
 
     Path path = Paths.get(args[0]);
     VMTranslator translator = new VMTranslator();
     translator.translate(path);
-
   }
 
 }

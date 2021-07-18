@@ -44,7 +44,6 @@ public class FunctionOpGenerator extends AbstractGenerator {
   }
 
   public List<String> returnCommand() {
-    function = GLOBAL_SCOPE;
     List<String> instructions = new ArrayList<>(Arrays.asList(
         lineComment("return"),
         lineComment("save endFrame"),

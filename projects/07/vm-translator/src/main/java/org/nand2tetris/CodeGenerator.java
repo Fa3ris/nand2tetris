@@ -74,10 +74,12 @@ public class CodeGenerator {
       case FUNCTION: {
         Token functionName = lexer.next();
         Token nVars = lexer.next();
+        branchingOpGenerator.setScope(functionName.getLexeme());
         return functionOpGenerator.declareFunction(functionName, nVars);
       }
 
       case RETURN:
+        branchingOpGenerator.resetScope();
         return functionOpGenerator.returnCommand();
 
       case CALL: {

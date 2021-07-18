@@ -145,4 +145,18 @@ public class FunctionOpGenerator extends AbstractGenerator {
         destComp(Dest.M, Comp.D) + inlineComment(String.format("*(SP - 1) = %s", address))
     );
   }
+
+  public List<String> bootstrap() {
+    List<String> instructions = new ArrayList<>(Arrays.asList(
+        lineComment("bootstrap"),
+        loadAddress("256"),
+        destComp(Dest.D, Comp.A),
+        loadSP(),
+        destComp(Dest.M, Comp.D) + inlineComment("SP = 256")
+    ));
+    Token sysInit = new Token(TokenType.IDENTIFIER, "Sys.init");
+    Token zero = new Token(TokenType.INTEGER, "0");
+    instructions.addAll(callFunction(sysInit, zero));
+    return instructions;
+  }
 }

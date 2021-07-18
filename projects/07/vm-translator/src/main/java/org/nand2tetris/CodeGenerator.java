@@ -20,6 +20,10 @@ public class CodeGenerator {
 
   private final FunctionOpGenerator functionOpGenerator = new FunctionOpGenerator();
 
+  public CodeGenerator() {
+    lexer = null;
+  }
+
   public CodeGenerator(Lexer lexer) {
     this.lexer = lexer;
   }
@@ -129,6 +133,10 @@ public class CodeGenerator {
 
     }
     throw new IllegalStateException("invalid segment for pop instruction " + segment);
+  }
+
+  public List<String> bootstrap() {
+    return functionOpGenerator.bootstrap();
   }
 
 }

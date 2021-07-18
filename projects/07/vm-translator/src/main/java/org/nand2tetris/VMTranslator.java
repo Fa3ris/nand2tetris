@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class VMTranslator {
 
@@ -24,6 +25,15 @@ public class VMTranslator {
     try (BufferedWriter bw = Files.newBufferedWriter(outputPath);
         PrintWriter pw = new PrintWriter(bw)) {
       List<Path> sourceFilePaths = filePathProvider.getSourceFilePaths();
+      long sysVmFileCount = sourceFilePaths.stream().filter(isSysVmFile()).count();
+      if (sysVmFileCount == 1) {
+        CodeGenerator bootstrapGenerator = new CodeGenerator();
+        System.out.println("bootstrap");
+        List<String> bootstrap = bootstrapGenerator.bootstrap();
+        for (String instruction : bootstrap) {
+          pw.println(instruction);
+        }
+      }
       for (Path sourceFilePath : sourceFilePaths) {
         String processSrcPathMsg = String.format("translate file %s", sourceFilePath);
         System.out.println(processSrcPathMsg);
@@ -42,6 +52,10 @@ public class VMTranslator {
       }
     }
 
+  }
+
+  private Predicate<Path> isSysVmFile() {
+    return path -> "Sys.vm".equalsIgnoreCase(path.getFileName().toString());
   }
 
   private String fileBaseName(Path path) {

@@ -8,12 +8,10 @@ public class BranchingOpGenerator extends AbstractGenerator {
 
   private String scope = GLOBAL_SCOPE;
 
-  // when function command
   public void setScope(String scope) {
     this.scope = scope;
   }
 
-  // when return command
   public void resetScope() {
     scope = GLOBAL_SCOPE;
   }

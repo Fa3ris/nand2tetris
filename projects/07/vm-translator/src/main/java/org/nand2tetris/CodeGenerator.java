@@ -83,7 +83,6 @@ public class CodeGenerator {
       }
 
       case RETURN:
-        branchingOpGenerator.resetScope();
         return functionOpGenerator.returnCommand();
 
       case CALL: {

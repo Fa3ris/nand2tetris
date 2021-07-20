@@ -7,7 +7,7 @@ import org.junit.Test;
 public class OptionTest {
 
   @Test
-  public void optionMatchesToken() throws Exception {
+  public void matchesShort() throws Exception {
     Option option = new Option(
         "v",
         "verbose",
@@ -15,40 +15,29 @@ public class OptionTest {
         0);
 
     assertTrue(option.matchesShort("v"));
+  }
+
+  @Test
+  public void matchesLong() throws Exception {
+    Option option = new Option(
+        "v",
+        "verbose",
+        "print message during processing",
+        0);
+
     assertTrue(option.matchesLong("verbose"));
   }
 
   @Test
-  public void noArgOption_expectsNoArg() throws Exception {
-    Option option = new Option(
-        "n",
-        "dry-run",
-        "dry run, no modification made",
-        0);
-
-    assertFalse(option.expectsArg());
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void noArgOption_cannotPassArg() throws Exception {
+  public void cannotAddMoreArgThanRequired() throws Exception {
+    int argNumber = 10;
     Option option = new Option(
         "f",
         "force",
         "force action",
-        0);
+        argNumber);
 
-    option.addArg("unexpectedArg");
-  }
-
-  @Test
-  public void cannotPassMoreArgThanRequired() throws Exception {
-    Option option = new Option(
-        "f",
-        "force",
-        "force action",
-        10);
-
-    for (int i = 0; i <10 ; i++) {
+    for (int i = 0; i < argNumber; i++) {
       option.addArg("allowedArg");
     }
     try {
@@ -56,21 +45,25 @@ public class OptionTest {
     } catch (Exception e) {
       assertTrue(e instanceof IllegalArgumentException);
       assertEquals(
-          String.format("too many arguments, expects only %s arg", 10),
+          String.format("too many arguments, expects only %s arg", argNumber),
           e.getMessage());
     }
   }
 
   @Test
-  public void oneArgOption() throws Exception {
+  public void expectsArg() throws Exception {
+
+    int argNumber = 5;
     Option option = new Option(
         "c",
         "comment",
         "display comments in output asm file",
-        1);
+        argNumber);
 
-    assertTrue(option.expectsArg());
-    option.addArg("toto");
+    for (int i = 0; i < argNumber; i++) {
+      assertTrue(option.expectsArg());
+      option.addArg("allowedArg");
+    }
     assertFalse(option.expectsArg());
   }
 

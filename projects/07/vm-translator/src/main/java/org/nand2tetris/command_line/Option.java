@@ -1,6 +1,5 @@
 package org.nand2tetris.command_line;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import lombok.Getter;
@@ -11,22 +10,22 @@ public class Option {
   private static final String DASH = "-";
   private static final String DASH_DASH = "--";
 
-  private String optionName;
+  @Setter
+  @Getter
+  private OptionName optionName = OptionName.UNDEFINED;
 
   private List<String> args = new LinkedList<>();
 
-  @Setter
-  private String shortOptPrefix = DASH;
-  private String shortOpt;
-
-  @Setter
-  private String longOptPrefix = DASH_DASH;
-  private String longOpt;
+  @Getter
+  private final String shortOpt;
 
   @Getter
-  private String description;
+  private final String longOpt;
 
-  private int argNumber = -1;
+  @Getter
+  private final String description;
+
+  private final int argNumber;
 
   public Option(String shortOpt, String longOpt, String description, int argNumber) {
     if (shortOpt == null || shortOpt.isEmpty()) {

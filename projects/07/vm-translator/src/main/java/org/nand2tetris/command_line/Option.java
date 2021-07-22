@@ -1,5 +1,6 @@
 package org.nand2tetris.command_line;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import lombok.Getter;
@@ -95,6 +96,11 @@ public class Option {
       );
     }
     args.add(token);
+  }
+
+  public String[] getArgs() {
+    String[] argsArr = args.toArray(new String[0]);
+    return argsArr;
   }
 
   public static final class Builder {

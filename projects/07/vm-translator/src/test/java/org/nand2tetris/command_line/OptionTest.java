@@ -67,4 +67,23 @@ public class OptionTest {
     assertFalse(option.expectsArg());
   }
 
+  @Test
+  public void getArgs() throws Exception {
+    int argNumber = 2;
+    Option option = new Option(
+        "d",
+        "delete",
+        "delete",
+        argNumber);
+
+    option.addArg("arg1");
+    option.addArg("arg2");
+
+    String[] args = option.getArgs();
+    assertEquals(2, args.length);
+
+    assertEquals("arg1", args[0]);
+    assertEquals("arg2", args[1]);
+  }
+
 }

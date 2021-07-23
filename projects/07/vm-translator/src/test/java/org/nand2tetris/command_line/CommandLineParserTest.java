@@ -122,4 +122,203 @@ public class CommandLineParserTest {
   private void parse() {
     parser.parse(args);
   }
+
+
+  @Test
+  public void argOnly() throws Exception {
+
+    Options options = new Options();
+    CommandLineParser parser = new CommandLineParser(options);
+
+    String[] line = {"hello", "world"};
+    CommandLine commandLine = parser.parseLine(line);
+    assertArrayEquals(line, commandLine.getArgs());
+  }
+
+  @Test
+  public void shortOption() throws Exception {
+
+    Option option = Option.builder()
+        .shortOpt("c")
+        .optionName("compact")
+        .build();
+    Options options = new Options();
+    options.addOption(option);
+
+    CommandLineParser parser = new CommandLineParser(options);
+
+    String[] line = new String[]{"-c"};
+    CommandLine commandLine = parser.parseLine(line);
+    assertTrue(commandLine.hasOption("compact"));
+  }
+
+  @Test
+  public void longOption() throws Exception {
+
+    Option option = Option.builder()
+        .longOpt("verbose")
+        .optionName("verbose")
+        .build();
+    Options options = new Options();
+    options.addOption(option);
+
+    CommandLineParser parser = new CommandLineParser(options);
+
+    String[] line = new String[]{"--verbose"};
+    CommandLine commandLine = parser.parseLine(line);
+    assertTrue(commandLine.hasOption("verbose"));
+
+  }
+
+  @Test
+  public void shortAndLongOption() throws Exception {
+
+    Option option = Option.builder()
+        .shortOpt("c")
+        .optionName("compact")
+        .build();
+    Options options = new Options();
+    options.addOption(option);
+
+    option = Option.builder()
+        .longOpt("verbose")
+        .optionName("verbose")
+        .build();
+    options.addOption(option);
+
+    CommandLineParser parser = new CommandLineParser(options);
+
+    String[][] lines = {
+        {"-c", "--verbose"},
+        {"--verbose", "-c"}
+    };
+
+    for (String[] line : lines) {
+      CommandLine commandLine = parser.parseLine(line);
+      assertTrue(commandLine.hasOption("compact"));
+      assertTrue(commandLine.hasOption("verbose"));
+    }
+  }
+
+
+  @Test
+  public void multipleFlags() throws Exception {
+
+    Option option = Option.builder()
+        .shortOpt("c")
+        .optionName("compact")
+        .build();
+    Options options = new Options();
+    options.addOption(option);
+
+    option = Option.builder()
+        .shortOpt("v")
+        .optionName("verbose")
+        .build();
+    options.addOption(option);
+
+    CommandLineParser parser = new CommandLineParser(options);
+
+    String[][] lines = {
+        {"-vc"},
+        {"-cv"}
+    };
+
+    for (String[] line : lines) {
+      CommandLine commandLine = parser.parseLine(line);
+      assertTrue(commandLine.hasOption("compact"));
+      assertTrue(commandLine.hasOption("verbose"));
+    }
+  }
+
+  @Test
+  public void singleArgOption() throws Exception {
+    Option option = Option.builder()
+        .shortOpt("c")
+        .optionName("compact")
+        .argNumber(1)
+        .build();
+
+    Options options = new Options();
+    options.addOption(option);
+
+    CommandLineParser parser = new CommandLineParser(options);
+
+    String[] line = new String[]{"-c", "titi"};
+    CommandLine commandLine = parser.parseLine(line);
+    String actual = commandLine.getOptionValue("compact");
+    assertEquals("titi", actual);
+
+  }
+
+  @Test
+  public void twoArgsOption() throws Exception {
+    Option option = Option.builder()
+        .shortOpt("t")
+        .optionName("table")
+        .argNumber(2)
+        .build();
+
+    Options options = new Options();
+    options.addOption(option);
+
+    CommandLineParser parser = new CommandLineParser(options);
+
+    String[] line = new String[]{"-t", "13", "22"};
+    CommandLine commandLine = parser.parseLine(line);
+    String[] actual = commandLine.getOptionValues("table");
+    String[] expected = {"13", "22"};
+    assertArrayEquals(expected, actual);
+  }
+
+  @Test
+  public void allInOne() throws Exception {
+    Option option = Option.builder()
+        .shortOpt("c")
+        .optionName("compact")
+        .build();
+    Options options = new Options();
+    options.addOption(option);
+
+    option = Option.builder()
+        .longOpt("verbose")
+        .optionName("verbose")
+        .build();
+    options.addOption(option);
+
+    option = Option.builder()
+        .shortOpt("l")
+        .optionName("list")
+        .argNumber(1)
+        .build();
+    options.addOption(option);
+
+    option = Option.builder()
+        .shortOpt("t")
+        .optionName("table")
+        .argNumber(2)
+        .build();
+    options.addOption(option);
+
+    CommandLineParser parser = new CommandLineParser(options);
+
+    String[] line;
+    CommandLine commandLine;
+
+    line = new String[]{"-t", "13", "22", "--verbose", "-c", "-l", "test", "arg1", "arg2", "arg3"};
+    commandLine = parser.parseLine(line);
+
+    String[] actualTable = commandLine.getOptionValues("table");
+    String[] expectedTable = {"13", "22"};
+    assertArrayEquals(expectedTable, actualTable);
+
+    assertTrue(commandLine.hasOption("compact"));
+    assertTrue(commandLine.hasOption("verbose"));
+
+    assertTrue(commandLine.hasOption("list"));
+    assertEquals("test", commandLine.getOptionValue("list"));
+
+    String[] expectedArgs = {"arg1", "arg2", "arg3"};
+    assertArrayEquals(expectedArgs, commandLine.getArgs());
+  }
 }

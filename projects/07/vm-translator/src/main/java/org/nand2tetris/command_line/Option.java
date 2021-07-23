@@ -2,30 +2,59 @@ package org.nand2tetris.command_line;
 
 import java.util.LinkedList;
 import java.util.List;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode
 public class Option {
 
-  private static final String DASH = "-";
-  private static final String DASH_DASH = "--";
+  private String optionName;
+  private final List<String> args = new LinkedList<>();
 
-  @Setter
-  @Getter
-  private OptionName optionName = OptionName.UNDEFINED;
-
-  private List<String> args = new LinkedList<>();
-
-  @Getter
   private final String shortOpt;
-
-  @Getter
   private final String longOpt;
-
-  @Getter
   private final String description;
 
   private final int argNumber;
+
+  public String getOptionName() {
+    return optionName;
+  }
+
+  public void setOptionName(String optionName) {
+    this.optionName = optionName;
+  }
+
+  public String getShortOpt() {
+    return shortOpt;
+  }
+
+  public boolean hasShortOpt() {
+    return shortOpt != null;
+  }
+
+  public String getLongOpt() {
+    return longOpt;
+  }
+
+  public boolean hasLongOpt() {
+    return longOpt != null;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public int getArgNumber() {
+    return argNumber;
+  }
+
+  public Option(Builder builder) {
+    optionName = builder.optionName;
+    shortOpt = builder.shortOpt;
+    longOpt = builder.longOpt;
+    description = builder.description;
+    argNumber = builder.argNumber;
+  }
 
   public Option(String shortOpt, String longOpt, String description, int argNumber) {
     if (shortOpt == null || shortOpt.isEmpty()) {
@@ -102,14 +131,45 @@ public class Option {
     return argsArr;
   }
 
+  public static Builder builder() {
+    return new Builder();
+  }
+
   public static final class Builder {
-    /**
-     * option name
-     * shortOp
-     * longOp
-     * description
-     * argNumber
-     *
-     */
+
+    private String optionName;
+    private String shortOpt;
+    private String longOpt;
+    private String description;
+    private int argNumber;
+
+    public Builder optionName(String optionName) {
+      this.optionName = optionName;
+      return this;
+    }
+
+    public Builder shortOpt(String shortOpt) {
+      this.shortOpt = shortOpt;
+      return this;
+    }
+
+    public Builder longOpt(String longOpt) {
+      this.longOpt = longOpt;
+      return this;
+    }
+
+    public Builder description(String description) {
+      this.description = description;
+      return this;
+    }
+
+    public Builder argNumber(int argNumber) {
+      this.argNumber = argNumber;
+      return this;
+    }
+
+    public Option build() {
+      return new Option(this);
+    }
   }
 }

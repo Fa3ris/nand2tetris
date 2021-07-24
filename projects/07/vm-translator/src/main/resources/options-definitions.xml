@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<options>
+
+  <option>
+    <name>comment</name>
+    <short>c</short>
+    <long>comment</long>
+<!--    <description>print comments in result ASM file</description>-->
+  </option>
+
+  <option>
+    <name>verbose</name>
+    <short>v</short>
+    <long>verbose</long>
+    <description>print messages during translation</description>
+  </option>
+
+</options>

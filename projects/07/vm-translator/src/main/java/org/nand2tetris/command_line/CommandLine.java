@@ -1,10 +1,14 @@
 package org.nand2tetris.command_line;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
+import org.nand2tetris.SymbolTable;
 
 public class CommandLine {
 
@@ -35,8 +39,7 @@ public class CommandLine {
   }
 
   public String[] getOptionValues(String optionName) {
-    String[] args = optionsFound.get(optionName);
-    return args;
+    return optionsFound.get(optionName);
   }
 
   public String[] getArgs() {
@@ -67,5 +70,28 @@ public class CommandLine {
 
   public void setDefaults(Properties defaults) {
 
+  }
+
+  public void print() {
+    StringBuilder sb = new StringBuilder();
+    String lineSep = System.lineSeparator();
+    sb.append("Command Line").append(lineSep);
+    sb.append("Arguments").append("\t").append(Arrays.toString(getArgs())).append(lineSep);
+    sb.append("---- Options ----").append(lineSep);
+
+
+    int rightPad = 2;
+    rightPad += optionsFound.keySet()
+        .stream()
+        .map(String::length)
+        .reduce(Integer::max)
+        .orElse(0);
+    String template = String.format("%%-%ss %%s", rightPad);
+
+    for (Entry<String, String[]> entry : optionsFound.entrySet()) {
+      String optionLine = String.format(template, entry.getKey() + ":", Arrays.toString(entry.getValue()));
+      sb.append(optionLine).append(lineSep);
+    }
+    System.out.println(sb);
   }
 }

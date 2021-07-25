@@ -6,7 +6,7 @@
     <name>comment</name>
     <short>c</short>
     <long>comment</long>
-<!--    <description>print comments in result ASM file</description>-->
+    <description>print comments in result ASM file</description>
   </option>
 
   <option>
@@ -14,6 +14,14 @@
     <short>v</short>
     <long>verbose</long>
     <description>print messages during translation</description>
+  </option>
+
+  <option>
+    <name>optimization</name>
+    <short>o</short>
+    <long>optimization</long>
+    <description>level of translation optimization</description>
+    <argNumber>1</argNumber>
   </option>
 
 </options>

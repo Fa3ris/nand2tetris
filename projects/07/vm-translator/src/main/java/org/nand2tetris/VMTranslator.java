@@ -46,9 +46,7 @@ public class VMTranslator {
           System.out.println("bootstrap");
         }
         List<String> bootstrap = codeGenerator.bootstrap();
-        for (String instruction : bootstrap) {
-          pw.println(instruction);
-        }
+        printInstructions(pw, bootstrap);
       }
       for (Path sourceFilePath : sourceFilePaths) {
         if (verbose) {
@@ -63,13 +61,32 @@ public class VMTranslator {
           codeGenerator.setBaseName(fileBaseName);
           List<String> instructions;
           while (!(instructions = codeGenerator.nextInstructions()).isEmpty()) {
-            for (String instruction : instructions) {
-              pw.println(instruction);
-            }
+            printInstructions(pw, instructions);
           }
         }
       }
     }
+  }
+
+  private void printInstructions(PrintWriter pw, List<String> instructions) {
+    for (String instruction : instructions) {
+      if (comments) {
+        pw.println(instruction);
+      } else {
+        instruction = removeComments(instruction);
+        if (!instruction.isEmpty()) {
+          pw.println(instruction);
+        }
+      }
+    }
+  }
+
+  private String removeComments(String instruction) {
+    int doubleSlash = instruction.indexOf("//");
+    if (doubleSlash >= 0) {
+      instruction = instruction.substring(0, doubleSlash).trim();
+    }
+    return instruction;
   }
 
   private Predicate<Path> isSysVmFile() {

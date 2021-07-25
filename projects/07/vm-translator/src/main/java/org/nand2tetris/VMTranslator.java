@@ -9,12 +9,24 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.Predicate;
+import lombok.Setter;
+import org.nand2tetris.command_line.CommandLine;
+import org.nand2tetris.command_line.CommandLineParser;
+import org.nand2tetris.command_line.Options;
+import org.nand2tetris.command_line.OptionsFactory;
 
 public class VMTranslator {
 
   private final SymbolTable symbolTable = new SymbolTable();
   private final FilePathProvider filePathProvider = new FilePathProvider();
   private final CodeGenerator codeGenerator = new CodeGenerator();
+
+  @Setter
+  private boolean verbose = false;
+  @Setter
+  private boolean comments = false;
+  @Setter
+  private int optimization = 0;
 
   public void translate(Path path) throws IOException {
 
@@ -65,14 +77,58 @@ public class VMTranslator {
   }
 
   public static void main(String[] args) throws IOException {
-    if (args.length == 0) {
+
+    Options options = new OptionsFactory().getDefaultOptions();
+    CommandLineParser parser = new CommandLineParser(options);
+
+    CommandLine commandLine = parser.parseLine(args);
+    commandLine.print();
+
+    if (commandLine.getArgs().length < 1) {
       System.err.println("missing file path");
-      System.exit(0);
+      System.exit(1);
     }
+
+    String pathArg = commandLine.getArgs()[0];
+    System.out.println("file path is " + pathArg);
+
+    boolean comment = commentFlag(commandLine);
+    boolean verbose = verboseFlag(commandLine);
+    int optimization = optimizationLevel(commandLine);
+
+    System.exit(2);
 
     Path path = Paths.get(args[0]);
     VMTranslator translator = new VMTranslator();
+    translator.setComments(comment);
+    translator.setVerbose(verbose);
+    translator.setOptimization(optimization);
     translator.translate(path);
+  }
+
+  private static boolean commentFlag(CommandLine commandLine) {
+    boolean res = commandLine.hasOption("comment");
+    if (res) {
+      System.out.println("comment flag present: will print comments in file");
+    }
+    return res;
+  }
+
+  private static boolean verboseFlag(CommandLine commandLine) {
+    boolean res = commandLine.hasOption("verbose");
+    if (res) {
+      System.out.println("verbose flag present: will print messages during translations");
+    }
+    return res;
+  }
+
+  private static int optimizationLevel(CommandLine commandLine) {
+    int res = 0;
+    if (commandLine.hasOption("optimization")) {
+      res = Integer.parseInt(commandLine.getOptionValue("optimization"));
+    }
+    System.out.printf("%s level is %s" + "%n", "optimization", res);
+    return res;
   }
 
 }

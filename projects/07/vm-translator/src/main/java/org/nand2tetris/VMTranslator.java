@@ -33,22 +33,28 @@ public class VMTranslator {
     filePathProvider.setInputPath(path);
 
     Path outputPath = filePathProvider.getOutputFilePath();
-    String outPathMsg = String.format("write result to %s", outputPath);
-    System.out.println(outPathMsg);
+    if (verbose) {
+      String outPathMsg = String.format("write result to %s", outputPath);
+      System.out.println(outPathMsg);
+    }
     try (BufferedWriter bw = Files.newBufferedWriter(outputPath);
         PrintWriter pw = new PrintWriter(bw)) {
       List<Path> sourceFilePaths = filePathProvider.getSourceFilePaths();
       long sysVmFileCount = sourceFilePaths.stream().filter(isSysVmFile()).count();
       if (sysVmFileCount == 1) {
-        System.out.println("bootstrap");
+        if (verbose) {
+          System.out.println("bootstrap");
+        }
         List<String> bootstrap = codeGenerator.bootstrap();
         for (String instruction : bootstrap) {
           pw.println(instruction);
         }
       }
       for (Path sourceFilePath : sourceFilePaths) {
-        String processSrcPathMsg = String.format("translate file %s", sourceFilePath);
-        System.out.println(processSrcPathMsg);
+        if (verbose) {
+          String processSrcPathMsg = String.format("translate file %s", sourceFilePath);
+          System.out.println(processSrcPathMsg);
+        }
         try (Reader srcReader = Files.newBufferedReader(sourceFilePath)) {
           CharReader srcBuffer = new CharReader(srcReader);
           Lexer srcLexer = new Lexer(srcBuffer, symbolTable);
@@ -82,7 +88,6 @@ public class VMTranslator {
     CommandLineParser parser = new CommandLineParser(options);
 
     CommandLine commandLine = parser.parseLine(args);
-    commandLine.print();
 
     if (commandLine.getArgs().length < 1) {
       System.err.println("missing file path");
@@ -90,7 +95,6 @@ public class VMTranslator {
     }
 
     String pathArg = commandLine.getArgs()[0];
-    System.out.println("file path is " + pathArg);
 
     VMTranslator translator = new VMTranslator();
     boolean comment = commentFlag(commandLine);
@@ -99,6 +103,16 @@ public class VMTranslator {
     translator.setVerbose(verbose);
     int optimization = optimizationLevel(commandLine);
     translator.setOptimization(optimization);
+
+    if (verbose) {
+      commandLine.print();
+      System.out.println("file path is " + pathArg);
+      System.out.println("verbose flag present: will print messages during translations");
+      if (comment) {
+        System.out.println("comment flag present: will print comments in file");
+      }
+      System.out.println("optimization level is " + optimization);
+    }
     Path path = Paths.get(pathArg);
     translator.translate(path);
   }
@@ -106,16 +120,13 @@ public class VMTranslator {
   private static boolean commentFlag(CommandLine commandLine) {
     boolean res = commandLine.hasOption("comment");
     if (res) {
-      System.out.println("comment flag present: will print comments in file");
+
     }
     return res;
   }
 
   private static boolean verboseFlag(CommandLine commandLine) {
     boolean res = commandLine.hasOption("verbose");
-    if (res) {
-      System.out.println("verbose flag present: will print messages during translations");
-    }
     return res;
   }
 
@@ -124,7 +135,6 @@ public class VMTranslator {
     if (commandLine.hasOption("optimization")) {
       res = Integer.parseInt(commandLine.getOptionValue("optimization"));
     }
-    System.out.printf("%s level is %s" + "%n", "optimization", res);
     return res;
   }
 

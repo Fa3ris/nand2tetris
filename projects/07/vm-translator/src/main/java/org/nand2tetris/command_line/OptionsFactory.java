@@ -2,11 +2,8 @@ package org.nand2tetris.command_line;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.LinkedList;
+import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -14,69 +11,92 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class OptionsFactory {
 
-  public static Options defaultOptions() {
+  private final static String xmlPath = "options-definitions.xml";
 
-    // GET DOCUMENT
-    InputStream is = OptionsFactory.class.getClassLoader().getResourceAsStream("options-definitions.xml");
+  public Options getDefaultOptions() {
+    Document document = defaultDocument();
+    NodeList optionTags = document.getElementsByTagName("option");
+    List<Option> optionList = optionList(optionTags);
+    Options options = new Options();
+    for (Option option : optionList) {
+      options.addOption(option);
+    }
+    return options;
+  }
+
+  private List<Option> optionList(NodeList optionTags) {
+    List<Option> optionList = new LinkedList<>();
+    for (int i = 0; i < optionTags.getLength() ; i++) {
+      Node optionTag = optionTags.item(i);
+      if (optionTag.getNodeType() == Node.ELEMENT_NODE) {
+        Element optionElt = (Element) optionTag;
+        Option option = convertOptionElement(optionElt);
+        optionList.add(option);
+      }
+    }
+    return optionList;
+  }
+
+  private Option convertOptionElement(Element optionElt) {
+    Option.Builder builder = Option.builder();
+    String name = childElementTextContent(optionElt, "name");
+    if (validTextContent(name)) {
+      builder.optionName(name);
+    }
+    String shortOpt = childElementTextContent(optionElt, "short");
+    if (validTextContent(shortOpt)) {
+      builder.shortOpt(shortOpt);
+    }
+    String longOpt = childElementTextContent(optionElt, "long");
+    if (validTextContent(longOpt)) {
+      builder.longOpt(longOpt);
+    }
+    String description = childElementTextContent(optionElt, "description");
+    if (validTextContent(description)) {
+      builder.description(description);
+    }
+    String argNumber = childElementTextContent(optionElt, "argNumber");
+    if (validTextContent(argNumber)) {
+      int args = Integer.parseInt(argNumber);
+      builder.argNumber(args);
+    }
+    return builder.build();
+  }
+
+  private boolean validTextContent(String content) {
+    return content != null && !content.isEmpty();
+  }
+
+  private String childElementTextContent(Element element, String tagName) {
+    NodeList list = element.getElementsByTagName(tagName);
+    if (list != null && list.getLength() > 0) {
+      return list.item(0).getTextContent();
+    }
+    return null;
+  }
+
+  private Document defaultDocument() {
+    try (InputStream is = OptionsFactory.class.getClassLoader().getResourceAsStream(xmlPath)) {
+      DocumentBuilder documentBuilder = documentBuilder();
+      return documentBuilder.parse(is);
+    } catch (IOException e) {
+      throw new RuntimeException("io error");
+    } catch (SAXException e) {
+      throw new RuntimeException("cannot parse input stream");
+    }
+  }
+
+  private DocumentBuilder documentBuilder() {
     DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-    DocumentBuilder dBuilder;
     try {
-      dBuilder = dbFactory.newDocumentBuilder();
+      return dbFactory.newDocumentBuilder();
     } catch (ParserConfigurationException e) {
       throw new RuntimeException("cannot create document builder");
     }
-    Document doc;
-    try {
-      doc = dBuilder.parse(is);
-    } catch (Exception e) {
-      throw new RuntimeException("cannot parse input stream");
-    }
-
-    String[] tagNames = {"name", "short", "long", "description"};
-
-    // GET OPTION TAGS
-    NodeList optionList = doc.getElementsByTagName("option");
-
-    for (int i = 0; i < optionList.getLength() ; i++) {
-      Node option = optionList.item(i);
-      // PRINT OPTION CHILDREN
-      if (option.getNodeType() == Node.ELEMENT_NODE) {
-        Element optionElt = (Element) option;
-        for (String tagName : tagNames) {
-          NodeList list = optionElt.getElementsByTagName(tagName);
-          if (list != null && list.getLength() > 0) {
-            String tagValue = list.item(0).getTextContent();
-            System.out.printf("%-10s %s%n", tagName, tagValue);
-          }
-        }
-      }
-      System.out.println();
-    }
-
-    Options options = new Options();
-
-    Option verbose = Option.builder()
-        .optionName("verbose")
-        .shortOpt("v")
-        .longOpt("verbose")
-        .description("print messages during translation")
-        .build();
-
-    options.addOption(verbose);
-
-    Option comment = Option.builder()
-        .optionName("comment")
-        .shortOpt("c")
-        .longOpt("comment")
-        .description("print comments in result ASM file")
-        .build();
-
-    options.addOption(comment);
-
-    return options;
   }
 
 }

@@ -92,17 +92,14 @@ public class VMTranslator {
     String pathArg = commandLine.getArgs()[0];
     System.out.println("file path is " + pathArg);
 
-    boolean comment = commentFlag(commandLine);
-    boolean verbose = verboseFlag(commandLine);
-    int optimization = optimizationLevel(commandLine);
-
-    System.exit(2);
-
-    Path path = Paths.get(args[0]);
     VMTranslator translator = new VMTranslator();
+    boolean comment = commentFlag(commandLine);
     translator.setComments(comment);
+    boolean verbose = verboseFlag(commandLine);
     translator.setVerbose(verbose);
+    int optimization = optimizationLevel(commandLine);
     translator.setOptimization(optimization);
+    Path path = Paths.get(pathArg);
     translator.translate(path);
   }
 

@@ -1,0 +1,65 @@
+class Hand {
+
+    field int value;
+    field String name;
+
+
+    static Hand PAPER;
+    static Hand ROCK;
+    static Hand SCISSORS;
+
+    constructor Hand new(int value, String name) {
+        let value = value;
+        let name = name;
+        return this;
+    }
+
+
+    method void toString() {
+        
+    }
+
+    function Hand getHand(int value) {
+        var Hand hand;
+
+        if (value = 1) {
+            let hand = getRock();
+        }
+        
+        if (value = 2) {
+            let hand = getPaper();
+        }
+
+        if (value = 3) {
+            let hand = getScissors();
+        }
+
+        return hand;
+    }
+
+
+    function Hand getPaper() {
+        if (PAPER = null) {
+            let PAPER = Hand.new(1, "paper");
+        }
+        return PAPER;
+
+    }
+
+    function Hand getRock() {
+
+         if (ROCK = null) {
+            let ROCK = Hand.new(2, "rock");
+        }
+
+        return ROCK;
+
+    }
+
+    function Hand getScissors() {
+         if (SCISSORS = null) {
+            let SCISSORS = Hand.new(3, "scissors");
+        }
+        return SCISSORS;
+    }
+}

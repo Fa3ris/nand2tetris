@@ -1,0 +1,92 @@
+function Hand.new 0
+push constant 2
+call Memory.alloc 1
+pop pointer 0
+push argument 0
+pop argument 0
+push argument 1
+pop argument 1
+push pointer 0
+return
+function Hand.getHand 0
+push constant 0
+return
+function Hand.getPaper 0
+push static 0
+push constant 0
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 1
+push constant 5
+call String.new 1
+push constant 112
+call String.appendChar 2
+push constant 97
+call String.appendChar 2
+push constant 112
+call String.appendChar 2
+push constant 101
+call String.appendChar 2
+push constant 114
+call String.appendChar 2
+call Hand.new 2
+pop static 0
+label IF_FALSE0
+push static 0
+return
+function Hand.getRock 0
+push static 1
+push constant 0
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 2
+push constant 4
+call String.new 1
+push constant 114
+call String.appendChar 2
+push constant 111
+call String.appendChar 2
+push constant 99
+call String.appendChar 2
+push constant 107
+call String.appendChar 2
+call Hand.new 2
+pop static 1
+label IF_FALSE0
+push static 1
+return
+function Hand.getScissors 0
+push static 2
+push constant 0
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 3
+push constant 8
+call String.new 1
+push constant 115
+call String.appendChar 2
+push constant 99
+call String.appendChar 2
+push constant 105
+call String.appendChar 2
+push constant 115
+call String.appendChar 2
+push constant 115
+call String.appendChar 2
+push constant 111
+call String.appendChar 2
+push constant 114
+call String.appendChar 2
+push constant 115
+call String.appendChar 2
+call Hand.new 2
+pop static 2
+label IF_FALSE0
+push static 2
+return

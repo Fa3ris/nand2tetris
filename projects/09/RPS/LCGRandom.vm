@@ -1,0 +1,72 @@
+function LCGRandom.setSeed 0
+push argument 0
+pop static 0
+push static 0
+push constant 0
+lt
+push static 0
+or
+push constant 16383
+gt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 1
+pop static 0
+label IF_FALSE0
+push constant 0
+return
+function LCGRandom.getSeed 0
+push static 0
+return
+function LCGRandom.rand 0
+push constant 32765
+push static 0
+call Math.multiply 2
+push constant 1
+add
+push constant 16384
+call Utils.mod 2
+pop static 0
+push static 0
+push constant 0
+lt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push static 0
+push constant 16384
+add
+pop static 0
+label IF_FALSE0
+push static 0
+return
+function LCGRandom.rangeThree 2
+call LCGRandom.rand 0
+pop local 0
+push local 0
+push constant 5461
+lt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 1
+pop local 1
+goto IF_END0
+label IF_FALSE0
+push local 0
+push constant 10922
+lt
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push constant 2
+pop local 1
+goto IF_END1
+label IF_FALSE1
+push constant 3
+pop local 1
+label IF_END1
+label IF_END0
+push local 1
+return

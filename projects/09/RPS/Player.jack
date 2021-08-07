@@ -1,0 +1,10 @@
+class Player {
+
+    function int getChoice() {
+        var int value;
+        do Output.printString("rock: 1   paper: 2   scissors: 3");
+        do Output.println();
+        let value = Keyboard.readInt("choose: ");
+        return value;
+    }
+}

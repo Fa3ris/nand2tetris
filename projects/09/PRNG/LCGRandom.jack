@@ -21,12 +21,12 @@ m and c are relatively prime = coprime
 a-1 is divisible by all prime factors of m,
 a-1 is divisible by 4 if m is divisible by 4.
 
-choose m a power of 2
+choose m a power of 2 => m = 2^i
 2^14 = 16384 -> m prime factor = 2
 
 if m is a power of 2, then a − 1 should be divisible by 4 but not divisible by 8, i.e. a ≡ 5 (mod 8)
 
-a = 5 + k*8, k >=0
+a = 5 + k*8, k >= 0
 
 choose large k
 k = 32760 / 8 = 4095
@@ -59,7 +59,7 @@ class LCGRandom {
         return seed;
     }
 
-    /* returns a random int in range 0..16383 inclusive */
+    /* returns a random int in range [0, 16383] inclusive */
     function int rand() {
         let seed = Utils.mod((32765 * seed) + 1, 16384);
         if (seed < 0) {

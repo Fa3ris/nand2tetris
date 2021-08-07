@@ -1,0 +1,30 @@
+class Main {
+
+    function void main() { 
+        var int value;
+        var int cpu;
+        var boolean continue;
+        var int continueChoice;
+
+        let continue = true;
+
+        while (continue) {
+            let value = Player.getChoice();
+            do Output.printString("you chose ");
+            do Output.printInt(value);
+            let cpu = LCGRandom.rangeThree();
+            do Output.println();
+            do Output.printString("AI chose ");
+            do Output.printInt(cpu);
+
+            let continueChoice = Keyboard.readInt("continue? 0/1 ");
+            let continue = continueChoice > 0;
+            
+            do Screen.clearScreen();
+            do Output.moveCursor(0, 0);
+        }
+
+        return;
+    }
+
+}

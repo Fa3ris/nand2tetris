@@ -3,13 +3,59 @@ push constant 2
 call Memory.alloc 1
 pop pointer 0
 push argument 0
-pop argument 0
+pop this 0
 push argument 1
-pop argument 1
+pop this 1
 push pointer 0
 return
-function Hand.getHand 0
+function Hand.toString 0
+push argument 0
+pop pointer 0
+push this 1
+call Output.printString 1
+pop temp 0
+push constant 32
+call Output.printChar 1
+pop temp 0
+push this 0
+call Output.printInt 1
+pop temp 0
 push constant 0
+return
+function Hand.getValue 0
+push argument 0
+pop pointer 0
+push this 0
+return
+function Hand.getHand 1
+push argument 0
+push constant 1
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+call Hand.getRock 0
+pop local 0
+label IF_FALSE0
+push argument 0
+push constant 2
+eq
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+call Hand.getPaper 0
+pop local 0
+label IF_FALSE1
+push argument 0
+push constant 3
+eq
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+call Hand.getScissors 0
+pop local 0
+label IF_FALSE2
+push local 0
 return
 function Hand.getPaper 0
 push static 0
@@ -89,4 +135,33 @@ call Hand.new 2
 pop static 2
 label IF_FALSE0
 push static 2
+return
+function Hand.compareHands 1
+push argument 1
+call Hand.getValue 1
+push argument 0
+call Hand.getValue 1
+sub
+pop local 0
+push local 0
+push constant 1
+gt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 1
+neg
+pop local 0
+label IF_FALSE0
+push local 0
+push constant 1
+neg
+lt
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push constant 1
+pop local 0
+label IF_FALSE1
+push local 0
 return

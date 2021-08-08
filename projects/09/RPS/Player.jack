@@ -7,4 +7,10 @@ class Player {
         let value = Keyboard.readInt("choose: ");
         return value;
     }
+
+    function Hand getHand() {
+        var int value;
+        let value = Player.getChoice();
+        return Hand.getHand(value);
+    }
 }

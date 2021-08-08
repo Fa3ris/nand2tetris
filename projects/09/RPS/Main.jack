@@ -1,61 +1,19 @@
 class Main {
 
     function void main() { 
-        var int value;
-        var int cpu;
         var boolean continue;
         var int continueChoice;
-        var Hand playerHand;
-        var Hand cpuHand;
-
-        var int compare;
-        var String resMsg;
 
         do LCGRandom.setSeed(42);
+
+        do RPSGame.setWinScore(3);
 
         let continue = true;
 
         while (continue) {
-            // get player hand
-            let value = Player.getChoice();
-            do Output.printString("you chose ");
-            do Output.printInt(value);
-            do Output.println();
-            let playerHand = Hand.getHand(value);
-            do playerHand.toString();
-            do Output.println();
 
-            // get cpu Hand
-            let cpu = LCGRandom.rangeThree();
-            let cpuHand = Hand.getHand(cpu);
-            do Output.printString("AI chose ");
-            do Output.printInt(cpu);
-            do Output.println();
-            do cpuHand.toString();
-            do Output.println();
-
-            // compare hands
-            let compare = Hand.compareHands(playerHand, cpuHand);
-            do Output.printString("result is ");
-            do Output.printInt(compare);
-            do Output.println();
-
-            if (compare > 0) {
-                let resMsg = "WIN";
-
-            }
-            if (compare = 0) {
-                let resMsg = "DRAW";
-
-            }
-
-            if (compare < 0) {
-                let resMsg = "LOSE";
-            }
-
-            do Output.printString(resMsg);
-            do Output.println();
-
+            do RPSGame.runGame();
+            
             let continueChoice = Keyboard.readInt("continue? 0/1 ");
             let continue = continueChoice > 0;
 

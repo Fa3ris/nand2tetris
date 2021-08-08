@@ -91,3 +91,9 @@ call Keyboard.readInt 1
 pop local 0
 push local 0
 return
+function Player.getHand 1
+call Player.getChoice 0
+pop local 0
+push local 0
+call Hand.getHand 1
+return

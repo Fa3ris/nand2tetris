@@ -8,34 +8,43 @@ class Hand {
     static Hand ROCK;
     static Hand SCISSORS;
 
-    constructor Hand new(int value, String name) {
-        let value = value;
-        let name = name;
+    // cannot use same name for field and argument !!!
+    constructor Hand new(int val, String n) {
+        let value = val;
+        let name = n;
         return this;
     }
 
 
     method void toString() {
-        
+        do Output.printString(name);
+        do Output.printChar(32); // SPACE
+        do Output.printInt(value);
+        return;
+    }
+
+    method int getValue() {
+        return value;
     }
 
     function Hand getHand(int value) {
         var Hand hand;
 
         if (value = 1) {
-            let hand = getRock();
+            let hand = Hand.getRock();
         }
         
         if (value = 2) {
-            let hand = getPaper();
+            let hand = Hand.getPaper();
         }
 
         if (value = 3) {
-            let hand = getScissors();
+            let hand = Hand.getScissors();
         }
 
         return hand;
     }
+
 
 
     function Hand getPaper() {
@@ -61,5 +70,27 @@ class Hand {
             let SCISSORS = Hand.new(3, "scissors");
         }
         return SCISSORS;
+    }
+
+    /**
+        return result of comparison
+        > 0 : h1 wins
+        = 0 : draw
+        < 0 : h1 loses
+    */
+    function int compareHands(Hand h1, Hand h2) {
+
+      var int res;
+      let res = h2.getValue() - h1.getValue();
+      
+      if (res > 1) {
+        let res = -1;
+      }
+
+      if (res < -1) {
+        let res = 1;
+      }
+
+      return res;
     }
 }

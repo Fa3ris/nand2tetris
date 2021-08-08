@@ -1,1 +1,39 @@
-class Score {}
+class Score {
+
+    field int playerScore;
+    field int cpuScore;
+    field int winScore;
+
+    constructor Score new(int targetScore) {
+        let playerScore = 0;
+        let cpuScore = 0;
+        let winScore = targetScore;
+        return this;
+    }
+
+    method boolean incPlayer() {
+        let playerScore = playerScore + 1;
+        return (playerScore = winScore) | (playerScore > winScore);
+    }
+
+    method boolean incCPU() {
+        let cpuScore = cpuScore + 1;
+        return (cpuScore = winScore) | (cpuScore > winScore);
+    }
+
+    method void dispose() {
+        // Uses an OS routine to recycle this object.
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method void print() {
+        do Output.printString("Player ");
+        do Output.printInt(playerScore);
+        do Output.printString(" / ");
+        do Output.printInt(cpuScore);
+        do Output.printString(" CPU");
+        do Output.println();
+        return;
+    }
+}

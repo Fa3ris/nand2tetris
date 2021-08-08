@@ -1,3 +1,8 @@
 class AI {
-    
+
+    function Hand getHand() {
+        var int value;
+        let value = LCGRandom.rangeThree();
+        return Hand.getHand(value);
+    }
 }

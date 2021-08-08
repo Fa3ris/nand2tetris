@@ -1,0 +1,6 @@
+function AI.getHand 1
+call LCGRandom.rangeThree 0
+pop local 0
+push local 0
+call Hand.getHand 1
+return

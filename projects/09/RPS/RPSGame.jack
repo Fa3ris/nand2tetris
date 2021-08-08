@@ -1,1 +1,83 @@
-class RPSGame {}
+class RPSGame {
+
+    static int winScore;
+
+    function void setWinScore(int s) {
+        let winScore = s;
+        return;
+    }
+
+    function void runGame() {
+
+        var Hand playerHand;
+        var Hand cpuHand;
+
+        var int compare;
+        var String resMsg;
+
+        var Score score;
+
+        var boolean playerWin;
+        var boolean cpuWin;
+
+        var boolean noWinner;
+
+
+        let score = Score.new(winScore);
+        let noWinner = true;
+
+        while (noWinner) {
+            // get player hand
+            let playerHand = Player.getHand();
+            do playerHand.toString();
+            do Output.println();
+
+            // get cpu Hand
+            let cpuHand = AI.getHand();
+            do cpuHand.toString();
+            do Output.println();
+
+            // compare hands
+            let compare = Hand.compareHands(playerHand, cpuHand);
+            do Output.printString("result is ");
+            do Output.printInt(compare);
+            do Output.println();
+
+            if (compare > 0) {
+                let resMsg = "WIN";
+                let playerWin = score.incPlayer();
+            }
+            if (compare = 0) {
+                let resMsg = "DRAW";
+            }
+            if (compare < 0) {
+                let resMsg = "LOSE";
+                let cpuWin = score.incCPU();
+            }
+
+            do Output.printString(resMsg);
+            do Output.println();
+
+            do score.print();
+
+            if (playerWin) {
+                do Output.printString("Player wins the game");
+                do Output.println();
+                let noWinner = false;
+            } 
+
+            if (cpuWin) {
+                do Output.printString("CPU wins the game");
+                do Output.println();
+                let noWinner = false;
+            }
+
+            do Keyboard.readInt("press any key to continue");
+
+            do Screen.clearScreen();
+            do Output.moveCursor(0, 0);
+
+        }
+       return;
+    }
+}

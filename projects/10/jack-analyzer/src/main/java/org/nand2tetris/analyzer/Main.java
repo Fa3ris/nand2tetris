@@ -1,4 +1,4 @@
-package org.nand2tetris;
+package org.nand2tetris.analyzer;
 
 /**
  * Hello world!

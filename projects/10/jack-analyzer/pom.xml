@@ -72,7 +72,7 @@
             <outputDirectory>${project.basedir}/../lib</outputDirectory>
             <archive>
               <manifest>
-                <mainClass>org.nand2tetris.Main</mainClass>
+                <mainClass>org.nand2tetris.analyzer.Main</mainClass>
               </manifest>
             </archive>
           </configuration>

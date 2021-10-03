@@ -1,4 +1,4 @@
-package org.nand2tetris.analyzer;
+package org.nand2tetris.tokenizer;
 
 public class SymbolTable {
 

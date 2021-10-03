@@ -1,19 +1,14 @@
 package org.nand2tetris.tokenizer;
 
-import java.io.Reader;
+interface CharReader {
 
-class CharReader {
-
-  public char peek() {
-    return '0';
-  }
-
-  public char read() {
-    return '0';
-  }
-
-  public boolean eof() {
-    return true;
-  }
-
+  /**
+   * go to next char or set EOF
+   */
+  void advance();
+  /**
+   * call after isEOF
+   */
+  char peekChar();
+  boolean isEOF();
 }

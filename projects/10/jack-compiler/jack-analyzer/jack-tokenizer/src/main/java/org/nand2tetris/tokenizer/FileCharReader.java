@@ -13,14 +13,21 @@ public class FileCharReader implements CharReader {
   private final Path path;
 
   public FileCharReader(Path path) {
+
     this.path = path;
+
+    if (this.path == null) {
+      eof = true;
+      return;
+    }
+
     long fileSize;
     try {
       fileSize = Files.size(path);
     } catch (IOException e) {
       fileSize = 0;
-      eof = true;
     }
+
     if (fileSize <= 0) {
       eof = true;
       return;
@@ -41,9 +48,14 @@ public class FileCharReader implements CharReader {
     }
     if (charRead < 0) {
       eof = true;
-    } else {
-      currentChar = (char) charRead;
+      try {
+        reader.close();
+      } catch (IOException e) {
+        throw new RuntimeException("error closing file " + path.toAbsolutePath(), e);
+      }
+      return;
     }
+    currentChar = (char) charRead;
   }
 
 

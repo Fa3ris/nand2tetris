@@ -7,6 +7,7 @@ interface CharReader {
    */
   void advance();
   /**
+   * return current char
    * call after isEOF
    */
   char peekChar();

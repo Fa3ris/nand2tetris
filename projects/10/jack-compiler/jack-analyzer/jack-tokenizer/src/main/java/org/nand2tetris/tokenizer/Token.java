@@ -1,9 +1,9 @@
 package org.nand2tetris.tokenizer;
 
+import lombok.Data;
+
+@Data
 public class Token {
-
-  TokenType type;
-  String lexeme;
-
-
+  private TokenType type;
+  private String lexeme;
 }

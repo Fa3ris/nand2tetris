@@ -1,6 +1,6 @@
 package org.nand2tetris.tokenizer;
 
-interface CharReader {
+public interface CharReader {
 
   /**
    * go to next char or set EOF

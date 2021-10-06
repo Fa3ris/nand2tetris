@@ -11,6 +11,10 @@ public class CharReaderStub implements CharReader {
 
   public CharReaderStub(String stream) {
     queue = new LinkedList<>();
+    if (stream == null || stream.isEmpty()) {
+      return;
+    }
+    queue.add('\0'); // for 1st advance
     for (int i = 0; i < stream.length(); i++) {
       queue.add(stream.charAt(i));
     }

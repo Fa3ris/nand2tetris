@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.nand2tetris.tokenizer.stubs.CharReaderStub;
 
 public class FileTokenizerTest {
-  
+
   @Test
   public void hasNoTokenIfNoContent() throws Exception {
     CharReader[] readers = new CharReader[]{
@@ -91,6 +91,34 @@ public class FileTokenizerTest {
         Token.build(TokenType.INTEGER, integerLexeme)
     );
     TokenMatcher.matchAll(expectedTokens, tokenizer);
+  }
+
+  @Test
+  public void returnsTokensNotSeparatedBySpace() throws Exception {
+    String a = "a";
+    String plus = "+";
+    String b = "b";
+    String stream = String.join("", Arrays.asList(a, plus, b)) ;
+    Tokenizer tokenizer = buildTokenizer(stream);
+    List<Token> expectedTokens = Arrays.asList(
+        Token.build(TokenType.IDENTIFIER, a),
+        Token.build(TokenType.SYMBOL, plus),
+        Token.build(TokenType.IDENTIFIER, b)
+    );
+    TokenMatcher.matchAll(expectedTokens, tokenizer);
+  }
+
+  @Test
+  public void returnStringLiteral() throws Exception {
+    String content = "my string literal";
+    String literal = "\"" + content + "\"";
+  }
+  @Test
+  public void ignoresComment() throws Exception {
+    String lineComment = "function // this is a comment";
+    String blockComment = "/* this is a comment */let";
+    String docComment = "}/** this is a comment */";
+
   }
 
   private Tokenizer buildTokenizer(String charStream) {

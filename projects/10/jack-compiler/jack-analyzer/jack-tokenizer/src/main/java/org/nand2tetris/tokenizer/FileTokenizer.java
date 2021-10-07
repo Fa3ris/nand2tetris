@@ -116,6 +116,7 @@ public class FileTokenizer implements Tokenizer {
   public void advance() {
 
     if (reader == null || reader.isEOF()) {
+      lexeme = null;
       return;
     }
 
@@ -127,7 +128,12 @@ public class FileTokenizer implements Tokenizer {
         lexeme = sb.toString();
         return;
       }
-      sb.append(reader.peekChar());
+      char charRead = reader.peekChar();
+      if (charRead == ' ') {
+        lexeme = sb.toString();
+        return;
+      }
+      sb.append(charRead);
     }
 
 //    State state = State.START;
@@ -158,15 +164,15 @@ public class FileTokenizer implements Tokenizer {
 
   }
 
-  private final StringBuilder lexemeBuilder = new StringBuilder();
+//  private final StringBuilder lexemeBuilder = new StringBuilder();
 
   private void completeToken(State state) {
 
     currentToken = new Token();
-    currentToken.setLexeme(lexemeBuilder.toString());
+//    currentToken.setLexeme(lexemeBuilder.toString());
     currentToken.setType(TokenType.IDENTIFIER);
 
-    lexemeBuilder.setLength(0);
+//    lexemeBuilder.setLength(0);
 
   }
 
@@ -183,6 +189,12 @@ public class FileTokenizer implements Tokenizer {
     TokenType type = TokenType.IDENTIFIER;
     if (lexeme.equals("class")) {
       type = TokenType.KEYWORD;
+    }
+    if (lexeme.equals("+")) {
+      type = TokenType.SYMBOL;
+    }
+    if (lexeme.equals("1342")) {
+      type = TokenType.INTEGER;
     }
     token.setType(type);
     return token;

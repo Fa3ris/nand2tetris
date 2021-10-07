@@ -10,8 +10,7 @@ import org.junit.Test;
 import org.nand2tetris.tokenizer.stubs.CharReaderStub;
 
 public class FileTokenizerTest {
-
-
+  
   @Test
   public void hasNoTokenIfNoContent() throws Exception {
     CharReader[] readers = new CharReader[]{
@@ -28,12 +27,9 @@ public class FileTokenizerTest {
   @Test
   public void hasTokenIfContent() throws Exception {
 
-    CharReader[] readers = new CharReader[]{
-        new CharReaderStub("Hello"),
-        new CharReaderStub("{"),
-        new CharReaderStub("+"),
-    };
-    for (CharReader reader : readers) {
+    String[] charStreams = {"Hello", "{", "+"};
+    for (String charStream : charStreams) {
+      CharReader reader = new CharReaderStub(charStream);
       Tokenizer tokenizer = new FileTokenizer(reader);
       tokenizer.advance();
       assertTrue(tokenizer.hasToken());

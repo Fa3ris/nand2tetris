@@ -7,7 +7,7 @@ import lombok.Data;
 public class Token {
   private TokenType type;
   private String lexeme;
-  
+
   public static Token build(TokenType type, String lexeme) {
     Token token = new Token();
     token.type = Objects.requireNonNull(type);

@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.nand2tetris.tokenizer.stubs.CharReaderStub;
 
@@ -27,7 +28,10 @@ public class FileTokenizerTest {
   @Test
   public void hasTokenIfContent() throws Exception {
 
-    String[] charStreams = {"Hello", "{", "+"};
+    String[] charStreams = {
+        "Hello",
+        "{",
+        "+"};
     for (String charStream : charStreams) {
       CharReader reader = new CharReaderStub(charStream);
       Tokenizer tokenizer = new FileTokenizer(reader);
@@ -94,7 +98,53 @@ public class FileTokenizerTest {
   }
 
   @Test
-  public void returnsTokensNotSeparatedBySpace() throws Exception {
+  public void returnsTokensSeparatedBySpace_aPlusb() throws Exception {
+    String a = "a";
+    String plus = "+";
+    String b = "b";
+    String stream = String.join(" ", Arrays.asList(a, plus, b)) ;
+    Tokenizer tokenizer = buildTokenizer(stream);
+    List<Token> expectedTokens = Arrays.asList(
+        Token.build(TokenType.IDENTIFIER, a),
+        Token.build(TokenType.SYMBOL, plus),
+        Token.build(TokenType.IDENTIFIER, b)
+    );
+    TokenMatcher.matchAll(expectedTokens, tokenizer);
+  }
+
+  @Test
+  public void returnsTokensSeparatedBySpace_bPlusa() throws Exception {
+    String a = "a";
+    String plus = "+";
+    String b = "b";
+    String stream = String.join(" ", Arrays.asList(b, plus, a)) ;
+    Tokenizer tokenizer = buildTokenizer(stream);
+    List<Token> expectedTokens = Arrays.asList(
+        Token.build(TokenType.IDENTIFIER, b),
+        Token.build(TokenType.SYMBOL, plus),
+        Token.build(TokenType.IDENTIFIER, a)
+    );
+    TokenMatcher.matchAll(expectedTokens, tokenizer);
+  }
+
+  @Test
+  public void returnIdentifierAndSymbol() throws Exception {
+    String[] delimiters = { "", " "};
+    for (String delimiter : delimiters) {
+      String a = "a";
+      String plus = "+";
+      String stream = String.join(delimiter, Arrays.asList(a, plus)) ;
+      Tokenizer tokenizer = buildTokenizer(stream);
+      List<Token> expectedTokens = Arrays.asList(
+          Token.build(TokenType.IDENTIFIER, a),
+          Token.build(TokenType.SYMBOL, plus)
+      );
+      TokenMatcher.matchAll(expectedTokens, tokenizer);
+    }
+  }
+
+  @Test
+  public void returnsTokensNotSeparatedBySpace_aPlusb() throws Exception {
     String a = "a";
     String plus = "+";
     String b = "b";

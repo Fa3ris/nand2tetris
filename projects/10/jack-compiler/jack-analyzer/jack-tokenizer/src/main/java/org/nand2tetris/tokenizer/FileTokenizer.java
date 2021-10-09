@@ -21,7 +21,11 @@ public class FileTokenizer implements Tokenizer {
   private enum State {
     START,
     END,
-    ILLEGAL
+    ILLEGAL,
+    ALPHA_NUM,
+    SYMBOL,
+    DIGIT,
+    ;
   }
 
   /**
@@ -112,27 +116,72 @@ public class FileTokenizer implements Tokenizer {
 
   String lexeme;
 
+  boolean lastCharUsed = true;
+
   @Override
   public void advance() {
 
+    lexeme = null;
     if (reader == null || reader.isEOF()) {
-      lexeme = null;
       return;
     }
 
     StringBuilder sb = new StringBuilder();
 
+    State state = State.START;
     while (true) {
-      reader.advance();
+      if (lastCharUsed) {
+        reader.advance();
+      } else {
+        // reset
+        lastCharUsed = true;
+      }
+
+      if (reader.isEOF() && state == State.START) {
+        return;
+      }
+
       if (reader.isEOF()) {
         lexeme = sb.toString();
         return;
       }
       char charRead = reader.peekChar();
-      if (charRead == ' ') {
+
+      // begin identifier
+      if (state == State.START && Character.isLetter(charRead)) {
+        state = State.ALPHA_NUM;
+      }
+
+      // begin integer
+      if (state == State.START && Character.isDigit(charRead)) {
+        state = State.DIGIT;
+      }
+
+      // begin symbol
+      if (state == State.START && (charRead == '+' || charRead == '{')) {
+        sb.append(charRead);
+        state = State.END;
+      }
+
+      // end identifier when encounter symbol
+      if (state == State.ALPHA_NUM && charRead == '+') {
+        state = State.END;
+        lastCharUsed = false;
+      }
+      // skip whitespace
+      if (state == State.START && charRead == ' ') {
+        continue;
+      }
+      // end identifier when whitespace
+      if (state == State.ALPHA_NUM && charRead == ' ') {
+        state = State.END;
+      }
+
+      if (state == State.END) {
         lexeme = sb.toString();
         return;
       }
+
       sb.append(charRead);
     }
 

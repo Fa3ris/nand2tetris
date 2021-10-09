@@ -56,7 +56,7 @@ public class FileTokenizer implements Tokenizer {
     this.reader = reader;
   }
 
-  private boolean isSymbol(char c) {
+  private boolean isSingleSymbol(char c) {
     switch (c) {
       case '{':
       case '}':
@@ -70,7 +70,7 @@ public class FileTokenizer implements Tokenizer {
       case '+':
       case '-':
       case '*':
-      case '/':
+//      case '/': // TODO special case of comment
       case '&':
       case '|':
       case '<':
@@ -116,117 +116,119 @@ public class FileTokenizer implements Tokenizer {
 
   String lexeme;
 
-  boolean lastCharUsed = true;
+  boolean currentCharUsedByPreviousToken = true;
+
+  private final StringBuilder sb = new StringBuilder();
+
+  private TokenType tokenType;
 
   @Override
   public void advance() {
 
+    // reset lexeme and type;
     lexeme = null;
+    tokenType = null;
+
     if (reader == null || reader.isEOF()) {
       return;
     }
 
-    StringBuilder sb = new StringBuilder();
+    sb.setLength(0);
 
-    State state = State.START;
     while (true) {
-      if (lastCharUsed) {
+      if (currentCharUsedByPreviousToken) {
         reader.advance();
+        if (reader.isEOF()) {
+          return;
+        }
       } else {
         // reset
-        lastCharUsed = true;
+        currentCharUsedByPreviousToken = true;
       }
 
-      if (reader.isEOF() && state == State.START) {
-        return;
-      }
+      // TODO check accepting state for last token
 
-      if (reader.isEOF()) {
-        lexeme = sb.toString();
-        return;
-      }
       char charRead = reader.peekChar();
 
-      // begin identifier
-      if (state == State.START && Character.isLetter(charRead)) {
-        state = State.ALPHA_NUM;
-      }
-
-      // begin integer
-      if (state == State.START && Character.isDigit(charRead)) {
-        state = State.DIGIT;
-      }
-
-      // begin symbol
-      if (state == State.START && (charRead == '+' || charRead == '{')) {
-        sb.append(charRead);
-        state = State.END;
-      }
-
-      // end identifier when encounter symbol
-      if (state == State.ALPHA_NUM && charRead == '+') {
-        state = State.END;
-        lastCharUsed = false;
-      }
-      // skip whitespace
-      if (state == State.START && charRead == ' ') {
+      if (Character.isWhitespace(charRead)) {
         continue;
       }
-      // end identifier when whitespace
-      if (state == State.ALPHA_NUM && charRead == ' ') {
-        state = State.END;
+
+      if (Character.isLetter(charRead)) {
+        sb.append(charRead);
+        tokenizeIdentifier();
+        return;
       }
 
-      if (state == State.END) {
+      if (Character.isDigit(charRead)) {
+        sb.append(charRead);
+        tokenizeInteger();
+        return;
+      }
+
+      if (isSingleSymbol(charRead)) {
+        sb.append(charRead);
+        tokenType = TokenType.SYMBOL;
+        lexeme = sb.toString();
+        return;
+      }
+    }
+  }
+
+  private void tokenizeInteger() {
+    while(true) {
+      reader.advance();
+      if (reader.isEOF()) {
+        tokenType = TokenType.INTEGER;
         lexeme = sb.toString();
         return;
       }
 
-      sb.append(charRead);
+      char charRead = reader.peekChar();
+      if (Character.isDigit(charRead)) {
+        sb.append(charRead);
+        continue;
+      }
+
+      if (charRead == '+') {
+        currentCharUsedByPreviousToken = false;
+      }
+
+      tokenType = TokenType.INTEGER;
+      lexeme = sb.toString();
+      return;
     }
-
-//    State state = State.START;
-//    currentToken = null;
-//
-//    while (true) {
-//      reader.advance();
-//      if (reader.isEOF()) {
-//
-//        return;
-//      }
-//
-//      char newChar = reader.peekChar();
-//
-//      State newState = transition(state, newChar);
-//
-//      if (newState == State.START) {
-//        continue;
-//      }
-//      if (newState == State.END) {
-//        completeToken(state);
-//        return;
-//      }
-//
-//      lexemeBuilder.append(newChar);
-//      state = newState;
-//    }
-
   }
 
-//  private final StringBuilder lexemeBuilder = new StringBuilder();
+  private void tokenizeIdentifier() {
+    while(true) {
+      reader.advance();
+      if (reader.isEOF()) {
+        lexeme = sb.toString();
+        tokenType = TokenType.IDENTIFIER;
+        if (isKeyword(lexeme)) {
+          tokenType = TokenType.KEYWORD;
+        }
+        return;
+      }
 
-  private void completeToken(State state) {
+      char charRead = reader.peekChar();
+      if (Character.isLetterOrDigit(charRead)) {
+        sb.append(charRead);
+        continue;
+      }
 
-    currentToken = new Token();
-//    currentToken.setLexeme(lexemeBuilder.toString());
-    currentToken.setType(TokenType.IDENTIFIER);
+      if (charRead == '+') {
+        currentCharUsedByPreviousToken = false;
+      }
 
-//    lexemeBuilder.setLength(0);
-
-  }
-
-  private State transition(State state, char newChar) {
-    return null;
+      lexeme = sb.toString();
+      tokenType = TokenType.IDENTIFIER;
+      if (isKeyword(lexeme)) {
+        tokenType = TokenType.KEYWORD;
+      }
+      return;
+    }
   }
 
   @Override
@@ -235,16 +237,16 @@ public class FileTokenizer implements Tokenizer {
     Token token = new Token();
     token.setLexeme(lexeme);
 
-    TokenType type = TokenType.IDENTIFIER;
-    if (lexeme.equals("class")) {
-      type = TokenType.KEYWORD;
-    }
-    if (lexeme.equals("+")) {
-      type = TokenType.SYMBOL;
-    }
-    if (lexeme.equals("1342")) {
-      type = TokenType.INTEGER;
-    }
+    TokenType type = tokenType;
+//    if (lexeme.equals("class")) {
+//      type = TokenType.KEYWORD;
+//    }
+//    if (lexeme.equals("+")) {
+//      type = TokenType.SYMBOL;
+//    }
+//    if (lexeme.equals("1342")) {
+//      type = TokenType.INTEGER;
+//    }
     token.setType(type);
     return token;
   }

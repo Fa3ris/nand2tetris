@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.nand2tetris.tokenizer.stubs.CharReaderStub;
 
@@ -14,12 +13,16 @@ public class FileTokenizerTest {
 
   @Test
   public void hasNoTokenIfNoContent() throws Exception {
-    CharReader[] readers = new CharReader[]{
-        null,
-        new CharReaderStub("")
+    String[] whiteSpaces = {
+        "",
+        "     ",
+        "\t",
+        "\n",
+        "\r",
+        "\r\n"
     };
-    for (CharReader reader : readers) {
-      Tokenizer tokenizer = new FileTokenizer(reader);
+    for (String whiteSpace : whiteSpaces) {
+      Tokenizer tokenizer = buildTokenizer(whiteSpace);
       tokenizer.advance();
       assertFalse(tokenizer.hasToken());
     }
@@ -27,14 +30,12 @@ public class FileTokenizerTest {
 
   @Test
   public void hasTokenIfContent() throws Exception {
-
     String[] charStreams = {
         "Hello",
         "{",
         "+"};
     for (String charStream : charStreams) {
-      CharReader reader = new CharReaderStub(charStream);
-      Tokenizer tokenizer = new FileTokenizer(reader);
+      Tokenizer tokenizer = buildTokenizer(charStream);
       tokenizer.advance();
       assertTrue(tokenizer.hasToken());
     }

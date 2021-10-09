@@ -1,5 +1,7 @@
 package org.nand2tetris.tokenizer;
 
+import java.util.Objects;
+
 public class FileTokenizer implements Tokenizer {
 
   private enum InputType {
@@ -53,7 +55,7 @@ public class FileTokenizer implements Tokenizer {
 
 
   public FileTokenizer(CharReader reader) {
-    this.reader = reader;
+    this.reader = Objects.requireNonNull(reader);
   }
 
   private boolean isSingleSymbol(char c) {
@@ -122,12 +124,15 @@ public class FileTokenizer implements Tokenizer {
 
   private TokenType tokenType;
 
+  private Token token;
+
   @Override
   public void advance() {
 
     // reset lexeme and type;
     lexeme = null;
     tokenType = null;
+    token = null;
 
     if (reader == null || reader.isEOF()) {
       return;
@@ -170,6 +175,7 @@ public class FileTokenizer implements Tokenizer {
         sb.append(charRead);
         tokenType = TokenType.SYMBOL;
         lexeme = sb.toString();
+        token = Token.build(tokenType, lexeme);
         return;
       }
     }
@@ -181,6 +187,7 @@ public class FileTokenizer implements Tokenizer {
       if (reader.isEOF()) {
         tokenType = TokenType.INTEGER;
         lexeme = sb.toString();
+        token = Token.build(tokenType, lexeme);
         return;
       }
 
@@ -196,6 +203,7 @@ public class FileTokenizer implements Tokenizer {
 
       tokenType = TokenType.INTEGER;
       lexeme = sb.toString();
+      token = Token.build(tokenType, lexeme);
       return;
     }
   }
@@ -209,6 +217,7 @@ public class FileTokenizer implements Tokenizer {
         if (isKeyword(lexeme)) {
           tokenType = TokenType.KEYWORD;
         }
+        token = Token.build(tokenType, lexeme);
         return;
       }
 
@@ -227,32 +236,18 @@ public class FileTokenizer implements Tokenizer {
       if (isKeyword(lexeme)) {
         tokenType = TokenType.KEYWORD;
       }
+      token = Token.build(tokenType, lexeme);
       return;
     }
   }
 
   @Override
   public Token peekToken() {
-
-    Token token = new Token();
-    token.setLexeme(lexeme);
-
-    TokenType type = tokenType;
-//    if (lexeme.equals("class")) {
-//      type = TokenType.KEYWORD;
-//    }
-//    if (lexeme.equals("+")) {
-//      type = TokenType.SYMBOL;
-//    }
-//    if (lexeme.equals("1342")) {
-//      type = TokenType.INTEGER;
-//    }
-    token.setType(type);
     return token;
   }
 
   @Override
   public boolean hasToken() {
-    return reader != null && lexeme != null;
+    return reader != null && token != null;
   }
 }

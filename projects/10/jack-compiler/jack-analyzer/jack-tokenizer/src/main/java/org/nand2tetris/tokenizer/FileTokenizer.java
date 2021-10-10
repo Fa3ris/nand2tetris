@@ -4,61 +4,13 @@ import java.util.Objects;
 
 public class FileTokenizer implements Tokenizer {
 
-  private enum InputType {
-    CHAR(0), // not one of other input types
-    DIGIT(1),
-    WS(4), // white space except EOL
-    SLASH(3), // needed for detecting comments
-    D_QUOTE(5), // double quote
-    SYMBOL(5),
-    EOL(3), // end of line
-    EOF(6);
-
-    final int colIndex;
-    InputType(int colIndex) {
-      this.colIndex = colIndex;
-    }
-  }
-
-  private enum State {
-    START,
-    END,
-    ILLEGAL,
-    ALPHA_NUM,
-    SYMBOL,
-    DIGIT,
-    ;
-  }
-
-  /**
-   *
-   * advance() {
-   *   state = start
-   *   while state != end
-   *    reader.advance();
-   *    if reader.isEOF() }
-   *      error
-   *    }
-   *
-   *    reader.peekChar()
-   *    lexemeBuilder.append(char);
-   *
-   *    newState = transition(state, peekedChar);
-   *
-   *    if illegal char throw
-   *
-   *
-   * }
-   */
   private final CharReader reader;
-
-
 
   public FileTokenizer(CharReader reader) {
     this.reader = Objects.requireNonNull(reader);
   }
 
-  private boolean isSingleSymbol(char c) {
+  private boolean isSymbol(char c) {
     switch (c) {
       case '{':
       case '}':
@@ -72,7 +24,7 @@ public class FileTokenizer implements Tokenizer {
       case '+':
       case '-':
       case '*':
-      case '/': // TODO special case of comment
+      case '/':
       case '&':
       case '|':
       case '<':
@@ -114,31 +66,26 @@ public class FileTokenizer implements Tokenizer {
     }
   }
 
-  private Token currentToken;
-
-  String lexeme;
 
   boolean currentCharUsedByPreviousToken = true;
 
   private final StringBuilder sb = new StringBuilder();
 
-  private TokenType tokenType;
-
   private Token token;
+
+  private void resetToken() {
+    token = null;
+    sb.setLength(0);
+  }
 
   @Override
   public void advance() {
 
-    // reset lexeme and type;
-    lexeme = null;
-    tokenType = null;
-    token = null;
+    resetToken();
 
     if (reader.isEOF()) {
       return;
     }
-
-    sb.setLength(0);
 
     while (true) {
       if (currentCharUsedByPreviousToken) {
@@ -147,19 +94,23 @@ public class FileTokenizer implements Tokenizer {
           return;
         }
       } else {
-        // reset
         currentCharUsedByPreviousToken = true;
       }
 
       // TODO check accepting state for last token
-
       char charRead = reader.peekChar();
 
       if (Character.isWhitespace(charRead)) {
         continue;
       }
 
-      if (Character.isLetter(charRead) || charRead == '_') {
+      if (charRead == '"') {
+        tokenizeStringLiteral();
+        return;
+      }
+
+      boolean isIdentifierStartChar = Character.isLetter(charRead) || charRead == '_';
+      if (isIdentifierStartChar) {
         sb.append(charRead);
         tokenizeIdentifier();
         return;
@@ -171,13 +122,119 @@ public class FileTokenizer implements Tokenizer {
         return;
       }
 
-      if (isSingleSymbol(charRead)) {
-        sb.append(charRead);
-        tokenType = TokenType.SYMBOL;
-        lexeme = sb.toString();
-        token = Token.build(tokenType, lexeme);
+      if (charRead == '/') {
+        reader.advance();
+        if (reader.isEOF()) {
+          buildDivide();
+          return;
+        }
+        charRead = reader.peekChar();
+
+        if (isLineBreak(charRead)) { // TODO test slash then line break
+          buildDivide();
+          return;
+        }
+
+        if (charRead == '/') {
+          consumeLineComment();
+          if (reader.isEOF()) {
+            return;
+          }
+          continue;
+        }
+
+        if (charRead == '*') {
+          consumeBlockComment();
+          if (reader.isEOF()) {
+            return;
+          }
+          continue;
+        }
+
+        buildDivide();
         return;
       }
+
+      if (isSymbol(charRead)) {
+        sb.append(charRead);
+        token = Token.build(TokenType.SYMBOL, sb.toString());
+        return;
+      }
+    }
+  }
+
+  private void buildDivide() {
+    token = Token.build(TokenType.SYMBOL, "/");
+  }
+
+  private void consumeBlockComment() {
+    while(true) {
+      reader.advance();
+      if (reader.isEOF()) {
+        throw new RuntimeException("block comment not closed but EOF");
+      }
+      char charRead = reader.peekChar();
+      if (charRead == '*') {
+        reader.advance();
+        if (reader.isEOF()) {
+          throw new RuntimeException("block comment not closed but EOF");
+        }
+        charRead = reader.peekChar();
+        if (charRead == '/') {
+          return;
+        }
+      }
+    }
+  }
+
+  private void consumeLineComment() {
+    char charRead;
+    while(true) {
+      reader.advance();
+      if (reader.isEOF()) {
+        return;
+      }
+      charRead = reader.peekChar();
+      if (isLineBreak(charRead)) {
+        return;
+      }
+    }
+  }
+
+  private boolean isLineBreak(char charRead) {
+    return charRead == '\n' || charRead == '\r';
+  }
+
+  private void tokenizeStringLiteral() {
+    while(true) {
+      reader.advance();
+      if (reader.isEOF()) {
+        throw new RuntimeException("string literal not completed but EOF " + sb);
+      }
+
+      char charRead = reader.peekChar();
+      if (isLineBreak(charRead)) {
+        throw new RuntimeException("string literal not completed but line break");
+      }
+
+      if (charRead == '\\') {
+        reader.advance();
+        if (reader.isEOF()) {
+          throw new RuntimeException("escape char not completed" + sb);
+        }
+
+        charRead = reader.peekChar();
+        if (charRead == '"') {
+          sb.append(charRead);
+          continue;
+        }
+      }
+
+      if (charRead == '"') {
+        token = Token.build(TokenType.STRING, sb.toString());
+        return;
+      }
+      sb.append(charRead);
     }
   }
 
@@ -185,9 +242,7 @@ public class FileTokenizer implements Tokenizer {
     while(true) {
       reader.advance();
       if (reader.isEOF()) {
-        tokenType = TokenType.INTEGER;
-        lexeme = sb.toString();
-        token = Token.build(tokenType, lexeme);
+        token = Token.build(TokenType.INTEGER, sb.toString());
         return;
       }
 
@@ -197,13 +252,11 @@ public class FileTokenizer implements Tokenizer {
         continue;
       }
 
-      if (charRead == '+') {
+      if (!Character.isWhitespace(charRead)) {
         currentCharUsedByPreviousToken = false;
       }
 
-      tokenType = TokenType.INTEGER;
-      lexeme = sb.toString();
-      token = Token.build(tokenType, lexeme);
+      token = Token.build(TokenType.INTEGER, sb.toString());
       return;
     }
   }
@@ -212,33 +265,33 @@ public class FileTokenizer implements Tokenizer {
     while(true) {
       reader.advance();
       if (reader.isEOF()) {
-        lexeme = sb.toString();
-        tokenType = TokenType.IDENTIFIER;
-        if (isKeyword(lexeme)) {
-          tokenType = TokenType.KEYWORD;
-        }
-        token = Token.build(tokenType, lexeme);
+        buildIdentifierOrKeyword();
         return;
       }
 
       char charRead = reader.peekChar();
-      if (Character.isLetterOrDigit(charRead) || charRead == '_') {
+      boolean isIdentifierInsideChar = Character.isLetterOrDigit(charRead) || charRead == '_';
+      if (isIdentifierInsideChar) {
         sb.append(charRead);
         continue;
       }
 
-      if (charRead == '+') {
+      if (!Character.isWhitespace(charRead)) {
         currentCharUsedByPreviousToken = false;
       }
 
-      lexeme = sb.toString();
-      tokenType = TokenType.IDENTIFIER;
-      if (isKeyword(lexeme)) {
-        tokenType = TokenType.KEYWORD;
-      }
-      token = Token.build(tokenType, lexeme);
+      buildIdentifierOrKeyword();
       return;
     }
+  }
+
+  private void buildIdentifierOrKeyword() {
+    String lexeme = sb.toString();
+    TokenType tokenType = TokenType.IDENTIFIER;
+    if (isKeyword(lexeme)) {
+      tokenType = TokenType.KEYWORD;
+    }
+    token = Token.build(tokenType, lexeme);
   }
 
   @Override

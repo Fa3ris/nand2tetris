@@ -1,5 +1,6 @@
 package org.nand2tetris.tokenizer;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -110,7 +111,7 @@ public class FileTokenizerTest {
 
 
   @Test
-  public void returnsSymbol_plus() throws Exception {
+  public void returnsSymbol() throws Exception {
     String[] symbols = {
       "+",
       "{",
@@ -224,15 +225,94 @@ public class FileTokenizerTest {
 
   @Test
   public void returnStringLiteral() throws Exception {
-    String content = "my string literal";
+    String[] contents = {
+        "my string literal",
+    };
+    for (String content : contents) {
+      String literal = "\"" + content + "\"";
+      Tokenizer tokenizer = buildTokenizer(literal);
+      List<Token> expectedTokens = Collections.singletonList(
+          Token.build(TokenType.STRING, content)
+      );
+      TokenMatcher.matchAll(expectedTokens, tokenizer);
+    }
+  }
+
+  @Test
+  public void escapeStringLiteral() throws Exception {
+    String prefix = "literal";
+    String suffix = "quotes";
+    String content = prefix + "\\\"" + suffix;
+    String expectedContent = prefix + "\"" + suffix;
     String literal = "\"" + content + "\"";
+    Tokenizer tokenizer = buildTokenizer(literal);
+    List<Token> expectedTokens = Collections.singletonList(
+        Token.build(TokenType.STRING, expectedContent)
+    );
+    TokenMatcher.matchAll(expectedTokens, tokenizer);
+
   }
   @Test
   public void ignoresComment() throws Exception {
-    String lineComment = "function // this is a comment";
-    String blockComment = "/* this is a comment */let";
-    String docComment = "}/** this is a comment */";
+    String[] comments = {
+        "// this is a comment",
+        "/* block comment one one line */",
+        "/** block documentation comment */",
+        "/** block documentation \n comment */",
+    };
 
+    for (String comment : comments) {
+      Tokenizer tokenizer = buildTokenizer(comment);
+      tokenizer.advance();
+      assertFalse(tokenizer.hasToken());
+    }
+
+  }
+
+  @Test
+  public void findTokenAfterComment() throws Exception {
+    String lineComment = "/* this is a comment */let";
+    Tokenizer tokenizer = buildTokenizer(lineComment);
+    tokenizer.advance();
+    assertEquals(Token.build(TokenType.KEYWORD, "let"), tokenizer.peekToken());
+    tokenizer.advance();
+    assertFalse(tokenizer.hasToken());
+  }
+
+  @Test
+  public void findTokenBeforeCommentNoSpace() throws Exception {
+    String lineComment = "}/** this is a comment */";
+    Tokenizer tokenizer = buildTokenizer(lineComment);
+    tokenizer.advance();
+    assertEquals(Token.build(TokenType.SYMBOL, "}"), tokenizer.peekToken());
+    tokenizer.advance();
+    assertFalse(tokenizer.hasToken());
+  }
+
+  @Test
+  public void findTokenBeforeComment() throws Exception {
+    String lineComment = "function // this is a comment";
+    Tokenizer tokenizer = buildTokenizer(lineComment);
+    tokenizer.advance();
+    assertEquals(Token.build(TokenType.KEYWORD, "function"), tokenizer.peekToken());
+    tokenizer.advance();
+    assertFalse(tokenizer.hasToken());
+  }
+
+  @Test
+  public void blockCommentMultiLine() throws Exception {
+    String lineComment = "/** this is a comment \n over multiple lines */";
+    Tokenizer tokenizer = buildTokenizer(lineComment);
+    tokenizer.advance();
+    assertFalse(tokenizer.hasToken());
+  }
+
+  @Test
+  public void divideAtEndOfLine() throws Exception {
+    String lineComment = "/\n";
+    Tokenizer tokenizer = buildTokenizer(lineComment);
+    tokenizer.advance();
+    assertEquals(Token.build(TokenType.SYMBOL, "/"), tokenizer.peekToken());
   }
 
   private Tokenizer buildTokenizer(String charStream) {

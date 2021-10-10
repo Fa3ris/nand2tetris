@@ -72,7 +72,7 @@ public class FileTokenizer implements Tokenizer {
       case '+':
       case '-':
       case '*':
-//      case '/': // TODO special case of comment
+      case '/': // TODO special case of comment
       case '&':
       case '|':
       case '<':
@@ -134,7 +134,7 @@ public class FileTokenizer implements Tokenizer {
     tokenType = null;
     token = null;
 
-    if (reader == null || reader.isEOF()) {
+    if (reader.isEOF()) {
       return;
     }
 
@@ -159,7 +159,7 @@ public class FileTokenizer implements Tokenizer {
         continue;
       }
 
-      if (Character.isLetter(charRead)) {
+      if (Character.isLetter(charRead) || charRead == '_') {
         sb.append(charRead);
         tokenizeIdentifier();
         return;
@@ -222,7 +222,7 @@ public class FileTokenizer implements Tokenizer {
       }
 
       char charRead = reader.peekChar();
-      if (Character.isLetterOrDigit(charRead)) {
+      if (Character.isLetterOrDigit(charRead) || charRead == '_') {
         sb.append(charRead);
         continue;
       }
@@ -248,6 +248,6 @@ public class FileTokenizer implements Tokenizer {
 
   @Override
   public boolean hasToken() {
-    return reader != null && token != null;
+    return token != null;
   }
 }

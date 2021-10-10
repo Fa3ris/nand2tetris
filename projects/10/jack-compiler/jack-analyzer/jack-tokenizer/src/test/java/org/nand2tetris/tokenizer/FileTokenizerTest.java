@@ -33,7 +33,8 @@ public class FileTokenizerTest {
     String[] charStreams = {
         "Hello",
         "{",
-        "+"};
+        "+"
+    };
     for (String charStream : charStreams) {
       Tokenizer tokenizer = buildTokenizer(charStream);
       tokenizer.advance();
@@ -43,7 +44,14 @@ public class FileTokenizerTest {
 
   @Test
   public void returnsIdentifierToken() throws Exception {
-    String[] lexemes = new String[] {"Hello", "Bye"};
+    String[] lexemes = {
+        "Hello",
+        "Bye",
+        "_underscore",
+        "var123",
+        "var_123",
+        "var_123_foo"
+    };
     for (String lexeme : lexemes) {
       Tokenizer tokenizer = buildTokenizer(lexeme);
       List<Token> expectedTokens = Collections.singletonList(
@@ -55,12 +63,36 @@ public class FileTokenizerTest {
 
   @Test
   public void returnsKeyword_class() throws Exception {
-    String lexeme = "class";
-    Tokenizer tokenizer = buildTokenizer(lexeme);
-    List<Token> expectedTokens = Collections.singletonList(
-        Token.build(TokenType.KEYWORD, lexeme)
-    );
-    TokenMatcher.matchAll(expectedTokens, tokenizer);
+    String[] keywords = {
+        "class",
+        "constructor",
+        "function",
+        "method",
+        "field",
+        "static",
+        "var",
+        "int",
+        "char",
+        "boolean",
+        "void",
+        "true",
+        "false",
+        "null",
+        "this",
+        "let",
+        "do",
+        "if",
+        "else",
+        "while",
+        "return"
+    };
+    for (String lexeme : keywords) {
+      Tokenizer tokenizer = buildTokenizer(lexeme);
+      List<Token> expectedTokens = Collections.singletonList(
+          Token.build(TokenType.KEYWORD, lexeme)
+      );
+      TokenMatcher.matchAll(expectedTokens, tokenizer);
+    }
   }
 
   @Test
@@ -79,23 +111,54 @@ public class FileTokenizerTest {
 
   @Test
   public void returnsSymbol_plus() throws Exception {
-    String symbolLexeme = "+";
+    String[] symbols = {
+      "+",
+      "{",
+      "}",
+      "(",
+      ")",
+      "[",
+      "]",
+      ".",
+      ",",
+      ";",
+      "+",
+      "-",
+      "*",
+      "/",
+      "&",
+      "|",
+      "<",
+      ">",
+      "=",
+      "~"
+    };
+    for (String symbolLexeme : symbols) {
+
     Tokenizer tokenizer = buildTokenizer(symbolLexeme);
     List<Token> expectedTokens = Collections.singletonList(
         Token.build(TokenType.SYMBOL, symbolLexeme)
     );
     TokenMatcher.matchAll(expectedTokens, tokenizer);
+    }
   }
 
 
   @Test
   public void returnsInteger() throws Exception {
-    String integerLexeme = "1342";
-    Tokenizer tokenizer = buildTokenizer(integerLexeme);
-    List<Token> expectedTokens = Collections.singletonList(
-        Token.build(TokenType.INTEGER, integerLexeme)
-    );
-    TokenMatcher.matchAll(expectedTokens, tokenizer);
+    String[] integers = {
+        "1342",
+        "9999",
+        "0",
+        "32767"
+    };
+    for (String integerLexeme : integers) {
+      Tokenizer tokenizer = buildTokenizer(integerLexeme);
+      List<Token> expectedTokens = Collections.singletonList(
+          Token.build(TokenType.INTEGER, integerLexeme)
+      );
+      TokenMatcher.matchAll(expectedTokens, tokenizer);
+    }
   }
 
   @Test

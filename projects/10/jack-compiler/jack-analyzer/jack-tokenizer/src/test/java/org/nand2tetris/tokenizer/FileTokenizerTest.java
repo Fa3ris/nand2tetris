@@ -315,6 +315,32 @@ public class FileTokenizerTest {
     assertEquals(Token.build(TokenType.SYMBOL, "/"), tokenizer.peekToken());
   }
 
+  @Test
+  public void parseSnippet() throws Exception {
+    String snippet = "if (x < 0) {\n"
+        + "\t// prints the sign\n"
+        + "\tlet sign = \"negative\";\n"
+        + "}";
+
+    Tokenizer tokenizer = buildTokenizer(snippet);
+    List<Token> expectedTokens = Arrays.asList(
+        Token.build(TokenType.KEYWORD, "if"),
+        Token.build(TokenType.SYMBOL, "("),
+        Token.build(TokenType.IDENTIFIER, "x"),
+        Token.build(TokenType.SYMBOL, "<"),
+        Token.build(TokenType.INTEGER, "0"),
+        Token.build(TokenType.SYMBOL, ")"),
+        Token.build(TokenType.SYMBOL, "{"),
+        Token.build(TokenType.KEYWORD, "let"),
+        Token.build(TokenType.IDENTIFIER, "sign"),
+        Token.build(TokenType.SYMBOL, "="),
+        Token.build(TokenType.STRING, "negative"),
+        Token.build(TokenType.SYMBOL, ";"),
+        Token.build(TokenType.SYMBOL, "}")
+    );
+    TokenMatcher.matchAll(expectedTokens, tokenizer);
+  }
+
   private Tokenizer buildTokenizer(String charStream) {
     CharReader reader = new CharReaderStub(charStream);
     return new FileTokenizer(reader);

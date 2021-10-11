@@ -48,6 +48,12 @@
         <scope>test</scope>
       </dependency>
 
+      <dependency>
+        <groupId>org.nand2tetris</groupId>
+        <artifactId>jack-tokenizer</artifactId>
+        <version>1.0-SNAPSHOT</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
@@ -101,6 +107,10 @@
         <plugin>
           <artifactId>maven-project-info-reports-plugin</artifactId>
           <version>3.0.0</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>3.3.0</version>
         </plugin>
       </plugins>
     </pluginManagement>

@@ -16,6 +16,7 @@
 
   <modules>
     <module>jack-tokenizer</module>
+    <module>jack-tokenizer-tester</module>
   </modules>
 
   <name>JACK ANALYZER</name>

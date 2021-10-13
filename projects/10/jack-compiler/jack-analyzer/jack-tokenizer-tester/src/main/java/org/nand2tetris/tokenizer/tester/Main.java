@@ -1,6 +1,5 @@
 package org.nand2tetris.tokenizer.tester;
 
-import com.sun.org.apache.xalan.internal.res.XSLTErrorResources;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -35,6 +34,10 @@ public class Main {
       Tokenizer tokenizer = new FileTokenizer(charReader);
       TokenToTagMapper mapper = new TokenToTagMapper();
 
+      String parentTag = "tokens";
+      bf.write( String.format("<%1$s>", parentTag));
+      bf.newLine();
+
       while (true) {
         tokenizer.advance();
         if (!tokenizer.hasToken()) {
@@ -44,6 +47,7 @@ public class Main {
         bf.write(tag);
         bf.newLine();
       }
+      bf.write( String.format("</%1$s>", parentTag));
     } catch (IOException e) {
       System.err.println("IO error: " + e.getMessage());
       e.printStackTrace(System.err);

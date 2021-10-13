@@ -1,7 +1,6 @@
 package org.nand2tetris.tokenizer.tester;
 
 import org.nand2tetris.tokenizer.Token;
-import org.nand2tetris.tokenizer.TokenType;
 
 public class TokenToTagMapper {
 
@@ -28,10 +27,24 @@ public class TokenToTagMapper {
       default:
         throw new RuntimeException("invalid type");
     }
-//    if (token.getType() == TokenType.SYMBOL) {
-//      tagName = "symbol";
-//    }
-    return String.format("<%1$s> %2$s </%1$s>",tagName, token.getLexeme());
+    String escapedLexeme = escape(token.getLexeme());
+    return String.format("<%1$s> %2$s </%1$s>",tagName, escapedLexeme);
+  }
+
+  private String escape(String lexeme) {
+    switch (lexeme) {
+
+      case "<":
+        return "&lt;";
+      case ">":
+        return "&gt;";
+      case "\"":
+        return "&quot;";
+      case "&":
+        return "&amp;";
+      default:
+        return lexeme;
+    }
   }
 
 }

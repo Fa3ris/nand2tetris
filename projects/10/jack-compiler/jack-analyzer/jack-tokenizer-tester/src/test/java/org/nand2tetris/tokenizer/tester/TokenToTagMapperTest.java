@@ -50,4 +50,20 @@ public class TokenToTagMapperTest {
     assertEquals(expectedContent, tag);
   }
 
+  @Test
+  public void escapeHTMLSymbols() throws Exception {
+    String[] symbols = { "<", ">", "\"", "&"};
+    String[] escaped = {"&lt;",	"&gt;",	"&quot;", "&amp;"};
+
+    for (int i = 0; i < symbols.length; i++) {
+      Token token = Token.build(TokenType.IDENTIFIER, symbols[i]);
+      String tag = mapper.convertToken(token);
+      String expectedContent = "<identifier> " + escaped[i] + " </identifier>";
+      assertEquals(expectedContent, tag);
+
+    }
+
+
+  }
+
 }

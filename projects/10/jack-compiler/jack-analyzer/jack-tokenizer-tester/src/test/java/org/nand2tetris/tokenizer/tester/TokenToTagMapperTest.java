@@ -30,7 +30,7 @@ public class TokenToTagMapperTest {
   public void returnIntegerTag() throws Exception {
     Token token = Token.build(TokenType.INTEGER, "0");
     String tag = mapper.convertToken(token);
-    String expectedContent = "<intConst> 0 </intConst>";
+    String expectedContent = "<integerConstant> 0 </integerConstant>";
     assertEquals(expectedContent, tag);
   }
 
@@ -38,7 +38,7 @@ public class TokenToTagMapperTest {
   public void returnStringTag() throws Exception {
     Token token = Token.build(TokenType.STRING, "negative");
     String tag = mapper.convertToken(token);
-    String expectedContent = "<stringConst> negative </stringConst>";
+    String expectedContent = "<stringConstant> negative </stringConstant>";
     assertEquals(expectedContent, tag);
   }
 

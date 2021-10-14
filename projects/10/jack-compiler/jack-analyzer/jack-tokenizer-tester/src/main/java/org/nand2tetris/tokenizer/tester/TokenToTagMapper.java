@@ -13,10 +13,10 @@ public class TokenToTagMapper {
         tagName = "keyword";
         break;
       case STRING:
-        tagName = "stringConst";
+        tagName = "stringConstant";
         break;
       case INTEGER:
-        tagName = "intConst";
+        tagName = "integerConstant";
         break;
       case SYMBOL:
         tagName = "symbol";

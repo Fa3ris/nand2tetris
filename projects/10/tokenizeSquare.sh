@@ -9,4 +9,4 @@ do
     ./token-tester.sh "$element"
 done
 
-./compareExpressionLessSquare.sh
+./compareSquare.sh

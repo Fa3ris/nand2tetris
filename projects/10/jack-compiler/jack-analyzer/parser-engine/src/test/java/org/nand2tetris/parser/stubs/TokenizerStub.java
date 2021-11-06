@@ -8,24 +8,29 @@ import org.nand2tetris.tokenizer.Tokenizer;
 
 public class TokenizerStub implements Tokenizer {
 
-  private Queue<Token> queue;
+  private final Queue<Token> queue;
 
   public TokenizerStub(List<Token> tokens) {
-    this.queue = new LinkedList<>(tokens);
+    this.queue = new LinkedList<>();
+    if (tokens == null || tokens.isEmpty()) {
+      return;
+    }
+    queue.add(null); // for 1st advance
+    queue.addAll(tokens);
   }
 
   @Override
   public void advance() {
-
+    queue.remove();
   }
 
   @Override
   public Token peekToken() {
-    return null;
+    return queue.element();
   }
 
   @Override
   public boolean hasToken() {
-    return false;
+    return !queue.isEmpty();
   }
 }

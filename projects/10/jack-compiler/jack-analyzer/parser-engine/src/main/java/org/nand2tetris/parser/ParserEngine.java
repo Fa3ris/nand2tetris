@@ -3,6 +3,7 @@ package org.nand2tetris.parser;
 import java.util.function.Predicate;
 import org.nand2tetris.parser.ast.AST;
 import org.nand2tetris.parser.ast.ClassNode;
+import org.nand2tetris.parser.ast.ClassVarDecNode;
 import org.nand2tetris.parser.ast.JackAST;
 import org.nand2tetris.parser.ast.Node;
 import org.nand2tetris.tokenizer.Token;
@@ -22,10 +23,17 @@ public class ParserEngine implements Parser {
   public AST parse() {
     tokenizer.advance();
     if (tokenizer.hasToken()) {
-      Token token = tokenizer.peekToken();
+      token = tokenizer.peekToken();
 
       if (isClassToken().test(token)) {
         Node node = parseClass();
+        AST ast = new JackAST();
+        ast.addNode(node);
+        return ast;
+      }
+
+      if (isFieldToken().test(token)) {
+        Node node = parseClassVarDec();
         AST ast = new JackAST();
         ast.addNode(node);
         return ast;
@@ -34,35 +42,66 @@ public class ParserEngine implements Parser {
     return null;
   }
 
+  private Node parseClassVarDec() {
+    ClassVarDecNode node = new ClassVarDecNode();
+    node.setScope(token);
+    tokenizer.advance();
+    token = tokenizer.peekToken();
+    ensureValidToken(token, isIntToken());
+    node.setType(token);
+
+    tokenizer.advance();
+    token = tokenizer.peekToken();
+    ensureValidToken(token, isTokenType(TokenType.IDENTIFIER));
+    node.setVarName(token);
+
+    tokenizer.advance();
+    token = tokenizer.peekToken();
+    ensureValidToken(token, isSymbol(";"));
+
+    return node;
+  }
 
   private Node parseClass() {
 
     tokenizer.advance();
     token = tokenizer.peekToken();
-    ensureTokenOfType(token, isOfType(TokenType.IDENTIFIER));
+    ensureValidToken(token, isTokenType(TokenType.IDENTIFIER));
     ClassNode node = new ClassNode();
     node.setClassName(token.getLexeme());
 
     tokenizer.advance();
     token = tokenizer.peekToken();
-    ensureTokenOfType(token, isSymbol("{"));
+    ensureValidToken(token, isSymbol("{"));
 
     tokenizer.advance();
     token = tokenizer.peekToken();
-    ensureTokenOfType(token, isSymbol("}"));
+    ensureValidToken(token, isSymbol("}"));
 
     return node;
   }
 
   private Predicate<Token> isClassToken() {
-    return isKeyword().and(isLexeme("class"));
+    return isKeyword("class");
   }
 
-  private Predicate<Token> isKeyword() {
-    return isOfType(TokenType.KEYWORD);
+  private Predicate<Token> isFieldToken() {
+    return isKeyword("field");
   }
 
-  private Predicate<Token> isOfType(TokenType type) {
+  private Predicate<Token> isIntToken() {
+    return isKeyword("int");
+  }
+
+  private Predicate<Token> isKeyword(String lexeme) {
+    return isKeywordToken().and(isLexeme(lexeme));
+  }
+
+  private Predicate<Token> isKeywordToken() {
+    return isTokenType(TokenType.KEYWORD);
+  }
+
+  private Predicate<Token> isTokenType(TokenType type) {
     return token -> token.getType() == type;
   }
 
@@ -71,10 +110,10 @@ public class ParserEngine implements Parser {
   }
 
   private Predicate<Token> isSymbol(String lexeme) {
-    return isOfType(TokenType.SYMBOL).and(isLexeme(lexeme));
+    return isTokenType(TokenType.SYMBOL).and(isLexeme(lexeme));
   }
 
-  private void ensureTokenOfType(Token token, Predicate<Token> predicate) {
+  private void ensureValidToken(Token token, Predicate<Token> predicate) {
       if (!predicate.test(token)) {
         throw new RuntimeException("invalid token " + token);
       }

@@ -37,6 +37,28 @@ public class ParserEngineTest {
     assertEquals(expectedXml, ast.toXMLString());
   }
 
+  @Test
+  public void parseSimpleClassVarDec() throws Exception {
+    List<Token> tokens = Arrays.asList(
+        Token.build(TokenType.KEYWORD, "field"),
+        Token.build(TokenType.KEYWORD, "int"),
+        Token.build(TokenType.IDENTIFIER, "size"),
+        Token.build(TokenType.SYMBOL, ";")
+    );
+
+    AST ast = parse(tokens);
+
+    String expectedXml = concat(Arrays.asList(
+        openTag("classVarDec"),
+        leafTag("keyword", "field"),
+        leafTag("keyword", "int"),
+        leafTag("identifier", "size"),
+        leafTag("symbol", ";"),
+        closeTag("classVarDec")));
+
+    assertEquals(expectedXml, ast.toXMLString());
+  }
+
   private AST parse(List<Token> tokens) {
     return new ParserEngine(new TokenizerStub(tokens)).parse();
   }

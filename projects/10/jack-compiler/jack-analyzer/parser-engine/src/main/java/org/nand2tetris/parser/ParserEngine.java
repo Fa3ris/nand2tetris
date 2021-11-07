@@ -53,10 +53,19 @@ public class ParserEngine implements Parser {
     tokenizer.advance();
     token = tokenizer.peekToken();
     ensureValidToken(token, isTokenType(TokenType.IDENTIFIER));
-    node.setVarName(token);
+    node.addVarName(token);
 
     tokenizer.advance();
     token = tokenizer.peekToken();
+
+    if (isSymbol(",").test(token)) {
+      tokenizer.advance();
+      token = tokenizer.peekToken();
+      ensureValidToken(token, isTokenType(TokenType.IDENTIFIER));
+      node.addVarName(token);
+      tokenizer.advance();
+      token = tokenizer.peekToken();
+    }
     ensureValidToken(token, isSymbol(";"));
 
     return node;

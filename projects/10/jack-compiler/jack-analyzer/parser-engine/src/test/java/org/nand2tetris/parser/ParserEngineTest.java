@@ -48,12 +48,36 @@ public class ParserEngineTest {
         Token.build(TokenType.IDENTIFIER, "size"),
         Token.build(TokenType.SYMBOL, ";")
     );
-    
+
     String expectedXml = concat(Arrays.asList(
         openTag("classVarDec"),
         leafTag("keyword", "field"),
         leafTag("keyword", "int"),
         leafTag("identifier", "size"),
+        leafTag("symbol", ";"),
+        closeTag("classVarDec")));
+
+    assertASTXML(tokens, expectedXml);
+  }
+
+  @Test
+  public void parseMultipleClassVarDec() throws Exception {
+    List<Token> tokens = Arrays.asList(
+        Token.build(TokenType.KEYWORD, "field"),
+        Token.build(TokenType.KEYWORD, "int"),
+        Token.build(TokenType.IDENTIFIER, "x"),
+        Token.build(TokenType.SYMBOL, ","),
+        Token.build(TokenType.IDENTIFIER, "y"),
+        Token.build(TokenType.SYMBOL, ";")
+    );
+
+    String expectedXml = concat(Arrays.asList(
+        openTag("classVarDec"),
+        leafTag("keyword", "field"),
+        leafTag("keyword", "int"),
+        leafTag("identifier", "x"),
+        leafTag("symbol", ","),
+        leafTag("identifier", "y"),
         leafTag("symbol", ";"),
         closeTag("classVarDec")));
 

@@ -2,21 +2,21 @@ package org.nand2tetris.parser.ast;
 
 import static org.nand2tetris.parser.utils.XMLUtils.closeTag;
 import static org.nand2tetris.parser.utils.XMLUtils.concat;
-import static org.nand2tetris.parser.utils.XMLUtils.leafTag;
+import static org.nand2tetris.parser.utils.XMLUtils.identifierTag;
+import static org.nand2tetris.parser.utils.XMLUtils.keywordTag;
 import static org.nand2tetris.parser.utils.XMLUtils.openTag;
+import static org.nand2tetris.parser.utils.XMLUtils.symbolTag;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import org.nand2tetris.tokenizer.Token;
 
 public class ClassVarDecNode extends AbstractNode {
 
+  private static final String tagName = "classVarDec";
   private Token scope;
   private Token type;
-  private Token varName;
-
   private List<Token> varNames = new ArrayList<>();
 
   public void setScope(Token scope) {
@@ -27,26 +27,22 @@ public class ClassVarDecNode extends AbstractNode {
     this.type = type;
   }
 
-  public void setVarName(Token varName) {
-    this.varName = varName;
-  }
-
   @Override
   public String toXMLString() {
     List<String> tags = new ArrayList<>();
-    tags.add(openTag("classVarDec"));
-    tags.add(leafTag("keyword", scope.getLexeme()));
-    tags.add(leafTag("keyword", type.getLexeme()));
+    tags.add(openTag(tagName));
+    tags.add(keywordTag(scope.getLexeme()));
+    tags.add(keywordTag(type.getLexeme()));
     Iterator<Token> it = varNames.iterator();
-    tags.add(leafTag("identifier", it.next().getLexeme()));
+    tags.add(identifierTag(it.next().getLexeme()));
 
     while (it.hasNext()) {
-      tags.add(leafTag("symbol", ","));
-      tags.add(leafTag("identifier", it.next().getLexeme()));
+      tags.add(symbolTag( ","));
+      tags.add(identifierTag(it.next().getLexeme()));
     }
 
-    tags.add(leafTag("symbol", ";"));
-    tags.add(closeTag("classVarDec"));
+    tags.add(symbolTag(";"));
+    tags.add(closeTag(tagName));
 
     return concat(tags);
   }

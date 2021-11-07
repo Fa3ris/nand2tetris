@@ -16,6 +16,20 @@ public abstract class XMLUtils {
     return String.format("<%1$s> %2$s </%1$s>", tagName, innerText);
   }
 
+  public static String symbolTag(String innerText) {
+    return leafTag("symbol", innerText);
+  }
+
+  public static String keywordTag(String innerText) {
+    return leafTag("keyword", innerText);
+  }
+
+  public static String identifierTag(String innerText) {
+    return leafTag("identifier", innerText);
+  }
+
+
+
   public static String concat(List<String> list) {
     StringBuilder sb = new StringBuilder();
     for (String s : list) {

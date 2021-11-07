@@ -1,7 +1,10 @@
 package org.nand2tetris.parser;
 
 import static org.junit.Assert.assertEquals;
-import static org.nand2tetris.parser.utils.XMLUtils.*;
+import static org.nand2tetris.parser.utils.XMLUtils.closeTag;
+import static org.nand2tetris.parser.utils.XMLUtils.concat;
+import static org.nand2tetris.parser.utils.XMLUtils.leafTag;
+import static org.nand2tetris.parser.utils.XMLUtils.openTag;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,7 +29,6 @@ public class ParserEngineTest {
         Token.build(TokenType.SYMBOL, "{"),
         Token.build(TokenType.SYMBOL, "}")
     );
-    AST ast = parse(tokens);
     String expectedXml = concat(Arrays.asList(
         openTag("class"),
         leafTag("keyword", "class"),
@@ -34,7 +36,8 @@ public class ParserEngineTest {
         leafTag("symbol", "{"),
         leafTag("symbol", "}"),
         closeTag("class")));
-    assertEquals(expectedXml, ast.toXMLString());
+
+    assertASTXML(tokens, expectedXml);
   }
 
   @Test
@@ -45,9 +48,7 @@ public class ParserEngineTest {
         Token.build(TokenType.IDENTIFIER, "size"),
         Token.build(TokenType.SYMBOL, ";")
     );
-
-    AST ast = parse(tokens);
-
+    
     String expectedXml = concat(Arrays.asList(
         openTag("classVarDec"),
         leafTag("keyword", "field"),
@@ -56,7 +57,13 @@ public class ParserEngineTest {
         leafTag("symbol", ";"),
         closeTag("classVarDec")));
 
+    assertASTXML(tokens, expectedXml);
+  }
+
+  private void assertASTXML(List<Token> tokens,  String expectedXml) {
+    AST ast = parse(tokens);
     assertEquals(expectedXml, ast.toXMLString());
+
   }
 
   private AST parse(List<Token> tokens) {

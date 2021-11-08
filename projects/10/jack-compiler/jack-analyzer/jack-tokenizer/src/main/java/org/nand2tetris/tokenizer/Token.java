@@ -14,4 +14,36 @@ public class Token {
     token.lexeme = Objects.requireNonNull(lexeme);
     return token;
   }
+
+  public static Token classToken() {
+    return Token.build(TokenType.KEYWORD, "class");
+  }
+
+  public static Token identifierToken(String name) {
+    return Token.build(TokenType.IDENTIFIER, name);
+  }
+
+  public static Token openBrace() {
+    return Token.build(TokenType.SYMBOL, "{");
+  }
+
+  public static Token closeBrace() {
+    return Token.build(TokenType.SYMBOL, "}");
+  }
+
+  public static Token field() {
+    return Token.build(TokenType.KEYWORD, "field");
+  }
+
+  public static Token intToken() {
+    return Token.build(TokenType.KEYWORD, "int");
+  }
+
+  public static Token semicolon() {
+    return Token.build(TokenType.SYMBOL, ";");
+  }
+
+  public static Token comma() {
+    return Token.build(TokenType.SYMBOL, ",");
+  }
 }

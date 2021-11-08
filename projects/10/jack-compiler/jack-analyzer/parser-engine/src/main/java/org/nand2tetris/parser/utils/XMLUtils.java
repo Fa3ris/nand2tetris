@@ -20,6 +20,34 @@ public abstract class XMLUtils {
     return leafTag("symbol", innerText);
   }
 
+  public static String openBraceTag() {
+    return symbolTag("{");
+  }
+
+  public static String closeBraceTag() {
+    return symbolTag("}");
+  }
+
+  public static String fieldTag() {
+    return keywordTag("field");
+  }
+
+  public static String intTag() {
+    return keywordTag("int");
+  }
+
+  public static String classTag() {
+    return keywordTag("class");
+  }
+
+  public static String semicolonTag() {
+    return symbolTag(";");
+  }
+
+  public static String commaTag() {
+    return symbolTag(",");
+  }
+
   public static String keywordTag(String innerText) {
     return leafTag("keyword", innerText);
   }

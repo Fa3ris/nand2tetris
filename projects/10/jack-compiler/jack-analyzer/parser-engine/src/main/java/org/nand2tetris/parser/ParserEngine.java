@@ -70,23 +70,23 @@ public class ParserEngine implements Parser {
 
     tokenizer.advance();
     token = tokenizer.peekToken();
-    ensureValidToken(token, isSymbol("("));
+    ensureValidToken(token, isOpenParen());
 
     Node parameterList = parseParameterList();
     node.setParameterListNode(parameterList);
     tokenizer.advance();
     token = tokenizer.peekToken();
-    ensureValidToken(token, isSymbol(")"));
+    ensureValidToken(token, isCloseParen());
 
     tokenizer.advance();
     token = tokenizer.peekToken();
-    ensureValidToken(token, isSymbol("{"));
+    ensureValidToken(token, isOpenBrace());
 
     Node subroutineBody = parseSubroutineBody();
     node.setSubroutineBodyNode(subroutineBody);
     tokenizer.advance();
     token = tokenizer.peekToken();
-    ensureValidToken(token, isSymbol("}"));
+    ensureValidToken(token, isCloseBrace());
 
     return node;
   }
@@ -121,7 +121,7 @@ public class ParserEngine implements Parser {
     token = tokenizer.peekToken();
 
     while (true) {
-      if (isSymbol(",").test(token)) {
+      if (isComma().test(token)) {
         tokenizer.advance();
         token = tokenizer.peekToken();
         ensureValidToken(token, isTokenType(TokenType.IDENTIFIER));
@@ -132,7 +132,7 @@ public class ParserEngine implements Parser {
         break;
       }
     }
-    ensureValidToken(token, isSymbol(";"));
+    ensureValidToken(token, isSemicolon());
 
     return node;
   }
@@ -147,11 +147,11 @@ public class ParserEngine implements Parser {
 
     tokenizer.advance();
     token = tokenizer.peekToken();
-    ensureValidToken(token, isSymbol("{"));
+    ensureValidToken(token, isOpenBrace());
 
     tokenizer.advance();
     token = tokenizer.peekToken();
-    ensureValidToken(token, isSymbol("}"));
+    ensureValidToken(token, isCloseBrace());
 
     return node;
   }
@@ -208,6 +208,29 @@ public class ParserEngine implements Parser {
     return token -> token.getLexeme().equals(lexeme);
   }
 
+  private Predicate<Token> isOpenParen() {
+    return isSymbol("(");
+  }
+
+  private Predicate<Token> isCloseParen() {
+    return isSymbol(")");
+  }
+
+  private Predicate<Token> isOpenBrace() {
+    return isSymbol("{");
+  }
+
+  private Predicate<Token> isCloseBrace() {
+    return isSymbol("}");
+  }
+
+  private Predicate<Token> isComma() {
+    return isSymbol(",");
+  }
+
+  private Predicate<Token> isSemicolon() {
+    return isSymbol(";");
+  }
   private Predicate<Token> isSymbol(String lexeme) {
     return isTokenType(TokenType.SYMBOL).and(isLexeme(lexeme));
   }

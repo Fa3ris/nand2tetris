@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import org.nand2tetris.tokenizer.Token;
+import org.nand2tetris.tokenizer.TokenType;
 
 public class ClassVarDecNode extends AbstractNode {
 
@@ -32,7 +33,13 @@ public class ClassVarDecNode extends AbstractNode {
     List<String> tags = new ArrayList<>();
     tags.add(openTag(tagName));
     tags.add(keywordTag(scope.getLexeme()));
-    tags.add(keywordTag(type.getLexeme()));
+    String typeTag;
+    if (type.getType() == TokenType.IDENTIFIER) {
+      typeTag = identifierTag(type.getLexeme());
+    } else {
+      typeTag = keywordTag(type.getLexeme());
+    }
+    tags.add(typeTag);
     Iterator<Token> it = varNames.iterator();
     tags.add(identifierTag(it.next().getLexeme()));
 

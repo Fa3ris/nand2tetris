@@ -32,7 +32,7 @@ public class ParserEngine implements Parser {
         return ast;
       }
 
-      if (isFieldToken().test(token)) {
+      if (isFieldToken().or(isStaticToken()).test(token)) {
         Node node = parseClassVarDec();
         AST ast = new JackAST();
         ast.addNode(node);
@@ -47,7 +47,8 @@ public class ParserEngine implements Parser {
     node.setScope(token);
     tokenizer.advance();
     token = tokenizer.peekToken();
-    ensureValidToken(token, isIntToken());
+    ensureValidToken(token, isIntToken().or(isCharToken()).or(isBooleanToken()).or(
+        isIdentifierToken()));
     node.setType(token);
 
     tokenizer.advance();
@@ -102,12 +103,28 @@ public class ParserEngine implements Parser {
     return isKeyword("field");
   }
 
+  private Predicate<Token> isStaticToken() {
+    return isKeyword("static");
+  }
+
   private Predicate<Token> isIntToken() {
     return isKeyword("int");
   }
 
+  private Predicate<? super Token> isCharToken() {
+    return isKeyword("char");
+  }
+
+  private Predicate<? super Token> isBooleanToken() {
+    return isKeyword("boolean");
+  }
+
   private Predicate<Token> isKeyword(String lexeme) {
     return isKeywordToken().and(isLexeme(lexeme));
+  }
+
+  private Predicate<? super Token> isIdentifierToken() {
+    return isTokenType(TokenType.IDENTIFIER);
   }
 
   private Predicate<Token> isKeywordToken() {

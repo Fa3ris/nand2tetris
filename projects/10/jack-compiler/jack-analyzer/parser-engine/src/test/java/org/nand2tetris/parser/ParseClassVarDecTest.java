@@ -4,11 +4,15 @@ import static org.nand2tetris.parser.test_utils.TestUtils.assertASTXML;
 import static org.nand2tetris.parser.test_utils.TestUtils.encloseInTag;
 import static org.nand2tetris.parser.test_utils.TestUtils.joinTags;
 import static org.nand2tetris.parser.test_utils.TestUtils.joinTokens;
+import static org.nand2tetris.parser.utils.XMLUtils.booleanTag;
+import static org.nand2tetris.parser.utils.XMLUtils.charTag;
 import static org.nand2tetris.parser.utils.XMLUtils.commaTag;
 import static org.nand2tetris.parser.utils.XMLUtils.concat;
 import static org.nand2tetris.parser.utils.XMLUtils.fieldTag;
+import static org.nand2tetris.parser.utils.XMLUtils.identifierTag;
 import static org.nand2tetris.parser.utils.XMLUtils.intTag;
 import static org.nand2tetris.parser.utils.XMLUtils.semicolonTag;
+import static org.nand2tetris.parser.utils.XMLUtils.staticTag;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -69,6 +73,56 @@ public class ParseClassVarDecTest {
         .mapToObj(Objects::toString).collect(Collectors.toList()).toArray(new String[]{});
     List<Token> tokens = classVarDecTokens(Token.field(), Token.intToken(), identifiers);
     List<String> expectedTags = classVarDecTags(fieldTag(), intTag(), identifiers);
+    String expectedXml = concat(expectedTags);
+    assertASTXML(tokens, expectedXml);
+  }
+
+  /**
+   * static int ROW;
+   */
+  @Test
+  public void parseStatic() throws Exception {
+    String[] identifiers = { "ROW"};
+    List<Token> tokens = classVarDecTokens(Token.staticToken(), Token.intToken(), identifiers);
+    List<String> expectedTags = classVarDecTags(staticTag(), intTag(), identifiers);
+    String expectedXml = concat(expectedTags);
+    assertASTXML(tokens, expectedXml);
+  }
+
+  /**
+   * field char joe;
+   */
+  @Test
+  public void parseChar() throws Exception {
+    String[] identifiers = { "joe"};
+    List<Token> tokens = classVarDecTokens(Token.field(), Token.charToken(), identifiers);
+    List<String> expectedTags = classVarDecTags(fieldTag(), charTag(), identifiers);
+    String expectedXml = concat(expectedTags);
+    assertASTXML(tokens, expectedXml);
+
+  }
+
+  /**
+   * field boolean isOK;
+   */
+  @Test
+  public void parseBoolean() throws Exception {
+    String[] identifiers = { "isOK"};
+    List<Token> tokens = classVarDecTokens(Token.field(), Token.booleanToken(), identifiers);
+    List<String> expectedTags = classVarDecTags(fieldTag(), booleanTag(), identifiers);
+    String expectedXml = concat(expectedTags);
+    assertASTXML(tokens, expectedXml);
+  }
+
+  /**
+   * field MyClass myClass;
+   */
+  @Test
+  public void parseClass() throws Exception {
+    String[] identifiers = { "myClass"};
+    String classType = "MyClass";
+    List<Token> tokens = classVarDecTokens(Token.field(), Token.identifierToken(classType), identifiers);
+    List<String> expectedTags = classVarDecTags(fieldTag(), identifierTag(classType), identifiers);
     String expectedXml = concat(expectedTags);
     assertASTXML(tokens, expectedXml);
   }

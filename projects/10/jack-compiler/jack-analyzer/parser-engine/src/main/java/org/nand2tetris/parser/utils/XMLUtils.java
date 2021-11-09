@@ -31,9 +31,20 @@ public abstract class XMLUtils {
   public static String fieldTag() {
     return keywordTag("field");
   }
+  public static String staticTag() {
+    return keywordTag("static");
+  }
 
   public static String intTag() {
     return keywordTag("int");
+  }
+
+  public static String charTag() {
+    return keywordTag("char");
+  }
+
+  public static String booleanTag() {
+    return keywordTag("boolean");
   }
 
   public static String classTag() {

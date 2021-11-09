@@ -46,4 +46,16 @@ public class Token {
   public static Token comma() {
     return Token.build(TokenType.SYMBOL, ",");
   }
+
+  public static Token staticToken() {
+    return Token.build(TokenType.KEYWORD, "static");
+  }
+
+  public static Token charToken() {
+    return Token.build(TokenType.KEYWORD, "char");
+  }
+
+  public static Token booleanToken() {
+    return Token.build(TokenType.KEYWORD, "boolean");
+  }
 }

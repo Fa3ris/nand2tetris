@@ -31,6 +31,14 @@ public class Token {
     return Token.build(TokenType.SYMBOL, "}");
   }
 
+  public static Token openParen() {
+    return Token.build(TokenType.SYMBOL, "(");
+  }
+
+  public static Token closeParen() {
+    return Token.build(TokenType.SYMBOL, ")");
+  }
+
   public static Token field() {
     return Token.build(TokenType.KEYWORD, "field");
   }
@@ -58,4 +66,18 @@ public class Token {
   public static Token booleanToken() {
     return Token.build(TokenType.KEYWORD, "boolean");
   }
+
+  public static Token constructorToken() {
+    return Token.build(TokenType.KEYWORD, "constructor");
+  }
+
+  public static Token voidToken() {
+    return Token.build(TokenType.KEYWORD, "void");
+  }
+
+  public static Token functionToken() {
+    return Token.build(TokenType.KEYWORD, "function");
+  }
+
+
 }

@@ -3,12 +3,13 @@ package org.nand2tetris.parser.ast;
 import static org.nand2tetris.parser.utils.XMLUtils.*;
 
 import java.util.Arrays;
+import org.nand2tetris.tokenizer.Token;
 
 public class ClassNode extends AbstractNode {
 
-  private String className;
+  private Token className;
 
-  public void setClassName(String name) {
+  public void setClassName(Token name) {
     className = name;
   }
 
@@ -16,10 +17,10 @@ public class ClassNode extends AbstractNode {
   public String toXMLString() {
     return concat(Arrays.asList(
         openTag("class"),
-        leafTag("keyword", "class"),
-        leafTag("identifier", className),
-        leafTag("symbol", "{"),
-        leafTag("symbol", "}"),
+        classTag(),
+        formatTag(className),
+        openBraceTag(),
+        closeBraceTag(),
         closeTag("class")));
   }
 }

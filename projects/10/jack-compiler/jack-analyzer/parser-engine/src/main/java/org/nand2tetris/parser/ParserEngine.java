@@ -6,6 +6,9 @@ import org.nand2tetris.parser.ast.ClassNode;
 import org.nand2tetris.parser.ast.ClassVarDecNode;
 import org.nand2tetris.parser.ast.JackAST;
 import org.nand2tetris.parser.ast.Node;
+import org.nand2tetris.parser.ast.ParameterListNode;
+import org.nand2tetris.parser.ast.SubroutineBodyNode;
+import org.nand2tetris.parser.ast.SubroutineDecNode;
 import org.nand2tetris.tokenizer.Token;
 import org.nand2tetris.tokenizer.TokenType;
 import org.nand2tetris.tokenizer.Tokenizer;
@@ -38,8 +41,66 @@ public class ParserEngine implements Parser {
         ast.addNode(node);
         return ast;
       }
+
+      if (isFunctionToken().test(token)) {
+        Node node = parseSubroutineDec();
+        AST ast = new JackAST();
+        ast.addNode(node);
+        return ast;
+
+      }
     }
     return null;
+  }
+
+  private Node parseSubroutineDec() {
+    SubroutineDecNode node = new SubroutineDecNode();
+    node.setRoutineType(token);
+    tokenizer.advance();
+    token = tokenizer.peekToken();
+    ensureValidToken(token, isVoidToken());
+
+    node.setReturnType(token);
+
+    tokenizer.advance();
+    token = tokenizer.peekToken();
+    ensureValidToken(token, isIdentifierToken());
+
+    node.setRoutineName(token);
+
+    tokenizer.advance();
+    token = tokenizer.peekToken();
+    ensureValidToken(token, isSymbol("("));
+
+    Node parameterList = parseParameterList();
+    node.setParameterListNode(parameterList);
+    tokenizer.advance();
+    token = tokenizer.peekToken();
+    ensureValidToken(token, isSymbol(")"));
+
+    tokenizer.advance();
+    token = tokenizer.peekToken();
+    ensureValidToken(token, isSymbol("{"));
+
+    Node subroutineBody = parseSubroutineBody();
+    node.setSubroutineBodyNode(subroutineBody);
+    tokenizer.advance();
+    token = tokenizer.peekToken();
+    ensureValidToken(token, isSymbol("}"));
+
+    return node;
+  }
+
+  private Node parseParameterList() {
+    ParameterListNode node = new ParameterListNode();
+    return node;
+  }
+
+  private Node parseSubroutineBody() {
+    SubroutineBodyNode node = new SubroutineBodyNode();
+
+
+    return node;
   }
 
   private Node parseClassVarDec() {
@@ -82,7 +143,7 @@ public class ParserEngine implements Parser {
     token = tokenizer.peekToken();
     ensureValidToken(token, isTokenType(TokenType.IDENTIFIER));
     ClassNode node = new ClassNode();
-    node.setClassName(token.getLexeme());
+    node.setClassName(token);
 
     tokenizer.advance();
     token = tokenizer.peekToken();
@@ -103,6 +164,10 @@ public class ParserEngine implements Parser {
     return isKeyword("field");
   }
 
+  private Predicate<Token> isFunctionToken() {
+    return isKeyword("function");
+  }
+
   private Predicate<Token> isStaticToken() {
     return isKeyword("static");
   }
@@ -111,11 +176,15 @@ public class ParserEngine implements Parser {
     return isKeyword("int");
   }
 
-  private Predicate<? super Token> isCharToken() {
+  private Predicate<Token> isCharToken() {
     return isKeyword("char");
   }
 
-  private Predicate<? super Token> isBooleanToken() {
+  private Predicate<Token> isVoidToken() {
+    return isKeyword("void");
+  }
+
+  private Predicate<Token> isBooleanToken() {
     return isKeyword("boolean");
   }
 
@@ -123,7 +192,7 @@ public class ParserEngine implements Parser {
     return isKeywordToken().and(isLexeme(lexeme));
   }
 
-  private Predicate<? super Token> isIdentifierToken() {
+  private Predicate<Token> isIdentifierToken() {
     return isTokenType(TokenType.IDENTIFIER);
   }
 

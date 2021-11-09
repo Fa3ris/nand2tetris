@@ -1,6 +1,9 @@
 package org.nand2tetris.parser.utils;
 
+import java.util.ArrayList;
 import java.util.List;
+import org.nand2tetris.tokenizer.Token;
+import org.nand2tetris.tokenizer.TokenType;
 
 public abstract class XMLUtils {
 
@@ -35,6 +38,16 @@ public abstract class XMLUtils {
     return keywordTag("static");
   }
 
+  public static String functionTag() {
+    return keywordTag("function");
+  }
+
+  public static String voidTag() {
+    return keywordTag("void");
+  }
+
+
+
   public static String intTag() {
     return keywordTag("int");
   }
@@ -59,14 +72,39 @@ public abstract class XMLUtils {
     return symbolTag(",");
   }
 
+  public static String openParenTag() {
+    return symbolTag("(");
+  }
+
+  public static String closeParenTag() {
+    return symbolTag(")");
+  }
+
   public static String keywordTag(String innerText) {
     return leafTag("keyword", innerText);
+  }
+
+  public static String formatTag(Token token) {
+    if (token.getType() == TokenType.KEYWORD) {
+      return keywordTag(token.getLexeme());
+    }
+    if (token.getType() == TokenType.IDENTIFIER) {
+      return identifierTag(token.getLexeme());
+    }
+    return leafTag("", token.getLexeme());
   }
 
   public static String identifierTag(String innerText) {
     return leafTag("identifier", innerText);
   }
 
+  public static List<String> encloseInTag(String parentTag, List<String> tags) {
+    List<String> enclosed = new ArrayList<>();
+    enclosed.add(openTag(parentTag));
+    enclosed.addAll(tags);
+    enclosed.add(closeTag(parentTag));
+    return enclosed;
+  }
 
 
   public static String concat(List<String> list) {

@@ -82,7 +82,7 @@ public class ParserEngine implements Parser {
 
     tokenizer.advance();
     token = tokenizer.peekToken();
-    ensureValidToken(token, isCharToken());
+    ensureValidToken(token, isTypeToken());
 
     node.setType(token);
 
@@ -167,8 +167,7 @@ public class ParserEngine implements Parser {
     node.setScope(token);
     tokenizer.advance();
     token = tokenizer.peekToken();
-    ensureValidToken(token, isIntToken().or(isCharToken()).or(isBooleanToken()).or(
-        isIdentifierToken()));
+    ensureValidToken(token, isTypeToken());
     node.setType(token);
 
     tokenizer.advance();
@@ -215,6 +214,10 @@ public class ParserEngine implements Parser {
     return node;
   }
 
+  private Predicate<Token> isTypeToken() {
+    return isIntToken().or(isCharToken()).or(isBooleanToken()).or(
+        isIdentifierToken());
+  }
   private Predicate<Token> isClassToken() {
     return isKeyword(CLASS);
   }

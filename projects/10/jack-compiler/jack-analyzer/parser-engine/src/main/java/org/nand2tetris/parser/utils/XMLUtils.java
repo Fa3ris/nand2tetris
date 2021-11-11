@@ -114,4 +114,8 @@ public abstract class XMLUtils {
     }
     return sb.toString();
   }
+
+  public static String varTag() {
+    return keywordTag("var");
+  }
 }

@@ -80,4 +80,7 @@ public class Token {
   }
 
 
+  public static Token varToken() {
+    return  Token.build(TokenType.KEYWORD, "var");
+  }
 }

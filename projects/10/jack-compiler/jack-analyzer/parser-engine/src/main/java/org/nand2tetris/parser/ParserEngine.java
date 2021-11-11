@@ -9,6 +9,7 @@ import org.nand2tetris.parser.ast.Node;
 import org.nand2tetris.parser.ast.ParameterListNode;
 import org.nand2tetris.parser.ast.SubroutineBodyNode;
 import org.nand2tetris.parser.ast.SubroutineDecNode;
+import org.nand2tetris.parser.ast.VarDecNode;
 import org.nand2tetris.tokenizer.Token;
 import org.nand2tetris.tokenizer.TokenType;
 import org.nand2tetris.tokenizer.Tokenizer;
@@ -49,9 +50,39 @@ public class ParserEngine implements Parser {
         return ast;
 
       }
+
+      if (isVarToken().test(token)) {
+        Node node = parseVarDec();
+        AST ast = new JackAST();
+        ast.addNode(node);
+        return ast;
+      }
     }
     return null;
   }
+
+  private Node parseVarDec() {
+    VarDecNode node = new VarDecNode();
+
+    tokenizer.advance();
+    token = tokenizer.peekToken();
+    ensureValidToken(token, isCharToken());
+
+    node.setType(token);
+
+    tokenizer.advance();
+    token = tokenizer.peekToken();
+    ensureValidToken(token, isIdentifierToken());
+
+    node.addVarName(token);
+
+    tokenizer.advance();
+    token = tokenizer.peekToken();
+    ensureValidToken(token, isSemicolon());
+
+    return node;
+  }
+
 
   private Node parseSubroutineDec() {
     SubroutineDecNode node = new SubroutineDecNode();
@@ -183,6 +214,11 @@ public class ParserEngine implements Parser {
   private Predicate<Token> isVoidToken() {
     return isKeyword("void");
   }
+
+  private Predicate<Token> isVarToken() {
+    return isKeyword("var");
+  }
+
 
   private Predicate<Token> isBooleanToken() {
     return isKeyword("boolean");

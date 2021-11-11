@@ -3,12 +3,15 @@ package org.nand2tetris.parser.test_utils;
 import static org.junit.Assert.assertEquals;
 import static org.nand2tetris.parser.utils.XMLUtils.closeTag;
 import static org.nand2tetris.parser.utils.XMLUtils.openTag;
+import static org.nand2tetris.tokenizer.Token.comma;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.nand2tetris.parser.ParserEngine;
 import org.nand2tetris.parser.ast.AST;
 import org.nand2tetris.parser.stubs.TokenizerStub;
+import org.nand2tetris.parser.utils.Joiner;
 import org.nand2tetris.tokenizer.Token;
 
 public abstract class TestUtils {
@@ -24,14 +27,8 @@ public abstract class TestUtils {
   }
 
   public static List<String> joinTags(List<String> identifierTags, String delimiterTag) {
-    List<String> joined = new ArrayList<>();
-    for (String identifierTag : identifierTags) {
-      if (!joined.isEmpty()) {
-        joined.add(delimiterTag);
-      }
-      joined.add(identifierTag);
-    }
-    return joined;
+    Joiner<String> tagJoiner = new Joiner<>(delimiterTag);
+    return tagJoiner.join(identifierTags);
   }
 
   public static List<String> encloseInTag(String parentTag, List<String> tags) {
@@ -43,14 +40,8 @@ public abstract class TestUtils {
   }
 
   public static List<Token> joinTokens(List<Token> identifierTokens, Token delimiter) {
-    List<Token> joined = new ArrayList<>();
-    for (Token identifierToken : identifierTokens) {
-      if (!joined.isEmpty()) {
-        joined.add(delimiter);
-      }
-      joined.add(identifierToken);
-    }
-    return joined;
+    Joiner<Token> tokenJoiner = new Joiner<>(delimiter);
+    return tokenJoiner.join(identifierTokens);
   }
 
 }

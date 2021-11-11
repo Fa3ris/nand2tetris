@@ -10,6 +10,7 @@ import static org.nand2tetris.parser.utils.XMLUtils.semicolonTag;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
+import org.nand2tetris.parser.utils.TagNames;
 import org.nand2tetris.parser.utils.XMLUtils;
 import org.nand2tetris.tokenizer.Token;
 
@@ -21,20 +22,22 @@ public class VarDecTest {
    */
   @Test
   public void singleCharDec() throws Exception {
+
+    String varName = "key";
     List<Token> tokens = Arrays.asList(
         Token.varToken(),
         Token.charToken(),
-        Token.identifierToken("key"),
+        Token.identifierToken(varName),
         Token.semicolon());
 
     List<String> tags = Arrays.asList(
         XMLUtils.varTag(),
         charTag(),
-        identifierTag("key"),
+        identifierTag(varName),
         semicolonTag()
     );
 
-    tags = encloseInTag("varDec", tags);
+    tags = encloseInTag(TagNames.varDec, tags);
     String expectedXML = concat(tags);
 
     assertASTXML(tokens, expectedXML);

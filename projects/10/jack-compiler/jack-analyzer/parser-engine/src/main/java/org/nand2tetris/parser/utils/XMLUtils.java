@@ -1,5 +1,21 @@
 package org.nand2tetris.parser.utils;
 
+import static org.nand2tetris.parser.utils.TagNames.classTag;
+import static org.nand2tetris.parser.utils.TagNames.symbol;
+import static org.nand2tetris.tokenizer.Keyword.BOOLEAN;
+import static org.nand2tetris.tokenizer.Keyword.CHAR;
+import static org.nand2tetris.tokenizer.Keyword.FIELD;
+import static org.nand2tetris.tokenizer.Keyword.FUNCTION;
+import static org.nand2tetris.tokenizer.Keyword.INT;
+import static org.nand2tetris.tokenizer.Keyword.STATIC;
+import static org.nand2tetris.tokenizer.Keyword.VOID;
+import static org.nand2tetris.tokenizer.Symbol.CLOSE_BRACE;
+import static org.nand2tetris.tokenizer.Symbol.CLOSE_PAREN;
+import static org.nand2tetris.tokenizer.Symbol.COMMA;
+import static org.nand2tetris.tokenizer.Symbol.OPEN_BRACE;
+import static org.nand2tetris.tokenizer.Symbol.OPEN_PAREN;
+import static org.nand2tetris.tokenizer.Symbol.SEMICOLON;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.nand2tetris.tokenizer.Token;
@@ -20,68 +36,72 @@ public abstract class XMLUtils {
   }
 
   public static String symbolTag(String innerText) {
-    return leafTag("symbol", innerText);
+    return leafTag(symbol, innerText);
   }
 
   public static String openBraceTag() {
-    return symbolTag("{");
+    return symbolTag(OPEN_BRACE);
   }
 
   public static String closeBraceTag() {
-    return symbolTag("}");
+    return symbolTag(CLOSE_BRACE);
   }
 
   public static String fieldTag() {
-    return keywordTag("field");
+    return keywordTag(FIELD);
   }
   public static String staticTag() {
-    return keywordTag("static");
+    return keywordTag(STATIC);
   }
 
   public static String functionTag() {
-    return keywordTag("function");
+    return keywordTag(FUNCTION);
   }
 
   public static String voidTag() {
-    return keywordTag("void");
+    return keywordTag(VOID);
   }
 
 
 
   public static String intTag() {
-    return keywordTag("int");
+    return keywordTag(INT);
   }
 
   public static String charTag() {
-    return keywordTag("char");
+    return keywordTag(CHAR);
   }
 
   public static String booleanTag() {
-    return keywordTag("boolean");
+    return keywordTag(BOOLEAN);
   }
 
   public static String classTag() {
-    return keywordTag("class");
+    return keywordTag(classTag);
   }
 
   public static String semicolonTag() {
-    return symbolTag(";");
+    return symbolTag(SEMICOLON);
   }
 
   public static String commaTag() {
-    return symbolTag(",");
+    return symbolTag(COMMA);
   }
 
   public static String openParenTag() {
-    return symbolTag("(");
+    return symbolTag(OPEN_PAREN);
   }
 
   public static String closeParenTag() {
-    return symbolTag(")");
+    return symbolTag(CLOSE_PAREN);
+  }
+
+  public static String varTag() {
+    return keywordTag(TagNames.varTag);
   }
 
   public static String keywordTag(String innerText) {
-    return leafTag("keyword", innerText);
+    return leafTag(TagNames.keyword, innerText);
   }
 
   public static String formatTag(Token token) {
@@ -95,7 +115,7 @@ public abstract class XMLUtils {
   }
 
   public static String identifierTag(String innerText) {
-    return leafTag("identifier", innerText);
+    return leafTag(TagNames.identifier, innerText);
   }
 
   public static List<String> encloseInTag(String parentTag, List<String> tags) {
@@ -115,7 +135,14 @@ public abstract class XMLUtils {
     return sb.toString();
   }
 
-  public static String varTag() {
-    return keywordTag("var");
+  public static List<String> joinTags(List<String> identifierTags, String delimiterTag) {
+    List<String> joined = new ArrayList<>();
+    for (String identifierTag : identifierTags) {
+      if (!joined.isEmpty()) {
+        joined.add(delimiterTag);
+      }
+      joined.add(identifierTag);
+    }
+    return joined;
   }
 }

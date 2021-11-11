@@ -2,15 +2,13 @@ package org.nand2tetris.parser.ast;
 
 import static org.nand2tetris.parser.utils.XMLUtils.closeBraceTag;
 import static org.nand2tetris.parser.utils.XMLUtils.closeParenTag;
-import static org.nand2tetris.parser.utils.XMLUtils.closeTag;
-import static org.nand2tetris.parser.utils.XMLUtils.concat;
 import static org.nand2tetris.parser.utils.XMLUtils.formatTag;
 import static org.nand2tetris.parser.utils.XMLUtils.openBraceTag;
 import static org.nand2tetris.parser.utils.XMLUtils.openParenTag;
-import static org.nand2tetris.parser.utils.XMLUtils.openTag;
 
 import java.util.Arrays;
 import java.util.List;
+import org.nand2tetris.parser.utils.TagNames;
 import org.nand2tetris.tokenizer.Token;
 
 public class SubroutineDecNode extends AbstractNode {
@@ -18,11 +16,9 @@ public class SubroutineDecNode extends AbstractNode {
 
   private Node parameterListNode, subroutineBodyNode;
 
-  private static final String parentTag = "subroutineDec";
-
   @Override
   protected String parentTag() {
-    return parentTag;
+    return TagNames.subroutineDec;
   }
 
   @Override

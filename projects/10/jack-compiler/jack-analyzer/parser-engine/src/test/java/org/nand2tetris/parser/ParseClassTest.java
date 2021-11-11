@@ -3,15 +3,15 @@ package org.nand2tetris.parser;
 import static org.nand2tetris.parser.test_utils.TestUtils.assertASTXML;
 import static org.nand2tetris.parser.utils.XMLUtils.classTag;
 import static org.nand2tetris.parser.utils.XMLUtils.closeBraceTag;
-import static org.nand2tetris.parser.utils.XMLUtils.closeTag;
 import static org.nand2tetris.parser.utils.XMLUtils.concat;
+import static org.nand2tetris.parser.utils.XMLUtils.encloseInTag;
 import static org.nand2tetris.parser.utils.XMLUtils.identifierTag;
 import static org.nand2tetris.parser.utils.XMLUtils.openBraceTag;
-import static org.nand2tetris.parser.utils.XMLUtils.openTag;
 
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
+import org.nand2tetris.parser.utils.TagNames;
 import org.nand2tetris.tokenizer.Token;
 
 public class ParseClassTest {
@@ -29,14 +29,12 @@ public class ParseClassTest {
         Token.openBrace(),
         Token.closeBrace()
     );
-    String parentTag = "class";
-    String expectedXml = concat(Arrays.asList(
-        openTag(parentTag),
+    String parentTag = TagNames.classTag;
+    String expectedXml = concat(encloseInTag(parentTag, Arrays.asList(
         classTag(),
         identifierTag(className),
         openBraceTag(),
-        closeBraceTag(),
-        closeTag(parentTag)));
+        closeBraceTag())));
 
     assertASTXML(tokens, expectedXml);
   }

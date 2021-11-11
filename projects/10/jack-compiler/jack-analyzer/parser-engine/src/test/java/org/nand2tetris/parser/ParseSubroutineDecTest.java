@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
+import org.nand2tetris.parser.utils.TagNames;
 import org.nand2tetris.tokenizer.Token;
 
 public class ParseSubroutineDecTest {
@@ -25,10 +26,12 @@ public class ParseSubroutineDecTest {
    */
   @Test
   public void argumentLessNoBody() throws Exception {
+
+    String functionName = "myFunction";
     List<Token> tokens = Arrays.asList(
         Token.functionToken(),
         Token.voidToken(),
-        Token.identifierToken("myFunction"),
+        Token.identifierToken(functionName),
         Token.openParen(),
         Token.closeParen(),
         Token.openBrace(),
@@ -37,7 +40,7 @@ public class ParseSubroutineDecTest {
     List<String> expectedTags = subroutineDecTags(
         functionTag(),
         voidTag(),
-        identifierTag("myFunction"),
+        identifierTag(functionName),
         parameterListTags(),
         subroutineBodyTags());
 
@@ -58,17 +61,17 @@ public class ParseSubroutineDecTest {
     tags.add(openBraceTag());
     tags.add(concat(subRoutineBodyTag));
     tags.add(closeBraceTag());
-    return encloseInTag("subroutineDec", tags);
+    return encloseInTag(TagNames.subroutineDec, tags);
   }
 
   private List<String> parameterListTags() {
     List<String> tags = new ArrayList<>();
-    return encloseInTag("parameterList", tags);
+    return encloseInTag(TagNames.parameterList, tags);
   }
 
   private List<String> subroutineBodyTags() {
     List<String> tags = new ArrayList<>();
-    return encloseInTag("subroutineBody", tags);
+    return encloseInTag(TagNames.subroutineBody, tags);
   }
 
 }

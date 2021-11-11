@@ -5,19 +5,19 @@ import static org.nand2tetris.parser.utils.XMLUtils.semicolonTag;
 import static org.nand2tetris.parser.utils.XMLUtils.varTag;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import org.nand2tetris.parser.utils.TagNames;
 import org.nand2tetris.tokenizer.Token;
 
 public class VarDecNode extends AbstractNode {
 
   private Token type;
 
-  private List<Token> varNames = new ArrayList<>();
+  private final List<Token> varNames = new ArrayList<>();
 
   @Override
   protected String parentTag() {
-    return "varDec";
+    return TagNames.varDec;
   }
 
   @Override

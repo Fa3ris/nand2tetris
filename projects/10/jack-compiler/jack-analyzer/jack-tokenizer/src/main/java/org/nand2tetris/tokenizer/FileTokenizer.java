@@ -1,5 +1,28 @@
 package org.nand2tetris.tokenizer;
 
+import static org.nand2tetris.tokenizer.Keyword.BOOLEAN;
+import static org.nand2tetris.tokenizer.Keyword.CHAR;
+import static org.nand2tetris.tokenizer.Keyword.CLASS;
+import static org.nand2tetris.tokenizer.Keyword.CONSTRUCTOR;
+import static org.nand2tetris.tokenizer.Keyword.DO;
+import static org.nand2tetris.tokenizer.Keyword.ELSE;
+import static org.nand2tetris.tokenizer.Keyword.FALSE;
+import static org.nand2tetris.tokenizer.Keyword.FIELD;
+import static org.nand2tetris.tokenizer.Keyword.FUNCTION;
+import static org.nand2tetris.tokenizer.Keyword.IF;
+import static org.nand2tetris.tokenizer.Keyword.INT;
+import static org.nand2tetris.tokenizer.Keyword.LET;
+import static org.nand2tetris.tokenizer.Keyword.METHOD;
+import static org.nand2tetris.tokenizer.Keyword.NULL;
+import static org.nand2tetris.tokenizer.Keyword.RETURN;
+import static org.nand2tetris.tokenizer.Keyword.STATIC;
+import static org.nand2tetris.tokenizer.Keyword.THIS;
+import static org.nand2tetris.tokenizer.Keyword.TRUE;
+import static org.nand2tetris.tokenizer.Keyword.VAR;
+import static org.nand2tetris.tokenizer.Keyword.VOID;
+import static org.nand2tetris.tokenizer.Keyword.WHILE;
+import static org.nand2tetris.tokenizer.Symbol.*;
+
 import java.util.Objects;
 
 public class FileTokenizer implements Tokenizer {
@@ -11,26 +34,27 @@ public class FileTokenizer implements Tokenizer {
   }
 
   private boolean isSymbol(char c) {
-    switch (c) {
-      case '{':
-      case '}':
-      case '(':
-      case ')':
-      case '[':
-      case ']':
-      case '.':
-      case ',':
-      case ';':
-      case '+':
-      case '-':
-      case '*':
-      case '/':
-      case '&':
-      case '|':
-      case '<':
-      case '>':
-      case '=':
-      case '~':
+    String s = String.valueOf(c);
+    switch (s) {
+      case OPEN_BRACE:
+      case CLOSE_BRACE:
+      case OPEN_PAREN:
+      case CLOSE_PAREN:
+      case OPEN_BRACK:
+      case CLOSE_BRACK:
+      case DOT:
+      case COMMA:
+      case SEMICOLON:
+      case PLUS:
+      case MINUS:
+      case STAR:
+      case SLASH:
+      case AND:
+      case OR:
+      case LT:
+      case GT:
+      case EQ:
+      case NOT:
         return true;
       default:
         return false;
@@ -39,27 +63,27 @@ public class FileTokenizer implements Tokenizer {
 
   private boolean isKeyword(String word) {
     switch (word) {
-      case "class":
-      case "constructor":
-      case "function":
-      case "method":
-      case "field":
-      case "static":
-      case "var":
-      case "int":
-      case "char":
-      case "boolean":
-      case "void":
-      case "true":
-      case "false":
-      case "null":
-      case "this":
-      case "let":
-      case "do":
-      case "if":
-      case "else":
-      case "while":
-      case "return":
+      case CLASS:
+      case CONSTRUCTOR:
+      case FUNCTION:
+      case METHOD:
+      case FIELD:
+      case STATIC:
+      case VAR:
+      case INT:
+      case CHAR:
+      case BOOLEAN:
+      case VOID:
+      case TRUE:
+      case FALSE:
+      case NULL:
+      case THIS:
+      case LET:
+      case DO:
+      case IF:
+      case ELSE:
+      case WHILE:
+      case RETURN:
         return true;
       default:
         return false;

@@ -21,6 +21,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.Test;
+import org.nand2tetris.parser.utils.TagNames;
 import org.nand2tetris.parser.utils.XMLUtils;
 import org.nand2tetris.tokenizer.Token;
 
@@ -156,6 +157,6 @@ public class ParseClassVarDecTest {
     List<String> joinedIdTags = joinTags(identifierTags, commaTag());
     tags.addAll(joinedIdTags);
     tags.add(semicolonTag());
-    return encloseInTag("classVarDec", tags);
+    return XMLUtils.encloseInTag(TagNames.classVarDec, tags);
   }
 }

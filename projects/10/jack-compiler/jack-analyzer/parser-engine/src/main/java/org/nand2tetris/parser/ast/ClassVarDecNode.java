@@ -18,7 +18,7 @@ public class ClassVarDecNode extends AbstractNode {
   private static final String tagName = "classVarDec";
   private Token scope;
   private Token type;
-  private List<Token> varNames = new ArrayList<>();
+  private final List<Token> varNames = new ArrayList<>();
 
   public void setScope(Token scope) {
     this.scope = scope;

@@ -1,5 +1,21 @@
 package org.nand2tetris.parser;
 
+import static org.nand2tetris.tokenizer.Keyword.BOOLEAN;
+import static org.nand2tetris.tokenizer.Keyword.CHAR;
+import static org.nand2tetris.tokenizer.Keyword.CLASS;
+import static org.nand2tetris.tokenizer.Keyword.FIELD;
+import static org.nand2tetris.tokenizer.Keyword.FUNCTION;
+import static org.nand2tetris.tokenizer.Keyword.INT;
+import static org.nand2tetris.tokenizer.Keyword.STATIC;
+import static org.nand2tetris.tokenizer.Keyword.VAR;
+import static org.nand2tetris.tokenizer.Keyword.VOID;
+import static org.nand2tetris.tokenizer.Symbol.CLOSE_BRACE;
+import static org.nand2tetris.tokenizer.Symbol.CLOSE_PAREN;
+import static org.nand2tetris.tokenizer.Symbol.COMMA;
+import static org.nand2tetris.tokenizer.Symbol.OPEN_BRACE;
+import static org.nand2tetris.tokenizer.Symbol.OPEN_PAREN;
+import static org.nand2tetris.tokenizer.Symbol.SEMICOLON;
+
 import java.util.function.Predicate;
 import org.nand2tetris.parser.ast.AST;
 import org.nand2tetris.parser.ast.ClassNode;
@@ -188,40 +204,40 @@ public class ParserEngine implements Parser {
   }
 
   private Predicate<Token> isClassToken() {
-    return isKeyword("class");
+    return isKeyword(CLASS);
   }
 
   private Predicate<Token> isFieldToken() {
-    return isKeyword("field");
+    return isKeyword(FIELD);
   }
 
   private Predicate<Token> isFunctionToken() {
-    return isKeyword("function");
+    return isKeyword(FUNCTION);
   }
 
   private Predicate<Token> isStaticToken() {
-    return isKeyword("static");
+    return isKeyword(STATIC);
   }
 
   private Predicate<Token> isIntToken() {
-    return isKeyword("int");
+    return isKeyword(INT);
   }
 
   private Predicate<Token> isCharToken() {
-    return isKeyword("char");
+    return isKeyword(CHAR);
   }
 
   private Predicate<Token> isVoidToken() {
-    return isKeyword("void");
+    return isKeyword(VOID);
   }
 
   private Predicate<Token> isVarToken() {
-    return isKeyword("var");
+    return isKeyword(VAR);
   }
 
 
   private Predicate<Token> isBooleanToken() {
-    return isKeyword("boolean");
+    return isKeyword(BOOLEAN);
   }
 
   private Predicate<Token> isKeyword(String lexeme) {
@@ -245,27 +261,28 @@ public class ParserEngine implements Parser {
   }
 
   private Predicate<Token> isOpenParen() {
-    return isSymbol("(");
+    return isSymbol(OPEN_PAREN
+    );
   }
 
   private Predicate<Token> isCloseParen() {
-    return isSymbol(")");
+    return isSymbol(CLOSE_PAREN);
   }
 
   private Predicate<Token> isOpenBrace() {
-    return isSymbol("{");
+    return isSymbol(OPEN_BRACE);
   }
 
   private Predicate<Token> isCloseBrace() {
-    return isSymbol("}");
+    return isSymbol(CLOSE_BRACE);
   }
 
   private Predicate<Token> isComma() {
-    return isSymbol(",");
+    return isSymbol(COMMA);
   }
 
   private Predicate<Token> isSemicolon() {
-    return isSymbol(";");
+    return isSymbol(SEMICOLON);
   }
   private Predicate<Token> isSymbol(String lexeme) {
     return isTokenType(TokenType.SYMBOL).and(isLexeme(lexeme));

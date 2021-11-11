@@ -5,14 +5,15 @@ import static org.nand2tetris.parser.utils.XMLUtils.concat;
 import static org.nand2tetris.parser.utils.XMLUtils.openTag;
 
 import java.util.Arrays;
+import org.nand2tetris.parser.utils.TagNames;
 
 public class SubroutineBodyNode extends AbstractNode {
 
   @Override
   public String toXMLString() {
     return concat(Arrays.asList(
-        openTag("subroutineBody"),
-        closeTag("subroutineBody")
+        openTag(TagNames.subroutineBody),
+        closeTag(TagNames.subroutineBody)
     ));
   }
 

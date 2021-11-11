@@ -1,5 +1,8 @@
 package org.nand2tetris.tokenizer;
 
+import static org.nand2tetris.tokenizer.Keyword.*;
+import static org.nand2tetris.tokenizer.Symbol.*;
+
 import java.util.Objects;
 import lombok.Data;
 
@@ -16,7 +19,7 @@ public class Token {
   }
 
   public static Token classToken() {
-    return Token.build(TokenType.KEYWORD, "class");
+    return Token.build(TokenType.KEYWORD, CLASS);
   }
 
   public static Token identifierToken(String name) {
@@ -24,63 +27,62 @@ public class Token {
   }
 
   public static Token openBrace() {
-    return Token.build(TokenType.SYMBOL, "{");
+    return Token.build(TokenType.SYMBOL, OPEN_BRACE);
   }
 
   public static Token closeBrace() {
-    return Token.build(TokenType.SYMBOL, "}");
+    return Token.build(TokenType.SYMBOL, CLOSE_BRACE);
   }
 
   public static Token openParen() {
-    return Token.build(TokenType.SYMBOL, "(");
+    return Token.build(TokenType.SYMBOL, OPEN_PAREN);
   }
 
   public static Token closeParen() {
-    return Token.build(TokenType.SYMBOL, ")");
+    return Token.build(TokenType.SYMBOL, CLOSE_PAREN);
   }
 
   public static Token field() {
-    return Token.build(TokenType.KEYWORD, "field");
+    return Token.build(TokenType.KEYWORD, FIELD);
   }
 
   public static Token intToken() {
-    return Token.build(TokenType.KEYWORD, "int");
+    return Token.build(TokenType.KEYWORD, INT);
   }
 
   public static Token semicolon() {
-    return Token.build(TokenType.SYMBOL, ";");
+    return Token.build(TokenType.SYMBOL, SEMICOLON);
   }
 
   public static Token comma() {
-    return Token.build(TokenType.SYMBOL, ",");
+    return Token.build(TokenType.SYMBOL, COMMA);
   }
 
   public static Token staticToken() {
-    return Token.build(TokenType.KEYWORD, "static");
+    return Token.build(TokenType.KEYWORD, STATIC);
   }
 
   public static Token charToken() {
-    return Token.build(TokenType.KEYWORD, "char");
+    return Token.build(TokenType.KEYWORD, CHAR);
   }
 
   public static Token booleanToken() {
-    return Token.build(TokenType.KEYWORD, "boolean");
+    return Token.build(TokenType.KEYWORD, BOOLEAN);
   }
 
   public static Token constructorToken() {
-    return Token.build(TokenType.KEYWORD, "constructor");
+    return Token.build(TokenType.KEYWORD, CONSTRUCTOR);
   }
 
   public static Token voidToken() {
-    return Token.build(TokenType.KEYWORD, "void");
+    return Token.build(TokenType.KEYWORD, VOID);
   }
 
   public static Token functionToken() {
-    return Token.build(TokenType.KEYWORD, "function");
+    return Token.build(TokenType.KEYWORD, FUNCTION);
   }
-
-
+  
   public static Token varToken() {
-    return  Token.build(TokenType.KEYWORD, "var");
+    return  Token.build(TokenType.KEYWORD, VAR);
   }
 }

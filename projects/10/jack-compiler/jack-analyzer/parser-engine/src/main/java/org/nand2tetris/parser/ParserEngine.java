@@ -88,12 +88,24 @@ public class ParserEngine implements Parser {
 
     tokenizer.advance();
     token = tokenizer.peekToken();
-    ensureValidToken(token, isIdentifierToken());
-
+    ensureValidToken(token, isTokenType(TokenType.IDENTIFIER));
     node.addVarName(token);
 
     tokenizer.advance();
     token = tokenizer.peekToken();
+
+    while (true) {
+      if (isComma().test(token)) {
+        tokenizer.advance();
+        token = tokenizer.peekToken();
+        ensureValidToken(token, isTokenType(TokenType.IDENTIFIER));
+        node.addVarName(token);
+        tokenizer.advance();
+        token = tokenizer.peekToken();
+      } else {
+        break;
+      }
+    }
     ensureValidToken(token, isSemicolon());
 
     return node;

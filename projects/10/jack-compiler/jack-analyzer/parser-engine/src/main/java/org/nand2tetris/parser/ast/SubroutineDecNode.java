@@ -1,9 +1,7 @@
 package org.nand2tetris.parser.ast;
 
-import static org.nand2tetris.parser.utils.XMLUtils.closeBraceTag;
 import static org.nand2tetris.parser.utils.XMLUtils.closeParenTag;
 import static org.nand2tetris.parser.utils.XMLUtils.formatTag;
-import static org.nand2tetris.parser.utils.XMLUtils.openBraceTag;
 import static org.nand2tetris.parser.utils.XMLUtils.openParenTag;
 
 import java.util.Arrays;

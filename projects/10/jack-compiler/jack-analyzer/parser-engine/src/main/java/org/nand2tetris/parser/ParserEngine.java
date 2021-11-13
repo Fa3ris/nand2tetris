@@ -103,28 +103,27 @@ public class ParserEngine implements Parser {
   }
 
   private Node parseParameterList() {
-    captureToken();
     ParameterListNode node = new ParameterListNode();
-    if (isCloseParen().test(token)) {
-      return node;
+    while (true) {
+      captureToken();
+      if (isCloseParen().test(token)) {
+        break;
+      }
+      if (isComma().test(token)) {
+        continue;
+      }
+      node.addArg(parseArgNode());
     }
-    ensureValidToken(token, isTypeToken());
-    ParameterArgNode arg1 = new ParameterArgNode();
-    arg1.setType(token);
-
-    captureTokenOfType(isIdentifierToken());
-    arg1.setName(token);
-    node.addArg(arg1);
-    captureTokenOfType(isComma());
-
-    captureTokenOfType(isTypeToken());
-    ParameterArgNode arg2 = new ParameterArgNode();
-    arg2.setType(token);
-    captureTokenOfType(isIdentifierToken());
-    arg2.setName(token);
-    node.addArg(arg2);
-    captureToken();
     return node;
+  }
+
+  private Node parseArgNode() {
+    ensureValidToken(token, isTypeToken());
+    ParameterArgNode arg = new ParameterArgNode();
+    arg.setType(token);
+    captureTokenOfType(isIdentifierToken());
+    arg.setName(token);
+    return arg;
   }
 
   private Node parseSubroutineBody() {

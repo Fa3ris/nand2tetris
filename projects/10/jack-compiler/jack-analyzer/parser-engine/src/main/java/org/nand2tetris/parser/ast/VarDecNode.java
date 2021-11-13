@@ -41,7 +41,7 @@ public class VarDecNode extends AbstractNode {
     type = token;
   }
 
-  public void addVarName(Token token) {
-    varNames.add(token);
+  public void addVarNames(List<Token> tokens) {
+    varNames.addAll(tokens);
   }
 }

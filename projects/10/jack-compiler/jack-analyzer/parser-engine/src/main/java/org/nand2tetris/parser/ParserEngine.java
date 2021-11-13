@@ -16,6 +16,8 @@ import static org.nand2tetris.tokenizer.Symbol.OPEN_BRACE;
 import static org.nand2tetris.tokenizer.Symbol.OPEN_PAREN;
 import static org.nand2tetris.tokenizer.Symbol.SEMICOLON;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Predicate;
 import org.nand2tetris.parser.ast.AST;
 import org.nand2tetris.parser.ast.ClassNode;
@@ -32,7 +34,7 @@ import org.nand2tetris.tokenizer.Tokenizer;
 
 public class ParserEngine implements Parser {
 
-  private Tokenizer tokenizer;
+  private final Tokenizer tokenizer;
 
   private Token token;
 
@@ -42,72 +44,41 @@ public class ParserEngine implements Parser {
 
   public AST parse() {
     tokenizer.advance();
-    if (tokenizer.hasToken()) {
-      token = tokenizer.peekToken();
+    if (!tokenizer.hasToken()) {
+      return null;
+    }
+    token = tokenizer.peekToken();
+    Node node = getRootNode();
+    AST ast = new JackAST();
+    ast.addNode(node);
+    return ast;
+  }
 
-      if (isClassToken().test(token)) {
-        Node node = parseClass();
-        AST ast = new JackAST();
-        ast.addNode(node);
-        return ast;
-      }
+  private Node getRootNode() {
+    if (isClassToken().test(token)) {
+      return parseClass();
+    }
 
-      if (isFieldToken().or(isStaticToken()).test(token)) {
-        Node node = parseClassVarDec();
-        AST ast = new JackAST();
-        ast.addNode(node);
-        return ast;
-      }
+    if (isFieldToken().or(isStaticToken()).test(token)) {
+      return parseClassVarDec();
+    }
 
-      if (isFunctionToken().test(token)) {
-        Node node = parseSubroutineDec();
-        AST ast = new JackAST();
-        ast.addNode(node);
-        return ast;
+    if (isFunctionToken().test(token)) {
+      return parseSubroutineDec();
+    }
 
-      }
-
-      if (isVarToken().test(token)) {
-        Node node = parseVarDec();
-        AST ast = new JackAST();
-        ast.addNode(node);
-        return ast;
-      }
+    if (isVarToken().test(token)) {
+      return parseVarDec();
     }
     return null;
   }
 
   private Node parseVarDec() {
     VarDecNode node = new VarDecNode();
-
-    tokenizer.advance();
-    token = tokenizer.peekToken();
-    ensureValidToken(token, isTypeToken());
-
+    captureTokenOfType(isTypeToken());
     node.setType(token);
-
-    tokenizer.advance();
-    token = tokenizer.peekToken();
-    ensureValidToken(token, isTokenType(TokenType.IDENTIFIER));
-    node.addVarName(token);
-
-    tokenizer.advance();
-    token = tokenizer.peekToken();
-
-    while (true) {
-      if (isComma().test(token)) {
-        tokenizer.advance();
-        token = tokenizer.peekToken();
-        ensureValidToken(token, isTokenType(TokenType.IDENTIFIER));
-        node.addVarName(token);
-        tokenizer.advance();
-        token = tokenizer.peekToken();
-      } else {
-        break;
-      }
-    }
+    node.addVarNames(consumeIdentifiers());
     ensureValidToken(token, isSemicolon());
-
     return node;
   }
 
@@ -115,38 +86,18 @@ public class ParserEngine implements Parser {
   private Node parseSubroutineDec() {
     SubroutineDecNode node = new SubroutineDecNode();
     node.setRoutineType(token);
-    tokenizer.advance();
-    token = tokenizer.peekToken();
-    ensureValidToken(token, isVoidToken());
-
+    captureTokenOfType(isVoidToken());
     node.setReturnType(token);
-
-    tokenizer.advance();
-    token = tokenizer.peekToken();
-    ensureValidToken(token, isIdentifierToken());
-
+    captureTokenOfType(isIdentifierToken());
     node.setRoutineName(token);
-
-    tokenizer.advance();
-    token = tokenizer.peekToken();
-    ensureValidToken(token, isOpenParen());
-
+    captureTokenOfType(isOpenParen());
     Node parameterList = parseParameterList();
     node.setParameterListNode(parameterList);
-    tokenizer.advance();
-    token = tokenizer.peekToken();
-    ensureValidToken(token, isCloseParen());
-
-    tokenizer.advance();
-    token = tokenizer.peekToken();
-    ensureValidToken(token, isOpenBrace());
-
+    captureTokenOfType(isCloseParen());
+    captureTokenOfType(isOpenBrace());
     Node subroutineBody = parseSubroutineBody();
     node.setSubroutineBodyNode(subroutineBody);
-    tokenizer.advance();
-    token = tokenizer.peekToken();
-    ensureValidToken(token, isCloseBrace());
-
+    captureTokenOfType(isCloseBrace());
     return node;
   }
 
@@ -157,61 +108,53 @@ public class ParserEngine implements Parser {
 
   private Node parseSubroutineBody() {
     SubroutineBodyNode node = new SubroutineBodyNode();
-
-
     return node;
   }
 
   private Node parseClassVarDec() {
     ClassVarDecNode node = new ClassVarDecNode();
     node.setScope(token);
-    tokenizer.advance();
-    token = tokenizer.peekToken();
-    ensureValidToken(token, isTypeToken());
+    captureTokenOfType(isTypeToken());
     node.setType(token);
+    node.addVarNames(consumeIdentifiers());
+    ensureValidToken(token, isSemicolon());
+    return node;
+  }
 
-    tokenizer.advance();
-    token = tokenizer.peekToken();
-    ensureValidToken(token, isTokenType(TokenType.IDENTIFIER));
-    node.addVarName(token);
-
-    tokenizer.advance();
-    token = tokenizer.peekToken();
-
+  private List<Token> consumeIdentifiers() {
+    List<Token> identifiers = new ArrayList<>();
+    captureTokenOfType(isIdentifierToken());
+    identifiers.add(token);
+    captureToken();
     while (true) {
       if (isComma().test(token)) {
-        tokenizer.advance();
-        token = tokenizer.peekToken();
-        ensureValidToken(token, isTokenType(TokenType.IDENTIFIER));
-        node.addVarName(token);
-        tokenizer.advance();
-        token = tokenizer.peekToken();
+        captureTokenOfType(isIdentifierToken());
+        identifiers.add(token);
+        captureToken();
       } else {
         break;
       }
     }
-    ensureValidToken(token, isSemicolon());
-
-    return node;
+    return identifiers;
   }
 
   private Node parseClass() {
-
-    tokenizer.advance();
-    token = tokenizer.peekToken();
-    ensureValidToken(token, isTokenType(TokenType.IDENTIFIER));
+    captureTokenOfType(isIdentifierToken());
     ClassNode node = new ClassNode();
     node.setClassName(token);
-
-    tokenizer.advance();
-    token = tokenizer.peekToken();
-    ensureValidToken(token, isOpenBrace());
-
-    tokenizer.advance();
-    token = tokenizer.peekToken();
-    ensureValidToken(token, isCloseBrace());
-
+    captureTokenOfType(isOpenBrace());
+    captureTokenOfType(isCloseBrace());
     return node;
+  }
+
+  private void captureTokenOfType(Predicate<Token> predicate) {
+    captureToken();
+    ensureValidToken(token, predicate);
+  }
+
+  private void captureToken() {
+    tokenizer.advance();
+    token = tokenizer.peekToken();
   }
 
   private Predicate<Token> isTypeToken() {

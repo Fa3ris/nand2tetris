@@ -1,21 +1,19 @@
 package org.nand2tetris.parser.ast;
 
-import static org.nand2tetris.parser.utils.XMLUtils.closeTag;
-import static org.nand2tetris.parser.utils.XMLUtils.concat;
-import static org.nand2tetris.parser.utils.XMLUtils.identifierTag;
-import static org.nand2tetris.parser.utils.XMLUtils.keywordTag;
-import static org.nand2tetris.parser.utils.XMLUtils.openTag;
-import static org.nand2tetris.parser.utils.XMLUtils.symbolTag;
+import static org.nand2tetris.parser.utils.XMLUtils.commaTag;
+import static org.nand2tetris.parser.utils.XMLUtils.formatTag;
+import static org.nand2tetris.parser.utils.XMLUtils.semicolonTag;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.nand2tetris.parser.utils.Joiner;
+import org.nand2tetris.parser.utils.TagNames;
+import org.nand2tetris.parser.utils.XMLUtils;
 import org.nand2tetris.tokenizer.Token;
-import org.nand2tetris.tokenizer.TokenType;
 
 public class ClassVarDecNode extends AbstractNode {
 
-  private static final String tagName = "classVarDec";
   private Token scope;
   private Token type;
   private final List<Token> varNames = new ArrayList<>();
@@ -29,32 +27,24 @@ public class ClassVarDecNode extends AbstractNode {
   }
 
   @Override
-  public String toXMLString() {
-    List<String> tags = new ArrayList<>();
-    tags.add(openTag(tagName));
-    tags.add(keywordTag(scope.getLexeme()));
-    String typeTag;
-    if (type.getType() == TokenType.IDENTIFIER) {
-      typeTag = identifierTag(type.getLexeme());
-    } else {
-      typeTag = keywordTag(type.getLexeme());
-    }
-    tags.add(typeTag);
-    Iterator<Token> it = varNames.iterator();
-    tags.add(identifierTag(it.next().getLexeme()));
-
-    while (it.hasNext()) {
-      tags.add(symbolTag( ","));
-      tags.add(identifierTag(it.next().getLexeme()));
-    }
-
-    tags.add(symbolTag(";"));
-    tags.add(closeTag(tagName));
-
-    return concat(tags);
+  protected String parentTag() {
+    return TagNames.classVarDec;
   }
 
-  public void addVarName(Token token) {
-    varNames.add(token);
+  @Override
+  protected List<String> childrenTags() {
+    Joiner<String> joiner = new Joiner<>(commaTag());
+    List<String> joined = joiner.join(varNames.stream()
+        .map(XMLUtils::formatTag).collect(Collectors.toList()));
+    List<String> tags = new ArrayList<>();
+    tags.add(formatTag(scope));
+    tags.add(formatTag(type));
+    tags.addAll(joined);
+    tags.add(semicolonTag());
+    return tags;
+  }
+
+  public void addVarNames(List<Token> tokens) {
+    varNames.addAll(tokens);
   }
 }

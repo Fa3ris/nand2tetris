@@ -46,8 +46,7 @@ public class ParseSubroutineDecTest {
         parameterListTags(),
         subroutineBodyTags());
 
-    String expectedXml = concat(expectedTags);
-    assertASTXML(tokens, expectedXml);
+    assertASTXML(tokens, expectedTags);
   }
 
   /**
@@ -73,8 +72,7 @@ public class ParseSubroutineDecTest {
         parameterListTags(),
         subroutineBodyTags());
 
-    String expectedXml = concat(expectedTags);
-    assertASTXML(tokens, expectedXml);
+    assertASTXML(tokens, expectedTags);
   }
 
   /**
@@ -99,8 +97,7 @@ public class ParseSubroutineDecTest {
         parameterListTags(),
         subroutineBodyTags());
 
-    String expectedXml = concat(expectedTags);
-    assertASTXML(tokens, expectedXml);
+    assertASTXML(tokens, expectedTags);
 
   }
 
@@ -127,8 +124,7 @@ public class ParseSubroutineDecTest {
         parameterListTags(),
         subroutineBodyTags());
 
-    String expectedXml = concat(expectedTags);
-    assertASTXML(tokens, expectedXml);
+    assertASTXML(tokens, expectedTags);
   }
 
 

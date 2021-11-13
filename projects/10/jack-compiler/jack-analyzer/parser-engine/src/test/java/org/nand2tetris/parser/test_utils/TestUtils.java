@@ -2,6 +2,7 @@ package org.nand2tetris.parser.test_utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.nand2tetris.parser.utils.XMLUtils.closeTag;
+import static org.nand2tetris.parser.utils.XMLUtils.concat;
 import static org.nand2tetris.parser.utils.XMLUtils.openTag;
 import static org.nand2tetris.tokenizer.Token.comma;
 
@@ -19,6 +20,12 @@ public abstract class TestUtils {
   public static void assertASTXML(List<Token> tokens,  String expectedXml) {
     AST ast = parse(tokens);
     assertEquals(expectedXml, ast.toXMLString());
+
+  }
+
+  public static void assertASTXML(List<Token> tokens,  List<String> expectedTags) {
+    AST ast = parse(tokens);
+    assertEquals(concat(expectedTags), ast.toXMLString());
 
   }
 

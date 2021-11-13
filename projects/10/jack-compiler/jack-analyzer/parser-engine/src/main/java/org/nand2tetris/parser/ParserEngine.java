@@ -3,6 +3,7 @@ package org.nand2tetris.parser;
 import static org.nand2tetris.tokenizer.Keyword.BOOLEAN;
 import static org.nand2tetris.tokenizer.Keyword.CHAR;
 import static org.nand2tetris.tokenizer.Keyword.CLASS;
+import static org.nand2tetris.tokenizer.Keyword.CONSTRUCTOR;
 import static org.nand2tetris.tokenizer.Keyword.FIELD;
 import static org.nand2tetris.tokenizer.Keyword.FUNCTION;
 import static org.nand2tetris.tokenizer.Keyword.INT;
@@ -63,7 +64,7 @@ public class ParserEngine implements Parser {
       return parseClassVarDec();
     }
 
-    if (isFunctionToken().test(token)) {
+    if (isFunctionToken().or(isConstructorToken()).test(token)) {
       return parseSubroutineDec();
     }
 
@@ -86,7 +87,7 @@ public class ParserEngine implements Parser {
   private Node parseSubroutineDec() {
     SubroutineDecNode node = new SubroutineDecNode();
     node.setRoutineType(token);
-    captureTokenOfType(isVoidToken());
+    captureTokenOfType(isVoidToken().or(isIdentifierToken()));
     node.setReturnType(token);
     captureTokenOfType(isIdentifierToken());
     node.setRoutineName(token);
@@ -94,10 +95,8 @@ public class ParserEngine implements Parser {
     Node parameterList = parseParameterList();
     node.setParameterListNode(parameterList);
     captureTokenOfType(isCloseParen());
-    captureTokenOfType(isOpenBrace());
     Node subroutineBody = parseSubroutineBody();
     node.setSubroutineBodyNode(subroutineBody);
-    captureTokenOfType(isCloseBrace());
     return node;
   }
 
@@ -107,7 +106,9 @@ public class ParserEngine implements Parser {
   }
 
   private Node parseSubroutineBody() {
+    captureTokenOfType(isOpenBrace());
     SubroutineBodyNode node = new SubroutineBodyNode();
+    captureTokenOfType(isCloseBrace());
     return node;
   }
 
@@ -155,6 +156,10 @@ public class ParserEngine implements Parser {
   private void captureToken() {
     tokenizer.advance();
     token = tokenizer.peekToken();
+  }
+
+  private Predicate<Token> isConstructorToken() {
+    return isKeyword(CONSTRUCTOR);
   }
 
   private Predicate<Token> isTypeToken() {

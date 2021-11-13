@@ -5,6 +5,7 @@ import static org.nand2tetris.parser.test_utils.TestUtils.encloseInTag;
 import static org.nand2tetris.parser.utils.XMLUtils.closeBraceTag;
 import static org.nand2tetris.parser.utils.XMLUtils.closeParenTag;
 import static org.nand2tetris.parser.utils.XMLUtils.concat;
+import static org.nand2tetris.parser.utils.XMLUtils.constructorTag;
 import static org.nand2tetris.parser.utils.XMLUtils.functionTag;
 import static org.nand2tetris.parser.utils.XMLUtils.identifierTag;
 import static org.nand2tetris.parser.utils.XMLUtils.openBraceTag;
@@ -22,10 +23,9 @@ public class ParseSubroutineDecTest {
 
   /**
    * function void myFunction() {}
-   * @throws Exception
    */
   @Test
-  public void argumentLessNoBody() throws Exception {
+  public void functionArgumentLessBodyLess() throws Exception {
 
     String functionName = "myFunction";
     List<Token> tokens = Arrays.asList(
@@ -48,6 +48,49 @@ public class ParseSubroutineDecTest {
     assertASTXML(tokens, expectedXml);
   }
 
+  /**
+   * constructor MyClass new() {}
+   */
+  @Test
+  public void constructorArgumentLessBodyLess() throws Exception {
+    String type = "MyClass";
+    String methodName = "new";
+    List<Token> tokens = Arrays.asList(
+        Token.constructorToken(),
+        Token.identifierToken(type),
+        Token.identifierToken(methodName),
+        Token.openParen(),
+        Token.closeParen(),
+        Token.openBrace(),
+        Token.closeBrace());
+
+    List<String> expectedTags = subroutineDecTags(
+        constructorTag(),
+        identifierTag(type),
+        identifierTag(methodName),
+        parameterListTags(),
+        subroutineBodyTags());
+
+    String expectedXml = concat(expectedTags);
+    assertASTXML(tokens, expectedXml);
+  }
+
+  /**
+   * method void printHello() {}
+   */
+  @Test
+  public void methodArgumentLessBodyLess() throws Exception {
+
+  }
+
+  /**
+   * method void printHello() {}
+   */
+  @Test
+  public void name() throws Exception {
+
+  }
+
 
   private List<String> subroutineDecTags(String routineType, String returnType, String routineName,
       List<String> parameterListTag, List<String> subRoutineBodyTag) {
@@ -58,9 +101,7 @@ public class ParseSubroutineDecTest {
     tags.add(openParenTag());
     tags.add(concat(parameterListTag));
     tags.add(closeParenTag());
-    tags.add(openBraceTag());
     tags.add(concat(subRoutineBodyTag));
-    tags.add(closeBraceTag());
     return encloseInTag(TagNames.subroutineDec, tags);
   }
 
@@ -71,6 +112,8 @@ public class ParseSubroutineDecTest {
 
   private List<String> subroutineBodyTags() {
     List<String> tags = new ArrayList<>();
+    tags.add(openBraceTag());
+    tags.add(closeBraceTag());
     return encloseInTag(TagNames.subroutineBody, tags);
   }
 

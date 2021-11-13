@@ -1,7 +1,6 @@
 package org.nand2tetris.parser;
 
 import static org.nand2tetris.parser.test_utils.TestUtils.assertASTXML;
-import static org.nand2tetris.parser.test_utils.TestUtils.encloseInTag;
 import static org.nand2tetris.parser.test_utils.TestUtils.joinTags;
 import static org.nand2tetris.parser.test_utils.TestUtils.joinTokens;
 import static org.nand2tetris.parser.utils.XMLUtils.booleanTag;
@@ -31,7 +30,7 @@ public class ParseClassVarDecTest {
    * field int size;
    */
   @Test
-  public void parseSimpleClassVarDec() throws Exception {
+  public void parseSingleIntClassVarDec() throws Exception {
     String[] identifiers = { "size"};
     List<Token> tokens = classVarDecTokens(Token.field(), Token.intToken(), identifiers);
     List<String> expectedTags = classVarDecTags(fieldTag(), intTag(), identifiers);
@@ -43,7 +42,7 @@ public class ParseClassVarDecTest {
    * field int x, y;
    */
   @Test
-  public void parseTwoClassVarDec() throws Exception {
+  public void parseTwoIntClassVarDec() throws Exception {
 
     String[] identifiers = { "x", "y"};
     List<Token> tokens = classVarDecTokens(Token.field(), Token.intToken(), identifiers);
@@ -53,10 +52,10 @@ public class ParseClassVarDecTest {
   }
 
   /**
-   * field foo, bar, baz;
+   * field int foo, bar, baz;
    */
   @Test
-  public void parseMultipleClassVarDec() throws Exception {
+  public void parseThreeIntClassVarDec() throws Exception {
     String[] identifiers = { "foo", "bar", "baz"};
     List<Token> tokens = classVarDecTokens(Token.field(), Token.intToken(), identifiers);
     List<String> expectedTags = classVarDecTags(fieldTag(), intTag(), identifiers);
@@ -68,7 +67,7 @@ public class ParseClassVarDecTest {
    * field 1, 2, ..., n-1, n;
    */
   @Test
-  public void parseNClassVarDec() throws Exception {
+  public void parseNIntClassVarDec() throws Exception {
     int n = 10;
     String[] identifiers = IntStream.rangeClosed(1, n)
         .mapToObj(Objects::toString).collect(Collectors.toList()).toArray(new String[]{});
@@ -82,7 +81,7 @@ public class ParseClassVarDecTest {
    * static int ROW;
    */
   @Test
-  public void parseStatic() throws Exception {
+  public void parseStaticClassVarDec() throws Exception {
     String[] identifiers = { "ROW"};
     List<Token> tokens = classVarDecTokens(Token.staticToken(), Token.intToken(), identifiers);
     List<String> expectedTags = classVarDecTags(staticTag(), intTag(), identifiers);
@@ -94,7 +93,7 @@ public class ParseClassVarDecTest {
    * field char joe;
    */
   @Test
-  public void parseChar() throws Exception {
+  public void parseCharClassVarDec() throws Exception {
     String[] identifiers = { "joe"};
     List<Token> tokens = classVarDecTokens(Token.field(), Token.charToken(), identifiers);
     List<String> expectedTags = classVarDecTags(fieldTag(), charTag(), identifiers);
@@ -107,7 +106,7 @@ public class ParseClassVarDecTest {
    * field boolean isOK;
    */
   @Test
-  public void parseBoolean() throws Exception {
+  public void parseBooleanClassVarDec() throws Exception {
     String[] identifiers = { "isOK"};
     List<Token> tokens = classVarDecTokens(Token.field(), Token.booleanToken(), identifiers);
     List<String> expectedTags = classVarDecTags(fieldTag(), booleanTag(), identifiers);
@@ -119,7 +118,7 @@ public class ParseClassVarDecTest {
    * field MyClass myClass;
    */
   @Test
-  public void parseClass() throws Exception {
+  public void parseClassClassVarDec() throws Exception {
     String[] identifiers = { "myClass"};
     String classType = "MyClass";
     List<Token> tokens = classVarDecTokens(Token.field(), Token.identifierToken(classType), identifiers);

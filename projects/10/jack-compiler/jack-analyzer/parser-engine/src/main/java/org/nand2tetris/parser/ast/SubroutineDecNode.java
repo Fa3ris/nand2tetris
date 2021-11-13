@@ -30,9 +30,8 @@ public class SubroutineDecNode extends AbstractNode {
         openParenTag(),
         parameterListNode.toXMLString(),
         closeParenTag(),
-        openBraceTag(),
-        subroutineBodyNode.toXMLString(),
-        closeBraceTag());
+        subroutineBodyNode.toXMLString()
+    );
   }
 
   public void setRoutineType(Token routineType) {

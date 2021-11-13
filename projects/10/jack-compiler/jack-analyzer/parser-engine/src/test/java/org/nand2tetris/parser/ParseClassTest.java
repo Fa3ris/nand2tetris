@@ -16,6 +16,11 @@ import org.nand2tetris.tokenizer.Token;
 
 public class ParseClassTest {
 
+  /**
+   * class Main {}
+   * and
+   * class Foo {}
+   */
   @Test
   public void parseEmptyClass() throws Exception {
     parseEmptyClass("Main");

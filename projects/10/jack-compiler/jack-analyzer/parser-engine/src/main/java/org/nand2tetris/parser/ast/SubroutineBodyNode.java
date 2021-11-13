@@ -1,20 +1,25 @@
 package org.nand2tetris.parser.ast;
 
-import static org.nand2tetris.parser.utils.XMLUtils.closeTag;
-import static org.nand2tetris.parser.utils.XMLUtils.concat;
-import static org.nand2tetris.parser.utils.XMLUtils.openTag;
+import static org.nand2tetris.parser.utils.XMLUtils.closeBraceTag;
+import static org.nand2tetris.parser.utils.XMLUtils.openBraceTag;
 
 import java.util.Arrays;
+import java.util.List;
 import org.nand2tetris.parser.utils.TagNames;
 
 public class SubroutineBodyNode extends AbstractNode {
 
   @Override
-  public String toXMLString() {
-    return concat(Arrays.asList(
-        openTag(TagNames.subroutineBody),
-        closeTag(TagNames.subroutineBody)
-    ));
+  protected String parentTag() {
+    return TagNames.subroutineBody;
+  }
+
+  @Override
+  protected List<String> childrenTags() {
+    return Arrays.asList(
+        openBraceTag(),
+        closeBraceTag()
+    );
   }
 
 }

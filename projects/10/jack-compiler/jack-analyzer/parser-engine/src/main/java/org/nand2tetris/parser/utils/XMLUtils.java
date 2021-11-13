@@ -4,6 +4,7 @@ import static org.nand2tetris.parser.utils.TagNames.classTag;
 import static org.nand2tetris.parser.utils.TagNames.symbol;
 import static org.nand2tetris.tokenizer.Keyword.BOOLEAN;
 import static org.nand2tetris.tokenizer.Keyword.CHAR;
+import static org.nand2tetris.tokenizer.Keyword.CONSTRUCTOR;
 import static org.nand2tetris.tokenizer.Keyword.FIELD;
 import static org.nand2tetris.tokenizer.Keyword.FUNCTION;
 import static org.nand2tetris.tokenizer.Keyword.INT;
@@ -56,6 +57,9 @@ public abstract class XMLUtils {
 
   public static String functionTag() {
     return keywordTag(FUNCTION);
+  }
+  public static String constructorTag() {
+    return keywordTag(CONSTRUCTOR);
   }
 
   public static String voidTag() {

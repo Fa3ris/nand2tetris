@@ -26,6 +26,7 @@ import org.nand2tetris.parser.ast.ClassNode;
 import org.nand2tetris.parser.ast.ClassVarDecNode;
 import org.nand2tetris.parser.ast.JackAST;
 import org.nand2tetris.parser.ast.Node;
+import org.nand2tetris.parser.ast.ParameterArgNode;
 import org.nand2tetris.parser.ast.ParameterListNode;
 import org.nand2tetris.parser.ast.SubroutineBodyNode;
 import org.nand2tetris.parser.ast.SubroutineDecNode;
@@ -95,14 +96,34 @@ public class ParserEngine implements Parser {
     captureTokenOfType(isOpenParen());
     Node parameterList = parseParameterList();
     node.setParameterListNode(parameterList);
-    captureTokenOfType(isCloseParen());
+    ensureValidToken(token, isCloseParen());
     Node subroutineBody = parseSubroutineBody();
     node.setSubroutineBodyNode(subroutineBody);
     return node;
   }
 
   private Node parseParameterList() {
+    captureToken();
     ParameterListNode node = new ParameterListNode();
+    if (isCloseParen().test(token)) {
+      return node;
+    }
+    ensureValidToken(token, isTypeToken());
+    ParameterArgNode arg1 = new ParameterArgNode();
+    arg1.setType(token);
+
+    captureTokenOfType(isIdentifierToken());
+    arg1.setName(token);
+    node.addArg(arg1);
+    captureTokenOfType(isComma());
+
+    captureTokenOfType(isTypeToken());
+    ParameterArgNode arg2 = new ParameterArgNode();
+    arg2.setType(token);
+    captureTokenOfType(isIdentifierToken());
+    arg2.setName(token);
+    node.addArg(arg2);
+    captureToken();
     return node;
   }
 

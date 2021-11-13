@@ -10,8 +10,10 @@ public abstract class AbstractNode implements Node {
 
   @Override
   public String toXMLString() {
-    List<String> enclosed = encloseInTag(parentTag(), childrenTags());
-    return concat(enclosed);
+    if (parentTag().isEmpty()) {
+      return concat(childrenTags());
+    }
+    return concat(encloseInTag(parentTag(), childrenTags()));
   }
 
   protected String parentTag() { return "";}

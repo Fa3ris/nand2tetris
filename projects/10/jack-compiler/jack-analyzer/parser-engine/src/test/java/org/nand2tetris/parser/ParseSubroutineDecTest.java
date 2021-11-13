@@ -4,18 +4,31 @@ import static org.nand2tetris.parser.test_utils.TestUtils.assertASTXML;
 import static org.nand2tetris.parser.test_utils.TestUtils.encloseInTag;
 import static org.nand2tetris.parser.utils.XMLUtils.closeBraceTag;
 import static org.nand2tetris.parser.utils.XMLUtils.closeParenTag;
+import static org.nand2tetris.parser.utils.XMLUtils.commaTag;
 import static org.nand2tetris.parser.utils.XMLUtils.concat;
 import static org.nand2tetris.parser.utils.XMLUtils.constructorTag;
 import static org.nand2tetris.parser.utils.XMLUtils.functionTag;
 import static org.nand2tetris.parser.utils.XMLUtils.identifierTag;
+import static org.nand2tetris.parser.utils.XMLUtils.intTag;
 import static org.nand2tetris.parser.utils.XMLUtils.methodTag;
 import static org.nand2tetris.parser.utils.XMLUtils.openBraceTag;
 import static org.nand2tetris.parser.utils.XMLUtils.openParenTag;
 import static org.nand2tetris.parser.utils.XMLUtils.voidTag;
-import static org.nand2tetris.tokenizer.Token.*;
+import static org.nand2tetris.tokenizer.Token.closeBrace;
+import static org.nand2tetris.tokenizer.Token.closeParen;
+import static org.nand2tetris.tokenizer.Token.comma;
+import static org.nand2tetris.tokenizer.Token.constructorToken;
+import static org.nand2tetris.tokenizer.Token.functionToken;
+import static org.nand2tetris.tokenizer.Token.identifierToken;
+import static org.nand2tetris.tokenizer.Token.intToken;
+import static org.nand2tetris.tokenizer.Token.methodToken;
+import static org.nand2tetris.tokenizer.Token.openBrace;
+import static org.nand2tetris.tokenizer.Token.openParen;
+import static org.nand2tetris.tokenizer.Token.voidToken;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.junit.Test;
 import org.nand2tetris.parser.utils.TagNames;
@@ -127,6 +140,45 @@ public class ParseSubroutineDecTest {
     assertASTXML(tokens, expectedTags);
   }
 
+  /**
+   * constructor Square new(int Ax, int Ay) {}
+   */
+  @Test
+  public void constructorParameterList() throws Exception {
+    String type = "Square";
+    String methodName = "new";
+    String firstArg = "Ax";
+    String secondArg = "Ay";
+    List<Token> tokens = Arrays.asList(
+        constructorToken(),
+        identifierToken(type),
+        identifierToken(methodName),
+        openParen(),
+        intToken(),
+        identifierToken(firstArg),
+        comma(),
+        intToken(),
+        identifierToken(secondArg),
+        closeParen(),
+        openBrace(),
+        closeBrace());
+
+    List<String> expectedTags = subroutineDecTags(
+        constructorTag(),
+        identifierTag(type),
+        identifierTag(methodName),
+        parameterListTags(Arrays.asList(
+            intTag(),
+            identifierTag(firstArg),
+            commaTag(),
+            intTag(),
+            identifierTag(secondArg)
+        )),
+        subroutineBodyTags());
+
+    assertASTXML(tokens, expectedTags);
+
+  }
 
   private List<String> subroutineDecTags(String routineType, String returnType, String routineName,
       List<String> parameterListTag, List<String> subRoutineBodyTag) {
@@ -142,7 +194,11 @@ public class ParseSubroutineDecTest {
   }
 
   private List<String> parameterListTags() {
-    List<String> tags = new ArrayList<>();
+    List<String> tags = Collections.emptyList();
+    return parameterListTags(tags);
+  }
+
+  private List<String> parameterListTags(List<String> tags) {
     return encloseInTag(TagNames.parameterList, tags);
   }
 

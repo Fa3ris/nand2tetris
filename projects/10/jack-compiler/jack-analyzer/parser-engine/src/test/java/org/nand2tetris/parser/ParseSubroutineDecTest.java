@@ -8,9 +8,11 @@ import static org.nand2tetris.parser.utils.XMLUtils.concat;
 import static org.nand2tetris.parser.utils.XMLUtils.constructorTag;
 import static org.nand2tetris.parser.utils.XMLUtils.functionTag;
 import static org.nand2tetris.parser.utils.XMLUtils.identifierTag;
+import static org.nand2tetris.parser.utils.XMLUtils.methodTag;
 import static org.nand2tetris.parser.utils.XMLUtils.openBraceTag;
 import static org.nand2tetris.parser.utils.XMLUtils.openParenTag;
 import static org.nand2tetris.parser.utils.XMLUtils.voidTag;
+import static org.nand2tetris.tokenizer.Token.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,13 +31,13 @@ public class ParseSubroutineDecTest {
 
     String functionName = "myFunction";
     List<Token> tokens = Arrays.asList(
-        Token.functionToken(),
-        Token.voidToken(),
-        Token.identifierToken(functionName),
-        Token.openParen(),
-        Token.closeParen(),
-        Token.openBrace(),
-        Token.closeBrace());
+        functionToken(),
+        voidToken(),
+        identifierToken(functionName),
+        openParen(),
+        closeParen(),
+        openBrace(),
+        closeBrace());
 
     List<String> expectedTags = subroutineDecTags(
         functionTag(),
@@ -56,13 +58,13 @@ public class ParseSubroutineDecTest {
     String type = "MyClass";
     String methodName = "new";
     List<Token> tokens = Arrays.asList(
-        Token.constructorToken(),
-        Token.identifierToken(type),
-        Token.identifierToken(methodName),
-        Token.openParen(),
-        Token.closeParen(),
-        Token.openBrace(),
-        Token.closeBrace());
+        constructorToken(),
+        identifierToken(type),
+        identifierToken(methodName),
+        openParen(),
+        closeParen(),
+        openBrace(),
+        closeBrace());
 
     List<String> expectedTags = subroutineDecTags(
         constructorTag(),
@@ -80,15 +82,53 @@ public class ParseSubroutineDecTest {
    */
   @Test
   public void methodArgumentLessBodyLess() throws Exception {
+    String functionName = "printHello";
+    List<Token> tokens = Arrays.asList(
+        methodToken(),
+        voidToken(),
+        identifierToken(functionName),
+        openParen(),
+        closeParen(),
+        openBrace(),
+        closeBrace());
+
+    List<String> expectedTags = subroutineDecTags(
+        methodTag(),
+        voidTag(),
+        identifierTag(functionName),
+        parameterListTags(),
+        subroutineBodyTags());
+
+    String expectedXml = concat(expectedTags);
+    assertASTXML(tokens, expectedXml);
 
   }
 
   /**
-   * method void printHello() {}
+   * method Square create() {}
    */
   @Test
-  public void name() throws Exception {
+  public void methodReturnClass() throws Exception {
+    String type = "Square";
+    String methodName = "create";
+    List<Token> tokens = Arrays.asList(
+        methodToken(),
+        identifierToken(type),
+        identifierToken(methodName),
+        openParen(),
+        closeParen(),
+        openBrace(),
+        closeBrace());
 
+    List<String> expectedTags = subroutineDecTags(
+        methodTag(),
+        identifierTag(type),
+        identifierTag(methodName),
+        parameterListTags(),
+        subroutineBodyTags());
+
+    String expectedXml = concat(expectedTags);
+    assertASTXML(tokens, expectedXml);
   }
 
 

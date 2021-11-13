@@ -85,4 +85,8 @@ public class Token {
   public static Token varToken() {
     return  Token.build(TokenType.KEYWORD, VAR);
   }
+
+  public static Token methodToken() {
+    return Token.build(TokenType.KEYWORD, METHOD);
+  }
 }

@@ -8,6 +8,7 @@ import static org.nand2tetris.tokenizer.Keyword.CONSTRUCTOR;
 import static org.nand2tetris.tokenizer.Keyword.FIELD;
 import static org.nand2tetris.tokenizer.Keyword.FUNCTION;
 import static org.nand2tetris.tokenizer.Keyword.INT;
+import static org.nand2tetris.tokenizer.Keyword.METHOD;
 import static org.nand2tetris.tokenizer.Keyword.STATIC;
 import static org.nand2tetris.tokenizer.Keyword.VOID;
 import static org.nand2tetris.tokenizer.Symbol.CLOSE_BRACE;
@@ -58,6 +59,11 @@ public abstract class XMLUtils {
   public static String functionTag() {
     return keywordTag(FUNCTION);
   }
+
+  public static String methodTag() {
+    return keywordTag(METHOD);
+  }
+
   public static String constructorTag() {
     return keywordTag(CONSTRUCTOR);
   }

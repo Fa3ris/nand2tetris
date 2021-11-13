@@ -7,6 +7,7 @@ import static org.nand2tetris.tokenizer.Keyword.CONSTRUCTOR;
 import static org.nand2tetris.tokenizer.Keyword.FIELD;
 import static org.nand2tetris.tokenizer.Keyword.FUNCTION;
 import static org.nand2tetris.tokenizer.Keyword.INT;
+import static org.nand2tetris.tokenizer.Keyword.METHOD;
 import static org.nand2tetris.tokenizer.Keyword.STATIC;
 import static org.nand2tetris.tokenizer.Keyword.VAR;
 import static org.nand2tetris.tokenizer.Keyword.VOID;
@@ -64,7 +65,7 @@ public class ParserEngine implements Parser {
       return parseClassVarDec();
     }
 
-    if (isFunctionToken().or(isConstructorToken()).test(token)) {
+    if (isFunctionToken().or(isConstructorToken()).or(isMethodToken()).test(token)) {
       return parseSubroutineDec();
     }
 
@@ -176,6 +177,10 @@ public class ParserEngine implements Parser {
 
   private Predicate<Token> isFunctionToken() {
     return isKeyword(FUNCTION);
+  }
+
+  private Predicate<Token> isMethodToken() {
+    return isKeyword(METHOD);
   }
 
   private Predicate<Token> isStaticToken() {

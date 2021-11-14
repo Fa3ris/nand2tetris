@@ -110,6 +110,14 @@ public abstract class XMLUtils {
     return keywordTag(TagNames.varTag);
   }
 
+  public static String letTag() {
+    return keywordTag(TagNames.letTag);
+  }
+
+  public static String equalTag() {
+    return keywordTag(TagNames.equalTag);
+  }
+
   public static String keywordTag(String innerText) {
     return leafTag(TagNames.keyword, innerText);
   }

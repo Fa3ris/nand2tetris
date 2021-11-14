@@ -89,4 +89,12 @@ public class Token {
   public static Token methodToken() {
     return Token.build(TokenType.KEYWORD, METHOD);
   }
+
+  public static Token letToken() {
+    return Token.build(TokenType.KEYWORD, LET);
+  }
+
+  public static Token equalToken() {
+    return Token.build(TokenType.KEYWORD, EQ);
+  }
 }

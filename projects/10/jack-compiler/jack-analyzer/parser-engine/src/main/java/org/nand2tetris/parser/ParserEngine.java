@@ -7,6 +7,7 @@ import static org.nand2tetris.tokenizer.Keyword.CONSTRUCTOR;
 import static org.nand2tetris.tokenizer.Keyword.FIELD;
 import static org.nand2tetris.tokenizer.Keyword.FUNCTION;
 import static org.nand2tetris.tokenizer.Keyword.INT;
+import static org.nand2tetris.tokenizer.Keyword.LET;
 import static org.nand2tetris.tokenizer.Keyword.METHOD;
 import static org.nand2tetris.tokenizer.Keyword.STATIC;
 import static org.nand2tetris.tokenizer.Keyword.VAR;
@@ -14,6 +15,7 @@ import static org.nand2tetris.tokenizer.Keyword.VOID;
 import static org.nand2tetris.tokenizer.Symbol.CLOSE_BRACE;
 import static org.nand2tetris.tokenizer.Symbol.CLOSE_PAREN;
 import static org.nand2tetris.tokenizer.Symbol.COMMA;
+import static org.nand2tetris.tokenizer.Symbol.EQ;
 import static org.nand2tetris.tokenizer.Symbol.OPEN_BRACE;
 import static org.nand2tetris.tokenizer.Symbol.OPEN_PAREN;
 import static org.nand2tetris.tokenizer.Symbol.SEMICOLON;
@@ -24,12 +26,15 @@ import java.util.function.Predicate;
 import org.nand2tetris.parser.ast.AST;
 import org.nand2tetris.parser.ast.ClassNode;
 import org.nand2tetris.parser.ast.ClassVarDecNode;
+import org.nand2tetris.parser.ast.ExpressionNode;
 import org.nand2tetris.parser.ast.JackAST;
+import org.nand2tetris.parser.ast.LetNode;
 import org.nand2tetris.parser.ast.Node;
 import org.nand2tetris.parser.ast.ParameterArgNode;
 import org.nand2tetris.parser.ast.ParameterListNode;
 import org.nand2tetris.parser.ast.SubroutineBodyNode;
 import org.nand2tetris.parser.ast.SubroutineDecNode;
+import org.nand2tetris.parser.ast.TermNode;
 import org.nand2tetris.parser.ast.VarDecNode;
 import org.nand2tetris.tokenizer.Token;
 import org.nand2tetris.tokenizer.TokenType;
@@ -134,19 +139,53 @@ public class ParserEngine implements Parser {
   private Node parseSubroutineBody() {
     SubroutineBodyNode node = new SubroutineBodyNode();
     captureToken();
-    if (isVarToken().test(token)) {
-      Node varDec = parseVarDec();
-      node.addVarDec(varDec);
-      captureToken();
+    while (true) {
+      if (isVarToken().test(token)) {
+        node.addVarDec(parseVarDec());
+        captureToken();
+      } else {
+        break;
+      }
     }
-    if (isVarToken().test(token)) {
-      Node varDec = parseVarDec();
-      node.addVarDec(varDec);
+
+    if (isLetToken().test(token)) {
+      Node letNode = parseLetStatement();
+      node.addStatement(letNode);
       captureToken();
     }
     ensureValidToken(token, isCloseBrace());
     return node;
   }
+
+  private Node parseLetStatement() {
+    LetNode node = new LetNode();
+    captureTokenOfType(isIdentifierToken());
+    node.setVarName(token);
+    captureTokenOfType(isEqualToken());
+    Node rightExpression = parseExpression();
+    node.setRightExpression(rightExpression);
+    captureTokenOfType(isSemicolon());
+    return node;
+  }
+
+  private Node parseExpression() {
+    ExpressionNode node = new ExpressionNode();
+    Node term = parseTerm();
+    node.addTerm(term);
+    return node;
+  }
+
+  private Node parseTerm() {
+    TermNode node = new TermNode();
+    captureTokenOfType(isIdentifierToken());
+    node.addVarName(token);
+    return node;
+  }
+
+  private Predicate<Token> isEqualToken() {
+    return isKeyword(EQ);
+  }
+
 
   private Node parseClassVarDec() {
     ClassVarDecNode node = new ClassVarDecNode();
@@ -238,6 +277,9 @@ public class ParserEngine implements Parser {
     return isKeyword(VAR);
   }
 
+  private Predicate<Token> isLetToken() {
+    return isKeyword(LET);
+  }
 
   private Predicate<Token> isBooleanToken() {
     return isKeyword(BOOLEAN);

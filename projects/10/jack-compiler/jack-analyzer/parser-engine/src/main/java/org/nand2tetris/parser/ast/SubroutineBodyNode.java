@@ -4,10 +4,14 @@ import static org.nand2tetris.parser.utils.XMLUtils.closeBraceTag;
 import static org.nand2tetris.parser.utils.XMLUtils.openBraceTag;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.nand2tetris.parser.utils.TagNames;
 
 public class SubroutineBodyNode extends AbstractNode {
+
+  private final List<Node> varDecs = new LinkedList<>();
 
   @Override
   protected String parentTag() {
@@ -16,10 +20,14 @@ public class SubroutineBodyNode extends AbstractNode {
 
   @Override
   protected List<String> childrenTags() {
-    return Arrays.asList(
-        openBraceTag(),
-        closeBraceTag()
-    );
+    List<String> tags = new LinkedList<>();
+    tags.add(openBraceTag());
+    tags.addAll(varDecs.stream().map(Node::toXMLString).collect(Collectors.toList()));
+    tags.add(closeBraceTag());
+    return tags;
   }
 
+  public void addVarDec(Node varDec) {
+    varDecs.add(varDec);
+  }
 }

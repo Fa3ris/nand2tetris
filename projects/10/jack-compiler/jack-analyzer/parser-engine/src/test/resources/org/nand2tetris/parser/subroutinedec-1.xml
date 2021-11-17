@@ -1,0 +1,13 @@
+<subroutineDec>
+  <keyword> function </keyword>
+  <keyword> void </keyword>
+  <identifier> myFunction </identifier>
+  <symbol> ( </symbol>
+  <parameterList>
+  </parameterList>
+  <symbol> ) </symbol>
+  <subroutineBody>
+    <symbol> { </symbol>
+    <symbol> } </symbol>
+  </subroutineBody>
+</subroutineDec>

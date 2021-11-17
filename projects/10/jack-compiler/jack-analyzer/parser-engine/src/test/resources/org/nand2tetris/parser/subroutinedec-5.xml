@@ -1,0 +1,18 @@
+<subroutineDec>
+  <keyword> constructor </keyword>
+  <identifier> Square </identifier>
+  <identifier> new </identifier>
+  <symbol> ( </symbol>
+  <parameterList>
+    <keyword> int </keyword>
+    <identifier> Ax </identifier>
+    <symbol> , </symbol>
+    <keyword> int </keyword>
+    <identifier> Ay </identifier>
+  </parameterList>
+  <symbol> ) </symbol>
+  <subroutineBody>
+    <symbol> { </symbol>
+    <symbol> } </symbol>
+  </subroutineBody>
+</subroutineDec>

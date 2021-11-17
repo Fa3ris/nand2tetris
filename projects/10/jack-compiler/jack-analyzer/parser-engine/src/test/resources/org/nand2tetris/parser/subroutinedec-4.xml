@@ -1,0 +1,13 @@
+<subroutineDec>
+  <keyword> method </keyword>
+  <identifier> Square </identifier>
+  <identifier> create </identifier>
+  <symbol> ( </symbol>
+  <parameterList>
+  </parameterList>
+  <symbol> ) </symbol>
+  <subroutineBody>
+    <symbol> { </symbol>
+    <symbol> } </symbol>
+  </subroutineBody>
+</subroutineDec>

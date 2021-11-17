@@ -1,0 +1,8 @@
+<varDec>
+  <keyword> var </keyword>
+  <keyword> char </keyword>
+  <identifier> foo </identifier>
+  <symbol> , </symbol>
+  <identifier> bar </identifier>
+  <symbol> ; </symbol>
+</varDec>

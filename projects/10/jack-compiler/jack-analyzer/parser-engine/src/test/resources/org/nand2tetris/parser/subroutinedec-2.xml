@@ -1,0 +1,13 @@
+<subroutineDec>
+  <keyword> constructor </keyword>
+  <identifier> MyClass </identifier>
+  <identifier> new </identifier>
+  <symbol> ( </symbol>
+  <parameterList>
+  </parameterList>
+  <symbol> ) </symbol>
+  <subroutineBody>
+    <symbol> { </symbol>
+    <symbol> } </symbol>
+  </subroutineBody>
+</subroutineDec>

@@ -1,0 +1,6 @@
+<varDec>
+  <keyword> var </keyword>
+  <identifier> MyClass </identifier>
+  <identifier> test1 </identifier>
+  <symbol> ; </symbol>
+</varDec>

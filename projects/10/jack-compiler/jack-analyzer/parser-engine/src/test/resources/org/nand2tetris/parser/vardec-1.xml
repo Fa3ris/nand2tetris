@@ -1,0 +1,6 @@
+<varDec>
+  <keyword> var </keyword>
+  <keyword> char </keyword>
+  <identifier> key </identifier>
+  <symbol> ; </symbol>
+</varDec>

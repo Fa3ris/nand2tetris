@@ -1,0 +1,24 @@
+<subroutineDec>
+  <keyword> constructor </keyword>
+  <identifier> Square </identifier>
+  <identifier> new </identifier>
+  <symbol> ( </symbol>
+  <parameterList>
+    <keyword> boolean </keyword>
+    <identifier> foo </identifier>
+    <symbol> , </symbol>
+    <keyword> char </keyword>
+    <identifier> bar </identifier>
+    <symbol> , </symbol>
+    <keyword> int </keyword>
+    <identifier> baz </identifier>
+    <symbol> , </symbol>
+    <identifier> Rectangle </identifier>
+    <identifier> rectangle </identifier>
+  </parameterList>
+  <symbol> ) </symbol>
+  <subroutineBody>
+    <symbol> { </symbol>
+    <symbol> } </symbol>
+  </subroutineBody>
+</subroutineDec>

@@ -6,16 +6,11 @@ import static org.nand2tetris.parser.utils.XMLUtils.booleanTag;
 import static org.nand2tetris.parser.utils.XMLUtils.charTag;
 import static org.nand2tetris.parser.utils.XMLUtils.closeBraceTag;
 import static org.nand2tetris.parser.utils.XMLUtils.closeParenTag;
-import static org.nand2tetris.parser.utils.XMLUtils.commaTag;
 import static org.nand2tetris.parser.utils.XMLUtils.concat;
-import static org.nand2tetris.parser.utils.XMLUtils.constructorTag;
-import static org.nand2tetris.parser.utils.XMLUtils.functionTag;
 import static org.nand2tetris.parser.utils.XMLUtils.identifierTag;
 import static org.nand2tetris.parser.utils.XMLUtils.intTag;
-import static org.nand2tetris.parser.utils.XMLUtils.methodTag;
 import static org.nand2tetris.parser.utils.XMLUtils.openBraceTag;
 import static org.nand2tetris.parser.utils.XMLUtils.openParenTag;
-import static org.nand2tetris.parser.utils.XMLUtils.voidTag;
 import static org.nand2tetris.tokenizer.Token.booleanToken;
 import static org.nand2tetris.tokenizer.Token.charToken;
 import static org.nand2tetris.tokenizer.Token.closeBrace;
@@ -30,12 +25,13 @@ import static org.nand2tetris.tokenizer.Token.openBrace;
 import static org.nand2tetris.tokenizer.Token.openParen;
 import static org.nand2tetris.tokenizer.Token.voidToken;
 
+import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.junit.Test;
-import org.nand2tetris.parser.utils.Joiner;
 import org.nand2tetris.parser.utils.TagNames;
 import org.nand2tetris.tokenizer.Token;
 
@@ -57,14 +53,10 @@ public class ParseSubroutineDecTest {
         openBrace(),
         closeBrace());
 
-    List<String> expectedTags = subroutineDecTags(
-        functionTag(),
-        voidTag(),
-        identifierTag(functionName),
-        parameterListTags(),
-        subroutineBodyTags());
+    URL url = getClass().getResource("subroutinedec-1.xml");
+    File file = new File(url.getFile());
 
-    assertASTXML(tokens, expectedTags);
+    assertASTXML(tokens, file);
   }
 
   /**
@@ -83,14 +75,10 @@ public class ParseSubroutineDecTest {
         openBrace(),
         closeBrace());
 
-    List<String> expectedTags = subroutineDecTags(
-        constructorTag(),
-        identifierTag(type),
-        identifierTag(methodName),
-        parameterListTags(),
-        subroutineBodyTags());
+    URL url = getClass().getResource("subroutinedec-2.xml");
+    File file = new File(url.getFile());
 
-    assertASTXML(tokens, expectedTags);
+    assertASTXML(tokens, file);
   }
 
   /**
@@ -108,14 +96,10 @@ public class ParseSubroutineDecTest {
         openBrace(),
         closeBrace());
 
-    List<String> expectedTags = subroutineDecTags(
-        methodTag(),
-        voidTag(),
-        identifierTag(functionName),
-        parameterListTags(),
-        subroutineBodyTags());
+    URL url = getClass().getResource("subroutinedec-3.xml");
+    File file = new File(url.getFile());
 
-    assertASTXML(tokens, expectedTags);
+    assertASTXML(tokens, file);
 
   }
 
@@ -135,14 +119,10 @@ public class ParseSubroutineDecTest {
         openBrace(),
         closeBrace());
 
-    List<String> expectedTags = subroutineDecTags(
-        methodTag(),
-        identifierTag(type),
-        identifierTag(methodName),
-        parameterListTags(),
-        subroutineBodyTags());
+    URL url = getClass().getResource("subroutinedec-4.xml");
+    File file = new File(url.getFile());
 
-    assertASTXML(tokens, expectedTags);
+    assertASTXML(tokens, file);
   }
 
   /**
@@ -168,20 +148,10 @@ public class ParseSubroutineDecTest {
         openBrace(),
         closeBrace());
 
-    List<String> expectedTags = subroutineDecTags(
-        constructorTag(),
-        identifierTag(type),
-        identifierTag(methodName),
-        parameterListTags(Arrays.asList(
-            intTag(),
-            identifierTag(firstArg),
-            commaTag(),
-            intTag(),
-            identifierTag(secondArg)
-        )),
-        subroutineBodyTags());
+    URL url = getClass().getResource("subroutinedec-5.xml");
+    File file = new File(url.getFile());
 
-    assertASTXML(tokens, expectedTags);
+    assertASTXML(tokens, file);
 
   }
 
@@ -215,22 +185,10 @@ public class ParseSubroutineDecTest {
     tokens.add(openBrace());
     tokens.add(closeBrace());
 
-    List<String> parameterListTags = new ArrayList<>();
-    parameterListTags.addAll(booleanArgTag(firstArg));
-    parameterListTags.add(commaTag());
-    parameterListTags.addAll(charArgTag(secondArg));
-    parameterListTags.add(commaTag());
-    parameterListTags.addAll(intArgTag(thirdArg));
-    parameterListTags.add(commaTag());
-    parameterListTags.addAll(classArgTag(fourthType, fourthArg));
+    URL url = getClass().getResource("subroutinedec-6.xml");
+    File file = new File(url.getFile());
 
-    List<String> expectedTags = subroutineDecTags(
-        constructorTag(),
-        identifierTag(type),
-        identifierTag(methodName),
-        parameterListTags(parameterListTags),
-        subroutineBodyTags());
-    assertASTXML(tokens, expectedTags);
+    assertASTXML(tokens, file);
   }
 
   private List<Token> booleanArg(String identifier) {

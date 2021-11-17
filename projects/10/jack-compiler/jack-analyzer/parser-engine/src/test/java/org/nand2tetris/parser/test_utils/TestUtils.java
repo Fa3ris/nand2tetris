@@ -11,10 +11,13 @@ import static org.nand2tetris.tokenizer.Token.comma;
 import static org.nand2tetris.tokenizer.Token.semicolon;
 import static org.nand2tetris.tokenizer.Token.varToken;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.xml.transform.Source;
+import org.junit.Assert;
 import org.nand2tetris.parser.ParserEngine;
 import org.nand2tetris.parser.ast.AST;
 import org.nand2tetris.parser.stubs.TokenizerStub;
@@ -22,6 +25,9 @@ import org.nand2tetris.parser.utils.Joiner;
 import org.nand2tetris.parser.utils.TagNames;
 import org.nand2tetris.parser.utils.XMLUtils;
 import org.nand2tetris.tokenizer.Token;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.builder.Input;
+import org.xmlunit.diff.Diff;
 
 public abstract class TestUtils {
 
@@ -35,6 +41,21 @@ public abstract class TestUtils {
     AST ast = parse(tokens);
     assertEquals(concat(expectedTags), ast.toXMLString());
 
+  }
+
+  public static void assertASTXML(List<Token> tokens,  File file) {
+    Source actualSource = Input.fromString(parse(tokens).toXMLString()).build();
+    Source expectedSource = Input.fromFile(file).build();
+    assertEqualSources(expectedSource, actualSource);
+  }
+
+  private static void assertEqualSources(Source expected, Source actual) {
+    Diff myDiff = DiffBuilder.compare(expected)
+        .withTest(actual)
+        .normalizeWhitespace()
+        .build();
+
+    Assert.assertFalse(myDiff.toString(), myDiff.hasDifferences());
   }
 
   public static AST parse(List<Token> tokens) {

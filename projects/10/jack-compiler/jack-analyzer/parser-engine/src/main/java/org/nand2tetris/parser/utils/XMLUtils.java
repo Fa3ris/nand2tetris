@@ -115,7 +115,7 @@ public abstract class XMLUtils {
   }
 
   public static String equalTag() {
-    return keywordTag(TagNames.equalTag);
+    return symbolTag(TagNames.equalTag);
   }
 
   public static String keywordTag(String innerText) {

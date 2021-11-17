@@ -12,6 +12,8 @@ import static org.nand2tetris.tokenizer.Token.charToken;
 import static org.nand2tetris.tokenizer.Token.identifierToken;
 import static org.nand2tetris.tokenizer.Token.intToken;
 
+import java.io.File;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -30,8 +32,10 @@ public class VarDecTest {
   public void singleCharDec() throws Exception {
     String varName = "key";
     List<Token> tokens = varDecTokens(charToken(), varName);
-    List<String> tags = varDecTags(charTag(), varName);
-    assertASTXML(tokens, tags);
+
+    URL url = getClass().getResource("vardec-1.xml");
+    File file = new File(url.getFile());
+    assertASTXML(tokens, file);
   }
 
   /**
@@ -43,9 +47,10 @@ public class VarDecTest {
     String bar = "bar";
     List<Token> tokens = varDecTokens(charToken(),
         Arrays.asList(foo, bar));
-    List<String> tags = varDecTags(charTag(),
-        Arrays.asList(foo, bar));
-    assertASTXML(tokens, tags);
+
+    URL url = getClass().getResource("vardec-2.xml");
+    File file = new File(url.getFile());
+    assertASTXML(tokens, file);
 
   }
   /**
@@ -55,8 +60,10 @@ public class VarDecTest {
   public void intVarDec() throws Exception {
     String n = "n";
     List<Token> tokens = varDecTokens(intToken(), n);
-    List<String> tags = varDecTags(intTag(), n);
-    assertASTXML(tokens, tags);
+
+    URL url = getClass().getResource("vardec-3.xml");
+    File file = new File(url.getFile());
+    assertASTXML(tokens, file);
   }
 
   /**
@@ -64,10 +71,12 @@ public class VarDecTest {
    */
   @Test
   public void booleanVarDec() throws Exception {
-    String id = "idKO";
+    String id = "isKO";
     List<Token> tokens = varDecTokens(booleanToken(), id);
-    List<String> tags = varDecTags(booleanTag(), id);
-    assertASTXML(tokens, tags);
+
+    URL url = getClass().getResource("vardec-4.xml");
+    File file = new File(url.getFile());
+    assertASTXML(tokens, file);
   }
 
   /**
@@ -78,8 +87,10 @@ public class VarDecTest {
     String type = "MyClass";
     String id = "test1";
     List<Token> tokens = varDecTokens(identifierToken(type), id);
-    List<String> tags = varDecTags(identifierTag(type), id);
-    assertASTXML(tokens, tags);
+
+    URL url = getClass().getResource("vardec-5.xml");
+    File file = new File(url.getFile());
+    assertASTXML(tokens, file);
   }
 
   /**

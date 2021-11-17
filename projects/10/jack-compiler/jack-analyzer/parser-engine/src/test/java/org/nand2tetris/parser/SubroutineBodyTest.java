@@ -1,5 +1,6 @@
 package org.nand2tetris.parser;
 
+import static com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl.INDENT_NUMBER;
 import static org.nand2tetris.parser.test_utils.TestUtils.assertASTXML;
 import static org.nand2tetris.parser.test_utils.TestUtils.encloseInTag;
 import static org.nand2tetris.parser.test_utils.TestUtils.varDecTags;
@@ -7,9 +8,7 @@ import static org.nand2tetris.parser.test_utils.TestUtils.varDecTokens;
 import static org.nand2tetris.parser.utils.XMLUtils.booleanTag;
 import static org.nand2tetris.parser.utils.XMLUtils.charTag;
 import static org.nand2tetris.parser.utils.XMLUtils.closeBraceTag;
-import static org.nand2tetris.parser.utils.XMLUtils.identifierTag;
 import static org.nand2tetris.parser.utils.XMLUtils.openBraceTag;
-import static org.nand2tetris.parser.utils.XMLUtils.semicolonTag;
 import static org.nand2tetris.tokenizer.Token.booleanToken;
 import static org.nand2tetris.tokenizer.Token.charToken;
 import static org.nand2tetris.tokenizer.Token.closeBrace;
@@ -17,12 +16,26 @@ import static org.nand2tetris.tokenizer.Token.identifierToken;
 import static org.nand2tetris.tokenizer.Token.openBrace;
 import static org.nand2tetris.tokenizer.Token.semicolon;
 
+import java.io.File;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import org.junit.Test;
 import org.nand2tetris.parser.utils.TagNames;
-import org.nand2tetris.parser.utils.XMLUtils;
 import org.nand2tetris.tokenizer.Token;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 public class SubroutineBodyTest {
 
@@ -43,13 +56,10 @@ public class SubroutineBodyTest {
     tokens.addAll(varDecTokens(booleanToken(), second));
     tokens.add(closeBrace());
 
-    List<String> tags = new ArrayList<>();
-    tags.add(openBraceTag());
-    tags.addAll(varDecTags(charTag(), first));
-    tags.addAll(varDecTags(booleanTag(), second));
-    tags.add(closeBraceTag());
-    tags = encloseInTag(TagNames.subroutineBody, tags);
-    assertASTXML(tokens, tags);
+    URL url = getClass().getResource("subroutinebody-2.xml");
+    File file = new File(url.getFile());
+
+    assertASTXML(tokens, file);
   }
 
   /**
@@ -69,46 +79,49 @@ public class SubroutineBodyTest {
     tokens.add(semicolon());
     tokens.add(closeBrace());
 
-    /*
-    <subroutineBody>
-      <symbol> { </symbol>
-       <letStatement>
-                <keyword> let </keyword>
-                <identifier> game </identifier>
-                <symbol> = </symbol>
-                <expression>
-                  <term>
-                    <identifier> game </identifier>
-                  </term>
-                </expression>
-                <symbol> ; </symbol>
-              </letStatement>
-      <symbol> } </symbol>
-    </subroutineBody>
-     */
+    URL url = getClass().getResource("subroutinebody-1.xml");
+    File file = new File(url.getFile());
 
-    List<String> termTags = new ArrayList<>();
-    termTags.add(identifierTag(id));
-    termTags = encloseInTag(TagNames.termTag, termTags);
+    assertASTXML(tokens, file);
+  }
 
-    List<String> expressionTags = new ArrayList<>();
-    expressionTags.addAll(termTags);
-    expressionTags = encloseInTag(TagNames.expressionTag, expressionTags);
+  private String docToString(Document document) throws Exception {
+    TransformerFactory tf = TransformerFactory.newInstance();
+    tf.setAttribute(INDENT_NUMBER, 15);
+    Transformer transformer;
+    transformer = tf.newTransformer();
+    transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+    transformer.setOutputProperty(OutputKeys.STANDALONE, "yes");
 
-    List<String> letTags = new ArrayList<>();
-    letTags.add(XMLUtils.letTag());
-    letTags.add(identifierTag(id));
-    letTags.add(XMLUtils.equalTag());
-    letTags.addAll(expressionTags);
-    letTags.add(semicolonTag());
-    letTags = encloseInTag(TagNames.letStatement, letTags);
+    StringWriter writer = new StringWriter();
 
-    List<String> tags = new ArrayList<>();
-    tags.add(openBraceTag());
-    tags.addAll(letTags);
-    tags.add(closeBraceTag());
-    tags = encloseInTag(TagNames.subroutineBody, tags);
-    assertASTXML(tokens, tags);
+    transformer.transform(new DOMSource(document), new StreamResult(writer));
+
+    return writer.getBuffer().toString();
+  }
+
+  private Document stringToDoc(String s) throws Exception {
+    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    DocumentBuilder builder;
+    builder = factory.newDocumentBuilder();
+    Document document = builder.parse(new InputSource(new StringReader(s)));
+    removeNodesEmptyOrWhiteSpace(document);
+    return document;
+  }
+
+  public static void removeNodesEmptyOrWhiteSpace(Node node) {
+    NodeList list = node.getChildNodes();
+    for (int i = 0; i < list.getLength(); i++) {
+      removeNodesEmptyOrWhiteSpace(list.item(i));
+    }
+    boolean emptyElement = node.getNodeType() == Node.ELEMENT_NODE
+        && node.getChildNodes().getLength() == 0;
+    boolean emptyText = node.getNodeType() == Node.TEXT_NODE
+        && node.getNodeValue().trim().isEmpty();
+    if (emptyElement || emptyText) {
+      node.getParentNode().removeChild(node);
+    }
   }
 
 }

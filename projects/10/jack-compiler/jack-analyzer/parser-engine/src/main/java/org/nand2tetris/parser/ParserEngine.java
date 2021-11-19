@@ -9,6 +9,7 @@ import static org.nand2tetris.tokenizer.Keyword.FUNCTION;
 import static org.nand2tetris.tokenizer.Keyword.INT;
 import static org.nand2tetris.tokenizer.Keyword.LET;
 import static org.nand2tetris.tokenizer.Keyword.METHOD;
+import static org.nand2tetris.tokenizer.Keyword.RETURN;
 import static org.nand2tetris.tokenizer.Keyword.STATIC;
 import static org.nand2tetris.tokenizer.Keyword.VAR;
 import static org.nand2tetris.tokenizer.Keyword.VOID;
@@ -32,6 +33,7 @@ import org.nand2tetris.parser.ast.LetNode;
 import org.nand2tetris.parser.ast.Node;
 import org.nand2tetris.parser.ast.ParameterArgNode;
 import org.nand2tetris.parser.ast.ParameterListNode;
+import org.nand2tetris.parser.ast.ReturnNode;
 import org.nand2tetris.parser.ast.SubroutineBodyNode;
 import org.nand2tetris.parser.ast.SubroutineDecNode;
 import org.nand2tetris.parser.ast.TermNode;
@@ -148,10 +150,21 @@ public class ParserEngine implements Parser {
       }
     }
 
-    if (isLetToken().test(token)) {
-      Node letNode = parseLetStatement();
-      node.addStatement(letNode);
-      captureToken();
+    while (true) {
+      if (isLetToken().test(token)) {
+        Node letNode = parseLetStatement();
+        node.addStatement(letNode);
+        captureToken();
+        continue;
+      }
+
+      if (isReturnToken().test(token)) {
+        Node returnNode = parseReturnStatement();
+        node.addStatement(returnNode);
+        captureToken();
+        continue;
+      }
+      break;
     }
     ensureValidToken(token, isCloseBrace());
     return node;
@@ -165,6 +178,14 @@ public class ParserEngine implements Parser {
     Node rightExpression = parseExpression();
     node.setRightExpression(rightExpression);
     captureTokenOfType(isSemicolon());
+    return node;
+  }
+
+  private Node parseReturnStatement() {
+    ReturnNode node = new ReturnNode();
+
+    captureToken();
+
     return node;
   }
 
@@ -231,6 +252,10 @@ public class ParserEngine implements Parser {
   private void captureToken() {
     tokenizer.advance();
     token = tokenizer.peekToken();
+  }
+
+  private Predicate<Token> isReturnToken() {
+    return isKeyword(RETURN);
   }
 
   private Predicate<Token> isConstructorToken() {

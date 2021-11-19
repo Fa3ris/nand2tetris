@@ -97,4 +97,8 @@ public class Token {
   public static Token equalToken() {
     return Token.build(TokenType.KEYWORD, EQ);
   }
+
+  public static Token returnToken() {
+    return Token.build(TokenType.KEYWORD, RETURN);
+  }
 }

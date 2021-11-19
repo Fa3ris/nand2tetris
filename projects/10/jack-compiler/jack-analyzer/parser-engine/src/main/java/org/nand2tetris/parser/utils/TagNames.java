@@ -1,5 +1,6 @@
 package org.nand2tetris.parser.utils;
 
+import com.sun.org.apache.bcel.internal.generic.RETURN;
 import java.security.Key;
 import org.nand2tetris.tokenizer.Keyword;
 import org.nand2tetris.tokenizer.Symbol;
@@ -24,4 +25,7 @@ public abstract class TagNames {
   public static final String varTag = Keyword.VAR;
   public static final String letTag = Keyword.LET;
   public static final String equalTag = Symbol.EQ;
+  public static final String statements = "statements";
+  public static final String returnTag = Keyword.RETURN;
+  public static final String returnStatement = "returnStatement";
 }

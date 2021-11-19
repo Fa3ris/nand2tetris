@@ -44,9 +44,15 @@ public abstract class TestUtils {
   }
 
   public static void assertASTXML(List<Token> tokens,  File file) {
-    Source actualSource = Input.fromString(parse(tokens).toXMLString()).build();
+    String actual = parse(tokens).toXMLString();
+    Source actualSource = Input.fromString(actual).build();
     Source expectedSource = Input.fromFile(file).build();
-    assertEqualSources(expectedSource, actualSource);
+    try {
+      assertEqualSources(expectedSource, actualSource);
+    } catch (AssertionError e) {
+      System.out.println(actual);
+      throw e;
+    }
   }
 
   private static void assertEqualSources(Source expected, Source actual) {
@@ -55,7 +61,7 @@ public abstract class TestUtils {
         .normalizeWhitespace()
         .build();
 
-    Assert.assertFalse(myDiff.toString(), myDiff.hasDifferences());
+    Assert.assertFalse(myDiff.fullDescription(), myDiff.hasDifferences());
   }
 
   public static AST parse(List<Token> tokens) {

@@ -85,6 +85,92 @@ public class SubroutineBodyTest {
     assertASTXML(tokens, file);
   }
 
+  /**
+   *      {
+   *         return;
+   *      }
+   */
+  @Test
+  public void returnVoid() throws Exception {
+    List<Token> tokens = new ArrayList<>();
+    tokens.add(openBrace());
+    tokens.add(Token.returnToken());
+    tokens.add(semicolon());
+    tokens.add(closeBrace());
+
+    URL url = getClass().getResource("subroutinebody-3.xml");
+    File file = new File(url.getFile());
+
+    assertASTXML(tokens, file);
+  }
+
+  /**
+   * {
+   *       var char key;
+   *       var boolean exit;
+   *       let game = game;
+   *       return;
+   *  }
+   */
+  @Test
+  public void varLetReturn() throws Exception {
+    List<Token> tokens = new ArrayList<>();
+    String first = "key";
+    String second = "exit";
+    tokens.add(openBrace());
+    tokens.addAll(varDecTokens(charToken(), first));
+    tokens.addAll(varDecTokens(booleanToken(), second));
+
+    String id = "game";
+    tokens.add(Token.letToken());
+    tokens.add(identifierToken(id));
+    tokens.add(Token.equalToken());
+    tokens.add(identifierToken(id));
+    tokens.add(semicolon());
+
+    tokens.add(Token.returnToken());
+    tokens.add(semicolon());
+    tokens.add(closeBrace());
+
+    URL url = getClass().getResource("subroutinebody-4.xml");
+    File file = new File(url.getFile());
+
+    assertASTXML(tokens, file);
+
+  }
+
+  /**
+   * {
+   *       let game = game;
+   *       let win = win;
+   *  }
+   */
+  @Test
+  public void letlet() throws Exception {
+    List<Token> tokens = new ArrayList<>();
+    tokens.add(openBrace());
+    String id = "game";
+    tokens.add(Token.letToken());
+    tokens.add(identifierToken(id));
+    tokens.add(Token.equalToken());
+    tokens.add(identifierToken(id));
+    tokens.add(semicolon());
+
+    String id2= "win";
+    tokens.add(Token.letToken());
+    tokens.add(identifierToken(id2));
+    tokens.add(Token.equalToken());
+    tokens.add(identifierToken(id2));
+    tokens.add(semicolon());
+
+    tokens.add(closeBrace());
+
+    URL url = getClass().getResource("subroutinebody-5.xml");
+    File file = new File(url.getFile());
+
+    assertASTXML(tokens, file);
+  }
+
   private String docToString(Document document) throws Exception {
     TransformerFactory tf = TransformerFactory.newInstance();
     tf.setAttribute(INDENT_NUMBER, 15);

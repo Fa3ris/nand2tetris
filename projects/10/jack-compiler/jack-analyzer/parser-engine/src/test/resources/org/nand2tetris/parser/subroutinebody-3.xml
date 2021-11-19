@@ -1,0 +1,10 @@
+<subroutineBody>
+  <symbol>{</symbol>
+  <statements>
+    <returnStatement>
+      <keyword> return </keyword>
+      <symbol> ; </symbol>
+    </returnStatement>
+  </statements>
+  <symbol>}</symbol>
+</subroutineBody>

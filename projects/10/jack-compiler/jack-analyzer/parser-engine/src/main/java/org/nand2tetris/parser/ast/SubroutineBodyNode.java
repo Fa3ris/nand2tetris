@@ -1,6 +1,7 @@
 package org.nand2tetris.parser.ast;
 
 import static org.nand2tetris.parser.utils.XMLUtils.closeBraceTag;
+import static org.nand2tetris.parser.utils.XMLUtils.encloseInTag;
 import static org.nand2tetris.parser.utils.XMLUtils.openBraceTag;
 
 import java.util.LinkedList;
@@ -23,7 +24,9 @@ public class SubroutineBodyNode extends AbstractNode {
     List<String> tags = new LinkedList<>();
     tags.add(openBraceTag());
     tags.addAll(varDecs.stream().map(Node::toXMLString).collect(Collectors.toList()));
-    tags.addAll(statements.stream().map(Node::toXMLString).collect(Collectors.toList()));
+    List<String> statementsTags = statements.stream().map(Node::toXMLString).collect(Collectors.toList());
+    statementsTags = encloseInTag(TagNames.statements, statementsTags);
+    tags.addAll(statementsTags);
     tags.add(closeBraceTag());
     return tags;
   }

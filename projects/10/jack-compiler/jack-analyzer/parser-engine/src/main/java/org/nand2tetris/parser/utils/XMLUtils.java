@@ -20,6 +20,7 @@ import static org.nand2tetris.tokenizer.Symbol.SEMICOLON;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.nand2tetris.tokenizer.Keyword;
 import org.nand2tetris.tokenizer.Token;
 import org.nand2tetris.tokenizer.TokenType;
 
@@ -114,6 +115,10 @@ public abstract class XMLUtils {
     return keywordTag(TagNames.letTag);
   }
 
+  public static String returnTag() {
+    return keywordTag(Keyword.RETURN);
+  }
+
   public static String equalTag() {
     return symbolTag(TagNames.equalTag);
   }
@@ -163,4 +168,6 @@ public abstract class XMLUtils {
     }
     return joined;
   }
+
+
 }

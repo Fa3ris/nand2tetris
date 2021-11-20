@@ -1,0 +1,35 @@
+<subroutineBody>
+  <symbol> { </symbol>
+  <varDec>
+    <keyword> var </keyword>
+    <keyword> boolean </keyword>
+    <identifier> b </identifier>
+    <symbol> ; </symbol>
+  </varDec>
+  <statements>
+    <ifStatement>
+      <keyword> if </keyword>
+      <symbol> ( </symbol>
+      <expression>
+        <term>
+          <identifier> b </identifier>
+        </term>
+      </expression>
+      <symbol> ) </symbol>
+      <symbol> { </symbol>
+      <statements>
+      </statements>
+      <symbol> } </symbol>
+      <keyword> else </keyword>
+      <symbol> { </symbol>
+      <statements>
+      </statements>
+      <symbol> } </symbol>
+    </ifStatement>
+    <returnStatement>
+      <keyword> return </keyword>
+      <symbol> ; </symbol>
+    </returnStatement>
+  </statements>
+  <symbol> } </symbol>
+</subroutineBody>

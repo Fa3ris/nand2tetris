@@ -20,7 +20,8 @@ import static org.nand2tetris.tokenizer.Symbol.SEMICOLON;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.nand2tetris.tokenizer.Keyword;
+import java.util.stream.Collectors;
+import org.nand2tetris.parser.ast.Node;
 import org.nand2tetris.tokenizer.Token;
 import org.nand2tetris.tokenizer.TokenType;
 
@@ -177,4 +178,21 @@ public abstract class XMLUtils {
   public static String dotTag() {
     return symbolTag(TagNames.dot);
     }
+
+  public static String ifTag() {
+    return keywordTag(TagNames.ifTag);
+  }
+
+  public static String elseTag() {
+    return keywordTag(TagNames.elseTag);
+  }
+
+  public static List<String> formatStatements(List<Node> statements) {
+    return encloseInTag(TagNames.statements, formatNodes(statements));
+  }
+
+  public static List<String> formatNodes(List<Node> nodes) {
+    return nodes.stream().map(Node::toXMLString).collect(
+        Collectors.toList());
+  }
 }

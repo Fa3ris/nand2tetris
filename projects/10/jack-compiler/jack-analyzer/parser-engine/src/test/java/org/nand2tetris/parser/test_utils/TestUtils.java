@@ -15,6 +15,8 @@ import static org.nand2tetris.tokenizer.Token.varToken;
 import java.io.File;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,13 +30,18 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.junit.Assert;
+import org.nand2tetris.parser.Parser;
 import org.nand2tetris.parser.ParserEngine;
 import org.nand2tetris.parser.ast.AST;
 import org.nand2tetris.parser.stubs.TokenizerStub;
 import org.nand2tetris.parser.utils.Joiner;
 import org.nand2tetris.parser.utils.TagNames;
 import org.nand2tetris.parser.utils.XMLUtils;
+import org.nand2tetris.tokenizer.CharReader;
+import org.nand2tetris.tokenizer.FileCharReader;
+import org.nand2tetris.tokenizer.FileTokenizer;
 import org.nand2tetris.tokenizer.Token;
+import org.nand2tetris.tokenizer.Tokenizer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -65,10 +72,29 @@ public abstract class TestUtils {
       assertEqualSources(expectedSource, actualSource);
     } catch (AssertionError e) {
       printXML(actual);
-//      System.out.println(actual);
       throw e;
     }
   }
+
+  public static void assertASTXML(AST ast, File file) {
+    String actual = ast.toXMLString();
+    Source actualSource = Input.fromString(actual).build();
+    Source expectedSource = Input.fromFile(file).build();
+    try {
+      assertEqualSources(expectedSource, actualSource);
+    } catch (AssertionError e) {
+      printXML(actual);
+      throw e;
+    }
+  }
+
+  public static void assertASTXML(File inputJackFile, File expectedXMLFile) {
+    CharReader charReader = new FileCharReader(inputJackFile.toPath());
+    Tokenizer tokenizer = new FileTokenizer(charReader);
+    Parser parser = new ParserEngine(tokenizer);
+    assertASTXML(parser.parse(), expectedXMLFile);
+  }
+
 
   private static void assertEqualSources(Source expected, Source actual) {
     Diff myDiff = DiffBuilder.compare(expected)

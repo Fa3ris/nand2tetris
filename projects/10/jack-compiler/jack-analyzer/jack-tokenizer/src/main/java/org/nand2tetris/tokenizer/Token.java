@@ -109,4 +109,12 @@ public class Token {
   public static Token dot() {
     return Token.build(TokenType.SYMBOL, DOT);
   }
+
+  public static Token ifToken() {
+    return Token.build(TokenType.KEYWORD, IF);
+  }
+
+  public static Token elseToken() {
+    return Token.build(TokenType.KEYWORD, ELSE);
+  }
 }

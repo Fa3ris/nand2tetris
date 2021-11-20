@@ -26,9 +26,12 @@ public abstract class TagNames {
   public static final String returnTag = Keyword.RETURN;
   public static final String doTag = Keyword.DO;
   public static final String dot = Symbol.DOT;
-  
+  public static final String ifTag = Keyword.IF;
+  public static final String elseTag = Keyword.ELSE;
+
   public static final String statements = "statements";
   public static final String returnStatement = "returnStatement";
   public static final String doStatement = "doStatement";
   public static final String expressionListTag = "expressionList";
+  public static final String ifStatement = "ifStatement";
 }

@@ -95,7 +95,7 @@ public class Token {
   }
 
   public static Token equalToken() {
-    return Token.build(TokenType.KEYWORD, EQ);
+    return Token.build(TokenType.SYMBOL, EQ);
   }
 
   public static Token returnToken() {
@@ -107,6 +107,6 @@ public class Token {
   }
 
   public static Token dot() {
-    return Token.build(TokenType.KEYWORD, DOT);
+    return Token.build(TokenType.SYMBOL, DOT);
   }
 }

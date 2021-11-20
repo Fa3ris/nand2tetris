@@ -210,7 +210,7 @@ public class ParserEngine implements Parser {
   }
 
   private Predicate<Token> isDotToken() {
-    return isKeyword(DOT);
+    return isSymbol(DOT);
   }
 
   private Predicate<Token> isDoToken() {
@@ -251,7 +251,7 @@ public class ParserEngine implements Parser {
   }
 
   private Predicate<Token> isEqualToken() {
-    return isKeyword(EQ);
+    return isSymbol(EQ);
   }
 
 
@@ -287,7 +287,23 @@ public class ParserEngine implements Parser {
     ClassNode node = new ClassNode();
     node.setClassName(token);
     captureTokenOfType(isOpenBrace());
-    captureTokenOfType(isCloseBrace());
+    captureToken();
+    while (true) {
+      if(isFieldToken().or(isStaticToken()).test(token)) {
+        parseClassVarDec();
+        captureToken();
+        continue;
+      }
+
+      if (isFunctionToken().or(isConstructorToken()).or(isMethodToken()).test(token)) {
+        parseSubroutineDec();
+        captureToken();
+        continue;
+      }
+      break;
+    }
+    ensureValidToken(token, isCloseBrace());
+//    captureTokenOfType(isCloseBrace());
     return node;
   }
 

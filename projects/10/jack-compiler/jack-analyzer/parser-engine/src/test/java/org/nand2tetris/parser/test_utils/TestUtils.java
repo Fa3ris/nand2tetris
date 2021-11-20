@@ -1,5 +1,6 @@
 package org.nand2tetris.parser.test_utils;
 
+import static com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl.INDENT_NUMBER;
 import static org.junit.Assert.assertEquals;
 import static org.nand2tetris.parser.utils.XMLUtils.closeTag;
 import static org.nand2tetris.parser.utils.XMLUtils.commaTag;
@@ -12,11 +13,20 @@ import static org.nand2tetris.tokenizer.Token.semicolon;
 import static org.nand2tetris.tokenizer.Token.varToken;
 
 import java.io.File;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import org.junit.Assert;
 import org.nand2tetris.parser.ParserEngine;
 import org.nand2tetris.parser.ast.AST;
@@ -25,6 +35,10 @@ import org.nand2tetris.parser.utils.Joiner;
 import org.nand2tetris.parser.utils.TagNames;
 import org.nand2tetris.parser.utils.XMLUtils;
 import org.nand2tetris.tokenizer.Token;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.builder.Input;
 import org.xmlunit.diff.Diff;
@@ -50,7 +64,8 @@ public abstract class TestUtils {
     try {
       assertEqualSources(expectedSource, actualSource);
     } catch (AssertionError e) {
-      System.out.println(actual);
+      printXML(actual);
+//      System.out.println(actual);
       throw e;
     }
   }
@@ -118,5 +133,52 @@ public abstract class TestUtils {
     tags.add(semicolonTag());
     return XMLUtils.encloseInTag(TagNames.varDec, tags);
   }
+
+  private static void printXML(String s) {
+    try {
+      System.out.println(docToString(stringToDoc(s)));
+    } catch (Exception e) {
+
+    }
+  }
+  private static Document stringToDoc(String s) throws Exception {
+    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    DocumentBuilder builder;
+    builder = factory.newDocumentBuilder();
+    Document document = builder.parse(new InputSource(new StringReader(s)));
+    removeNodesEmptyOrWhiteSpace(document);
+    return document;
+  }
+
+  private static final int INDENT = 2;
+  private static final String XML_OUTPUT_VALUE = "yes";
+  private static String docToString(Document document) throws Exception {
+    TransformerFactory tf = TransformerFactory.newInstance();
+    tf.setAttribute(INDENT_NUMBER, INDENT);
+    Transformer transformer;
+    transformer = tf.newTransformer();
+    transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, XML_OUTPUT_VALUE);
+    transformer.setOutputProperty(OutputKeys.INDENT, XML_OUTPUT_VALUE);
+    transformer.setOutputProperty(OutputKeys.STANDALONE, XML_OUTPUT_VALUE);
+
+    StringWriter writer = new StringWriter();
+    transformer.transform(new DOMSource(document), new StreamResult(writer));
+    return writer.getBuffer().toString();
+  }
+
+  private static void removeNodesEmptyOrWhiteSpace(Node node) {
+    NodeList list = node.getChildNodes();
+    for (int i = 0; i < list.getLength(); i++) {
+      removeNodesEmptyOrWhiteSpace(list.item(i));
+    }
+    boolean emptyElement = node.getNodeType() == Node.ELEMENT_NODE
+        && node.getChildNodes().getLength() == 0;
+    boolean emptyText = node.getNodeType() == Node.TEXT_NODE
+        && node.getNodeValue().trim().isEmpty();
+    if (emptyElement || emptyText) {
+      node.getParentNode().removeChild(node);
+    }
+  }
+
 
 }

@@ -116,7 +116,7 @@ public abstract class XMLUtils {
   }
 
   public static String returnTag() {
-    return keywordTag(Keyword.RETURN);
+    return keywordTag(TagNames.returnTag);
   }
 
   public static String equalTag() {
@@ -170,4 +170,11 @@ public abstract class XMLUtils {
   }
 
 
+  public static String doTag() {
+    return keywordTag(TagNames.doTag);
+  }
+
+  public static String dotTag() {
+    return symbolTag(TagNames.dot);
+    }
 }

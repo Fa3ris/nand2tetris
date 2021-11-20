@@ -4,6 +4,7 @@ import static org.nand2tetris.tokenizer.Keyword.BOOLEAN;
 import static org.nand2tetris.tokenizer.Keyword.CHAR;
 import static org.nand2tetris.tokenizer.Keyword.CLASS;
 import static org.nand2tetris.tokenizer.Keyword.CONSTRUCTOR;
+import static org.nand2tetris.tokenizer.Keyword.DO;
 import static org.nand2tetris.tokenizer.Keyword.FIELD;
 import static org.nand2tetris.tokenizer.Keyword.FUNCTION;
 import static org.nand2tetris.tokenizer.Keyword.INT;
@@ -16,6 +17,7 @@ import static org.nand2tetris.tokenizer.Keyword.VOID;
 import static org.nand2tetris.tokenizer.Symbol.CLOSE_BRACE;
 import static org.nand2tetris.tokenizer.Symbol.CLOSE_PAREN;
 import static org.nand2tetris.tokenizer.Symbol.COMMA;
+import static org.nand2tetris.tokenizer.Symbol.DOT;
 import static org.nand2tetris.tokenizer.Symbol.EQ;
 import static org.nand2tetris.tokenizer.Symbol.OPEN_BRACE;
 import static org.nand2tetris.tokenizer.Symbol.OPEN_PAREN;
@@ -27,6 +29,8 @@ import java.util.function.Predicate;
 import org.nand2tetris.parser.ast.AST;
 import org.nand2tetris.parser.ast.ClassNode;
 import org.nand2tetris.parser.ast.ClassVarDecNode;
+import org.nand2tetris.parser.ast.DoNode;
+import org.nand2tetris.parser.ast.ExpressionListNode;
 import org.nand2tetris.parser.ast.ExpressionNode;
 import org.nand2tetris.parser.ast.JackAST;
 import org.nand2tetris.parser.ast.LetNode;
@@ -164,10 +168,53 @@ public class ParserEngine implements Parser {
         captureToken();
         continue;
       }
+
+      if (isDoToken().test(token)) {
+        Node returnNode = parseDoStatement();
+        node.addStatement(returnNode);
+        captureToken();
+        continue;
+      }
       break;
     }
     ensureValidToken(token, isCloseBrace());
     return node;
+  }
+
+  private Node parseDoStatement() {
+    DoNode node = new DoNode();
+    captureTokenOfType(isIdentifierToken());
+    Token identifier = token;
+    captureToken();
+    if (isDotToken().test(token)) {
+      node.addIdentifier(identifier);
+      captureTokenOfType(isIdentifierToken());
+      node.addSubroutineName(token);
+    }
+    captureTokenOfType(isOpenParen());
+    node.addExpressionList(parseExpressionList());
+    ensureValidToken(token, isCloseParen());
+    captureTokenOfType(isSemicolon());
+    return node;
+  }
+
+  private Node parseExpressionList() {
+    ExpressionListNode node = new ExpressionListNode();
+
+    captureToken();
+    if (isCloseParen().test(token)) {
+      return node;
+    }
+
+    throw new IllegalStateException();
+  }
+
+  private Predicate<Token> isDotToken() {
+    return isKeyword(DOT);
+  }
+
+  private Predicate<Token> isDoToken() {
+    return isKeyword(DO);
   }
 
   private Node parseLetStatement() {

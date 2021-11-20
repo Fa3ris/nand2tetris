@@ -101,4 +101,12 @@ public class Token {
   public static Token returnToken() {
     return Token.build(TokenType.KEYWORD, RETURN);
   }
+
+  public static Token doToken() {
+    return Token.build(TokenType.KEYWORD, DO);
+  }
+
+  public static Token dot() {
+    return Token.build(TokenType.KEYWORD, DOT);
+  }
 }

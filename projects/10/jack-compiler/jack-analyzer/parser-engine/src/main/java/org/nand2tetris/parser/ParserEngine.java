@@ -65,9 +65,8 @@ public class ParserEngine implements Parser {
       return null;
     }
     token = tokenizer.peekToken();
-    Node node = getRootNode();
     AST ast = new JackAST();
-    ast.addNode(node);
+    ast.addNode(getRootNode());
     return ast;
   }
 
@@ -98,6 +97,7 @@ public class ParserEngine implements Parser {
    * 'var' type varName (',' varName)* ';'
    */
   private Node parseVarDec() {
+    ensureValidToken(token, isVarToken());
     VarDecNode node = new VarDecNode();
     captureTokenOfType(isTypeToken());
     node.setType(token);
@@ -115,7 +115,7 @@ public class ParserEngine implements Parser {
     ensureValidToken(token, isFunctionToken().or(isConstructorToken()).or(isMethodToken()));
     SubroutineDecNode node = new SubroutineDecNode();
     node.setRoutineType(token);
-    captureTokenOfType(isVoidToken().or(isIdentifierToken()));
+    captureTokenOfType(isVoidToken().or(isTypeToken()));
     node.setReturnType(token);
     captureTokenOfType(isIdentifierToken());
     node.setRoutineName(token);
@@ -130,19 +130,22 @@ public class ParserEngine implements Parser {
   }
 
   /**
-   * ((type varName) (',' type varName)* )?
+   * (type varName (',' type varName)* )?
    */
   private Node parseParameterList() {
     ParameterListNode node = new ParameterListNode();
     while (true) {
       captureToken();
-      if (isCloseParen().test(token)) {
-        break;
-      }
       if (isComma().test(token)) {
+        captureToken();
+        node.addArg(parseParameterListArgNode());
         continue;
       }
-      node.addArg(parseArgNode());
+      if (isTypeToken().test(token)) {
+        node.addArg(parseParameterListArgNode());
+        continue;
+      }
+      break;
     }
     return node;
   }
@@ -150,7 +153,7 @@ public class ParserEngine implements Parser {
   /**
    * type varName
    */
-  private Node parseArgNode() {
+  private Node parseParameterListArgNode() {
     ensureValidToken(token, isTypeToken());
     ParameterArgNode arg = new ParameterArgNode();
     arg.setType(token);
@@ -163,25 +166,35 @@ public class ParserEngine implements Parser {
    * '{' varDec* statements '}'
    */
   private Node parseSubroutineBody() {
-    SubroutineBodyNode node = new SubroutineBodyNode();
     ensureValidToken(token, isOpenBrace());
-    captureToken();
-    while (true) {
-      if (isVarToken().test(token)) {
-        node.addVarDec(parseVarDec());
-        captureToken();
-      } else {
-        break;
-      }
+    SubroutineBodyNode node = new SubroutineBodyNode();
+
+    for (Node varDec : parseVarDecs()) {
+      node.addVarDec(varDec);
     }
 
-    List<Node> ifStatements = parseStatements();
-    for (Node statement : ifStatements) {
+    for (Node statement : parseStatements()) {
       node.addStatement(statement);
     }
 
     ensureValidToken(token, isCloseBrace());
     return node;
+  }
+
+  /**
+   * varDec*
+   */
+  private List<Node> parseVarDecs() {
+    List<Node> varDecs = new ArrayList<>();
+    while (true) {
+      captureToken();
+      if (isVarToken().test(token)) {
+        varDecs.add(parseVarDec());
+        continue;
+      }
+      break;
+    }
+    return varDecs;
   }
 
   /**
@@ -197,8 +210,7 @@ public class ParserEngine implements Parser {
     captureTokenOfType(isOpenBrace());
 
     captureToken();
-    List<Node> ifStatements = parseStatements();
-    for (Node statement : ifStatements) {
+    for (Node statement : parseStatements()) {
       node.addIfStatement(statement);
     }
     ensureValidToken(token, isCloseBrace());
@@ -224,44 +236,45 @@ public class ParserEngine implements Parser {
   private List<Node> parseStatements() {
     List<Node> statements = new ArrayList<>();
     while (true) {
-      if (isLetToken().test(token)) {
-        Node letNode = parseLetStatement();
-        statements.add(letNode);
-        captureToken();
-        continue;
+      Node statement = parseStatement();
+      if (statement == null) {
+        break;
       }
-
-      if (isReturnToken().test(token)) {
-        Node returnNode = parseReturnStatement();
-        statements.add(returnNode);
-        captureToken();
-        continue;
-      }
-
-      if (isDoToken().test(token)) {
-        Node returnNode = parseDoStatement();
-        statements.add(returnNode);
-        captureToken();
-        continue;
-      }
-
-      if (isIfToken().test(token)) {
-        Node ifNode = parseIfStatement();
-        statements.add(ifNode);
-        captureToken();
-        continue;
-      }
-      break;
+      statements.add(statement);
+      captureToken();
     }
     return statements;
   }
 
+  /**
+   * letStatement | returnStatement | doStatement | ifStatement | whileStatement
+   */
+  private Node parseStatement() {
+    if (isLetToken().test(token)) {
+      return parseLetStatement();
+    }
+
+    if (isReturnToken().test(token)) {
+      return parseReturnStatement();
+    }
+
+    if (isDoToken().test(token)) {
+      return parseDoStatement();
+    }
+
+    if (isIfToken().test(token)) {
+      return parseIfStatement();
+    }
+
+    return null;
+  }
 
 
   /**
    * 'do' subroutineCall ';'
    */
   private Node parseDoStatement() {
+    ensureValidToken(token, isDoToken());
     DoNode node = new DoNode();
     captureTokenOfType(isIdentifierToken());
     Token identifier = token;
@@ -313,6 +326,7 @@ public class ParserEngine implements Parser {
    * 'return' expression? ';'
    */
   private Node parseReturnStatement() {
+    ensureValidToken(token, isReturnToken());
     ReturnNode node = new ReturnNode();
 
     captureToken();
@@ -337,8 +351,6 @@ public class ParserEngine implements Parser {
     return node;
   }
 
-
-
   /**
    * ('static' | 'field') type varName (',' varName)* ';'
    */
@@ -352,19 +364,21 @@ public class ParserEngine implements Parser {
     return node;
   }
 
+  /**
+   * identifier (',' identifier)*
+   */
   private List<Token> parseIdentifiers() {
     List<Token> identifiers = new ArrayList<>();
     captureTokenOfType(isIdentifierToken());
     identifiers.add(token);
-    captureToken();
     while (true) {
+      captureToken();
       if (isComma().test(token)) {
         captureTokenOfType(isIdentifierToken());
         identifiers.add(token);
-        captureToken();
-      } else {
-        break;
+        continue;
       }
+      break;
     }
     return identifiers;
   }
@@ -377,17 +391,15 @@ public class ParserEngine implements Parser {
     ClassNode node = new ClassNode();
     node.setClassName(token);
     captureTokenOfType(isOpenBrace());
-    captureToken();
     while (true) {
-      if(isFieldToken().or(isStaticToken()).test(token)) {
+      captureToken();
+      if (isFieldToken().or(isStaticToken()).test(token)) {
         node.addClassVarDec(parseClassVarDec());
-        captureToken();
         continue;
       }
 
       if (isFunctionToken().or(isConstructorToken()).or(isMethodToken()).test(token)) {
         node.addSubroutineDec(parseSubroutineDec());
-        captureToken();
         continue;
       }
       break;
@@ -506,8 +518,7 @@ public class ParserEngine implements Parser {
   }
 
   private Predicate<Token> isOpenParen() {
-    return isSymbol(OPEN_PAREN
-    );
+    return isSymbol(OPEN_PAREN);
   }
 
   private Predicate<Token> isCloseParen() {

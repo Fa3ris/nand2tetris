@@ -76,6 +76,7 @@ public class ParserEngine implements Parser {
 
   private Node getRootNode() {
     if (isClassToken().test(token)) {
+      pushBackToken();
       return parseClass();
     }
 
@@ -109,9 +110,9 @@ public class ParserEngine implements Parser {
    * 'class' className '{' classVarDec* subroutineDec* '}'
    */
   private Node parseClass() {
-    captureTokenOfType(isIdentifierToken());
+    captureTokenOfType(isClassToken());
     ClassNode node = new ClassNode();
-    node.setClassName(token);
+    node.setClassName(captureTokenOfType(isIdentifierToken()));
     captureTokenOfType(isOpenBrace());
     while (true) {
       captureToken();
@@ -469,18 +470,20 @@ public class ParserEngine implements Parser {
     return node;
   }
 
-  private void captureTokenOfType(Predicate<Token> predicate) {
+  private Token captureTokenOfType(Predicate<Token> predicate) {
     captureToken();
     ensureValidToken(token, predicate);
+    return token;
   }
 
-  private void captureToken() {
+  private Token captureToken() {
     if (!stack.isEmpty()) {
       token = stack.pop();
-      return;
+      return token;
     }
     tokenizer.advance();
     token = tokenizer.peekToken();
+    return token;
   }
 
   private void pushBackToken() {

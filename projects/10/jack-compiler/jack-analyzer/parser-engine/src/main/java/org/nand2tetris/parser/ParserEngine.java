@@ -433,7 +433,7 @@ public class ParserEngine implements Parser {
       return node;
     }
     pushBackToken();
-    parseExpression();
+    node.addExpression(parseExpression());
 
     captureToken();
     if (isCloseParen().test(token)) {

@@ -1,9 +1,11 @@
 package org.nand2tetris.parser.ast;
 
-import java.util.Arrays;
+import static org.nand2tetris.parser.utils.XMLUtils.returnTag;
+import static org.nand2tetris.parser.utils.XMLUtils.semicolonTag;
+
+import java.util.ArrayList;
 import java.util.List;
 import org.nand2tetris.parser.utils.TagNames;
-import org.nand2tetris.parser.utils.XMLUtils;
 
 public class ReturnNode extends AbstractNode {
 
@@ -16,9 +18,13 @@ public class ReturnNode extends AbstractNode {
 
   @Override
   protected List<String> childrenTags() {
-    return Arrays.asList(
-        XMLUtils.returnTag(),
-        XMLUtils.semicolonTag());
+    List<String> tags = new ArrayList<>();
+    tags.add(returnTag());
+    if (expression != null) {
+      tags.add(expression.toXMLString());
+    }
+    tags.add(semicolonTag());
+    return tags;
   }
 
   public void setExpression(Node node) {

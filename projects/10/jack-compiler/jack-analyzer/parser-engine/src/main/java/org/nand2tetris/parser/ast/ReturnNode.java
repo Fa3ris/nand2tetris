@@ -7,6 +7,8 @@ import org.nand2tetris.parser.utils.XMLUtils;
 
 public class ReturnNode extends AbstractNode {
 
+  private Node expression;
+
   @Override
   protected String parentTag() {
     return TagNames.returnStatement;
@@ -17,5 +19,9 @@ public class ReturnNode extends AbstractNode {
     return Arrays.asList(
         XMLUtils.returnTag(),
         XMLUtils.semicolonTag());
+  }
+
+  public void setExpression(Node node) {
+    expression = node;
   }
 }

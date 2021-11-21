@@ -25,7 +25,9 @@ import static org.nand2tetris.tokenizer.Symbol.OPEN_BRACE;
 import static org.nand2tetris.tokenizer.Symbol.OPEN_PAREN;
 import static org.nand2tetris.tokenizer.Symbol.SEMICOLON;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 import java.util.function.Predicate;
 import org.nand2tetris.parser.ast.AST;
@@ -350,6 +352,8 @@ public class ParserEngine implements Parser {
         node.addElseStatement(statement);
       }
       ensureValidToken(token, isCloseBrace());
+    } else {
+      pushBackToken();
     }
     return node;
   }
@@ -403,15 +407,33 @@ public class ParserEngine implements Parser {
     ReturnNode node = new ReturnNode();
 
     captureToken();
+    if (isSemicolon().test(token)) {
+      return node;
+    }
 
+    pushBackToken();
+
+
+    node.setExpression(parseExpression());
+    captureTokenOfType(isSemicolon());
     return node;
   }
+
+  private final Deque<Token> stack = new ArrayDeque<>();
+
 
   /**
    * (expression (',' expression)* )?
    */
   private Node parseExpressionList() {
     ExpressionListNode node = new ExpressionListNode();
+
+    captureToken();
+    if (isCloseParen().test(token)) {
+      return node;
+    }
+    pushBackToken();
+    parseExpression();
 
     captureToken();
     if (isCloseParen().test(token)) {
@@ -426,11 +448,20 @@ public class ParserEngine implements Parser {
    */
   private Node parseExpression() {
     ExpressionNode node = new ExpressionNode();
-    Node term = parseTerm();
-    node.addTerm(term);
+    node.addTerm(parseTerm());
     return node;
   }
 
+  /**
+   * integerConstant
+   * | stringConstant
+   * | keywordConstant
+   * | varName
+   * | varName '[' expression ']'
+   * | subroutineCall
+   * | '(' expression ')'
+   * | unaryOp term
+   */
   private Node parseTerm() {
     TermNode node = new TermNode();
     captureTokenOfType(isIdentifierToken());
@@ -444,8 +475,16 @@ public class ParserEngine implements Parser {
   }
 
   private void captureToken() {
+    if (!stack.isEmpty()) {
+      token = stack.pop();
+      return;
+    }
     tokenizer.advance();
     token = tokenizer.peekToken();
+  }
+
+  private void pushBackToken() {
+    stack.push(token);
   }
 
   private void ensureValidToken(Token token, Predicate<Token> predicate) {

@@ -9,10 +9,17 @@ public class ExpressionLessSquareTest {
 
   @Test
   public void Main() throws Exception {
-    String baseName = "Main";
+    assertEqualXML("Main");
+  }
+
+  @Test
+  public void SquareGame() throws Exception {
+    assertEqualXML("SquareGame");
+  }
+
+  private void assertEqualXML(String baseName) {
     TestUtils.assertASTXML(
         new File(getClass().getResource(baseName + ".jack").getFile()),
         new File(getClass().getResource(baseName + ".xml").getFile()));
   }
-
 }

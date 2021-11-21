@@ -91,6 +91,7 @@ public class ParserEngine implements Parser {
     }
 
     if (isVarToken().test(token)) {
+      pushBackToken();
       return parseVarDec();
     }
 
@@ -132,7 +133,8 @@ public class ParserEngine implements Parser {
         break;
       }
     }
-    ensureValidToken(token, isCloseBrace());
+//    ensureValidToken(token, isCloseBrace());
+    captureTokenOfType(isCloseBrace());
     return node;
   }
 
@@ -190,8 +192,7 @@ public class ParserEngine implements Parser {
     node.setParameterListNode(parseParameterList());
     ensureValidToken(token, isCloseParen());
     captureToken();
-    Node subroutineBody = parseSubroutineBody();
-    node.setSubroutineBodyNode(subroutineBody);
+    node.setSubroutineBodyNode(parseSubroutineBody());
     return node;
   }
 
@@ -244,6 +245,7 @@ public class ParserEngine implements Parser {
     }
 
     ensureValidToken(token, isCloseBrace());
+    captureTokenOfType(isCloseBrace());
     return node;
   }
 
@@ -253,12 +255,12 @@ public class ParserEngine implements Parser {
   private List<Node> parseVarDecs() {
     List<Node> varDecs = new ArrayList<>();
     while (true) {
-      captureToken();
-      if (isVarToken().test(token)) {
-        varDecs.add(parseVarDec());
-        continue;
+      Node varDec = parseVarDec();
+      if (varDec != null) {
+        varDecs.add(varDec);
+      } else {
+        break;
       }
-      break;
     }
     return varDecs;
   }
@@ -267,7 +269,11 @@ public class ParserEngine implements Parser {
    * 'var' type varName (',' varName)* ';'
    */
   private Node parseVarDec() {
-    ensureValidToken(token, isVarToken());
+    captureToken();
+    if (!isVarToken().test(token)) {
+      pushBackToken();
+      return null;
+    }
     VarDecNode node = new VarDecNode();
     captureTokenOfType(isTypeToken());
     node.setType(token);
@@ -287,7 +293,6 @@ public class ParserEngine implements Parser {
         break;
       }
       statements.add(statement);
-      captureToken();
     }
     return statements;
   }
@@ -296,6 +301,7 @@ public class ParserEngine implements Parser {
    * letStatement | returnStatement | doStatement | ifStatement | whileStatement
    */
   private Node parseStatement() {
+    captureToken();
     if (isLetToken().test(token)) {
       return parseLetStatement();
     }
@@ -316,6 +322,7 @@ public class ParserEngine implements Parser {
       return parseWhileStatement();
     }
 
+    pushBackToken();
     return null;
   }
 
@@ -323,14 +330,15 @@ public class ParserEngine implements Parser {
    * 'while' '(' expression ')' '{' statements '}'
    */
   private Node parseWhileStatement() {
+    ensureValidToken(token, isWhileToken());
     WhileNode node = new WhileNode();
     captureTokenOfType(isOpenParen());
     node.setExpression(parseExpression());
     captureTokenOfType(isCloseParen());
     captureTokenOfType(isOpenBrace());
-    captureToken();
     node.addStatements(parseStatements());
     ensureValidToken(token, isCloseBrace());
+    captureTokenOfType(isCloseBrace());
     return node;
   }
 
@@ -341,28 +349,27 @@ public class ParserEngine implements Parser {
     ensureValidToken(token, isIfToken());
     IfNode node = new IfNode();
     captureTokenOfType(isOpenParen());
-    Node expression = parseExpression();
-    node.addExpression(expression);
+    node.addExpression(parseExpression());
     captureTokenOfType(isCloseParen());
     captureTokenOfType(isOpenBrace());
 
-    captureToken();
     for (Node statement : parseStatements()) {
       node.addIfStatement(statement);
     }
     ensureValidToken(token, isCloseBrace());
 
+    captureTokenOfType(isCloseBrace());
     captureToken();
     if (isElseToken().test(token)) {
       node.setElseBlockPresent();
       captureTokenOfType(isOpenBrace());
 
-      captureToken();
       List<Node> elseStatements = parseStatements();
       for (Node statement : elseStatements) {
         node.addElseStatement(statement);
       }
-      ensureValidToken(token, isCloseBrace());
+
+      captureTokenOfType(isCloseBrace());
     } else {
       pushBackToken();
     }

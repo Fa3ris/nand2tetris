@@ -81,6 +81,7 @@ public class ParserEngine implements Parser {
     }
 
     if (isClassVarDecFirstToken().test(token)) {
+      pushBackToken();
       return parseClassVarDec();
     }
 
@@ -115,11 +116,15 @@ public class ParserEngine implements Parser {
     node.setClassName(captureTokenOfType(isIdentifierToken()));
     captureTokenOfType(isOpenBrace());
     while (true) {
-      captureToken();
-      if (isClassVarDecFirstToken().test(token)) {
-        node.addClassVarDec(parseClassVarDec());
-        continue;
+      Node classVarDec = parseClassVarDec();
+      if (classVarDec != null) {
+        node.addClassVarDec(classVarDec);
+      } else {
+        break;
       }
+    }
+    while (true) {
+      captureToken();
 
       if (isSubroutineDecFirstToken().test(token)) {
         node.addSubroutineDec(parseSubroutineDec());
@@ -135,10 +140,14 @@ public class ParserEngine implements Parser {
    * ('static' | 'field') type varName (',' varName)* ';'
    */
   private Node parseClassVarDec() {
+    captureToken();
+    if (!isClassVarDecFirstToken().test(token)) {
+      pushBackToken();
+      return null;
+    }
     ClassVarDecNode node = new ClassVarDecNode();
     node.setScope(token);
-    captureTokenOfType(isTypeToken());
-    node.setType(token);
+    node.setType(captureTokenOfType(isTypeToken()));
     node.addVarNames(parseIdentifiers());
     ensureValidToken(token, isSemicolon());
     return node;

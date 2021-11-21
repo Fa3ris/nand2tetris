@@ -59,6 +59,8 @@ public class ParserEngine implements Parser {
 
   private Token token;
 
+  private final Deque<Token> stack = new ArrayDeque<>();
+
   public ParserEngine(Tokenizer tokenizer) {
     this.tokenizer = tokenizer;
   }
@@ -133,7 +135,6 @@ public class ParserEngine implements Parser {
         break;
       }
     }
-//    ensureValidToken(token, isCloseBrace());
     captureTokenOfType(isCloseBrace());
     return node;
   }
@@ -160,18 +161,15 @@ public class ParserEngine implements Parser {
    */
   private List<Token> parseIdentifiers() {
     List<Token> identifiers = new ArrayList<>();
-    captureTokenOfType(isIdentifierToken());
-    identifiers.add(token);
+    identifiers.add(captureTokenOfType(isIdentifierToken()));
     while (true) {
       captureToken();
       if (isComma().test(token)) {
-        captureTokenOfType(isIdentifierToken());
-        identifiers.add(token);
+        identifiers.add(captureTokenOfType(isIdentifierToken()));
         continue;
       }
-      break;
+      return identifiers;
     }
-    return identifiers;
   }
 
   /**
@@ -212,9 +210,8 @@ public class ParserEngine implements Parser {
         node.addArg(parseParameterListArgNode());
         continue;
       }
-      break;
+      return node;
     }
-    return node;
   }
 
   /**
@@ -224,8 +221,7 @@ public class ParserEngine implements Parser {
     ensureValidToken(token, isTypeToken());
     ParameterArgNode arg = new ParameterArgNode();
     arg.setType(token);
-    captureTokenOfType(isIdentifierToken());
-    arg.setName(token);
+    arg.setName(captureTokenOfType(isIdentifierToken()));
     return arg;
   }
 
@@ -235,16 +231,12 @@ public class ParserEngine implements Parser {
   private Node parseSubroutineBody() {
     ensureValidToken(token, isOpenBrace());
     SubroutineBodyNode node = new SubroutineBodyNode();
-
     for (Node varDec : parseVarDecs()) {
       node.addVarDec(varDec);
     }
-
     for (Node statement : parseStatements()) {
       node.addStatement(statement);
     }
-
-    ensureValidToken(token, isCloseBrace());
     captureTokenOfType(isCloseBrace());
     return node;
   }
@@ -275,8 +267,7 @@ public class ParserEngine implements Parser {
       return null;
     }
     VarDecNode node = new VarDecNode();
-    captureTokenOfType(isTypeToken());
-    node.setType(token);
+    node.setType(captureTokenOfType(isTypeToken()));
     node.addVarNames(parseIdentifiers());
     ensureValidToken(token, isSemicolon());
     return node;
@@ -290,11 +281,10 @@ public class ParserEngine implements Parser {
     while (true) {
       Node statement = parseStatement();
       if (statement == null) {
-        break;
+        return statements;
       }
       statements.add(statement);
     }
-    return statements;
   }
 
   /**
@@ -337,7 +327,6 @@ public class ParserEngine implements Parser {
     captureTokenOfType(isCloseParen());
     captureTokenOfType(isOpenBrace());
     node.addStatements(parseStatements());
-    ensureValidToken(token, isCloseBrace());
     captureTokenOfType(isCloseBrace());
     return node;
   }
@@ -353,20 +342,18 @@ public class ParserEngine implements Parser {
     captureTokenOfType(isCloseParen());
     captureTokenOfType(isOpenBrace());
 
-    for (Node statement : parseStatements()) {
-      node.addIfStatement(statement);
+    for (Node ifStatement : parseStatements()) {
+      node.addIfStatement(ifStatement);
     }
-    ensureValidToken(token, isCloseBrace());
-
     captureTokenOfType(isCloseBrace());
+
     captureToken();
     if (isElseToken().test(token)) {
       node.setElseBlockPresent();
       captureTokenOfType(isOpenBrace());
 
-      List<Node> elseStatements = parseStatements();
-      for (Node statement : elseStatements) {
-        node.addElseStatement(statement);
+      for (Node elseStatement : parseStatements()) {
+        node.addElseStatement(elseStatement);
       }
 
       captureTokenOfType(isCloseBrace());
@@ -385,19 +372,18 @@ public class ParserEngine implements Parser {
   private Node parseDoStatement() {
     ensureValidToken(token, isDoToken());
     DoNode node = new DoNode();
-    captureTokenOfType(isIdentifierToken());
-    Token identifier = token;
+    Token identifier = captureTokenOfType(isIdentifierToken());
     captureToken();
     if (isDotToken().test(token)) {
       node.addIdentifier(identifier);
-      captureTokenOfType(isIdentifierToken());
-      node.addSubroutineName(token);
+      node.addSubroutineName(captureTokenOfType(isIdentifierToken()));
       captureTokenOfType(isOpenParen());
     } else if (isOpenParen().test(token)) {
       node.addSubroutineName(identifier);
+    } else {
+      throw new IllegalStateException();
     }
     node.addExpressionList(parseExpressionList());
-    ensureValidToken(token, isCloseParen());
     captureTokenOfType(isSemicolon());
     return node;
   }
@@ -408,11 +394,9 @@ public class ParserEngine implements Parser {
   private Node parseLetStatement() {
     ensureValidToken(token, isLetToken());
     LetNode node = new LetNode();
-    captureTokenOfType(isIdentifierToken());
-    node.setVarName(token);
+    node.setVarName(captureTokenOfType(isIdentifierToken()));
     captureTokenOfType(isEqualToken());
-    Node rightExpression = parseExpression();
-    node.setRightExpression(rightExpression);
+    node.setRightExpression(parseExpression());
     captureTokenOfType(isSemicolon());
     return node;
   }
@@ -428,17 +412,11 @@ public class ParserEngine implements Parser {
     if (isSemicolon().test(token)) {
       return node;
     }
-
     pushBackToken();
-
-
     node.setExpression(parseExpression());
     captureTokenOfType(isSemicolon());
     return node;
   }
-
-  private final Deque<Token> stack = new ArrayDeque<>();
-
 
   /**
    * (expression (',' expression)* )?
@@ -488,19 +466,16 @@ public class ParserEngine implements Parser {
   }
 
   private Token captureTokenOfType(Predicate<Token> predicate) {
-    captureToken();
-    ensureValidToken(token, predicate);
+    ensureValidToken(captureToken(), predicate);
     return token;
   }
 
   private Token captureToken() {
     if (!stack.isEmpty()) {
-      token = stack.pop();
-      return token;
+      return token = stack.pop();
     }
     tokenizer.advance();
-    token = tokenizer.peekToken();
-    return token;
+    return token = tokenizer.peekToken();
   }
 
   private void pushBackToken() {

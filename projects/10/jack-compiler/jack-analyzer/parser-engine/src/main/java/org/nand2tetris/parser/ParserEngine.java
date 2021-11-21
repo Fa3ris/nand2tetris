@@ -94,6 +94,9 @@ public class ParserEngine implements Parser {
     return null;
   }
 
+  /**
+   * 'var' type varName (',' varName)* ';'
+   */
   private Node parseVarDec() {
     VarDecNode node = new VarDecNode();
     captureTokenOfType(isTypeToken());
@@ -104,7 +107,12 @@ public class ParserEngine implements Parser {
   }
 
 
+  /**
+   * ('constructor' | 'function' | 'method') ('void' | type) subroutineName
+   * '(' parameterList ')' subroutineBody
+   */
   private Node parseSubroutineDec() {
+    ensureValidToken(token, isFunctionToken().or(isConstructorToken()).or(isMethodToken()));
     SubroutineDecNode node = new SubroutineDecNode();
     node.setRoutineType(token);
     captureTokenOfType(isVoidToken().or(isIdentifierToken()));
@@ -121,6 +129,9 @@ public class ParserEngine implements Parser {
     return node;
   }
 
+  /**
+   * ((type varName) (',' type varName)* )?
+   */
   private Node parseParameterList() {
     ParameterListNode node = new ParameterListNode();
     while (true) {
@@ -136,6 +147,9 @@ public class ParserEngine implements Parser {
     return node;
   }
 
+  /**
+   * type varName
+   */
   private Node parseArgNode() {
     ensureValidToken(token, isTypeToken());
     ParameterArgNode arg = new ParameterArgNode();
@@ -145,8 +159,12 @@ public class ParserEngine implements Parser {
     return arg;
   }
 
+  /**
+   * '{' varDec* statements '}'
+   */
   private Node parseSubroutineBody() {
     SubroutineBodyNode node = new SubroutineBodyNode();
+    ensureValidToken(token, isOpenBrace());
     captureToken();
     while (true) {
       if (isVarToken().test(token)) {
@@ -157,36 +175,11 @@ public class ParserEngine implements Parser {
       }
     }
 
-    while (true) {
-      if (isLetToken().test(token)) {
-        Node letNode = parseLetStatement();
-        node.addStatement(letNode);
-        captureToken();
-        continue;
-      }
-
-      if (isReturnToken().test(token)) {
-        Node returnNode = parseReturnStatement();
-        node.addStatement(returnNode);
-        captureToken();
-        continue;
-      }
-
-      if (isDoToken().test(token)) {
-        Node returnNode = parseDoStatement();
-        node.addStatement(returnNode);
-        captureToken();
-        continue;
-      }
-
-      if (isIfToken().test(token)) {
-        Node ifNode = parseIfStatement();
-        node.addStatement(ifNode);
-        captureToken();
-        continue;
-      }
-      break;
+    List<Node> ifStatements = parseStatements();
+    for (Node statement : ifStatements) {
+      node.addStatement(statement);
     }
+
     ensureValidToken(token, isCloseBrace());
     return node;
   }
@@ -195,6 +188,7 @@ public class ParserEngine implements Parser {
    * 'if' '(' expression ')' '{' statements '}' ( else '{' statements '}' )?
    */
   private Node parseIfStatement() {
+    ensureValidToken(token, isIfToken());
     IfNode node = new IfNode();
     captureTokenOfType(isOpenParen());
     Node expression = parseExpression();
@@ -224,6 +218,9 @@ public class ParserEngine implements Parser {
     return node;
   }
 
+  /**
+   * statement*
+   */
   private List<Node> parseStatements() {
     List<Node> statements = new ArrayList<>();
     while (true) {
@@ -259,14 +256,11 @@ public class ParserEngine implements Parser {
     return statements;
   }
 
-  private Predicate<Token> isElseToken() {
-    return isKeyword(ELSE);
-  }
 
-  private Predicate<Token> isIfToken() {
-    return isKeyword(Keyword.IF);
-  }
 
+  /**
+   * 'do' subroutineCall ';'
+   */
   private Node parseDoStatement() {
     DoNode node = new DoNode();
     captureTokenOfType(isIdentifierToken());
@@ -284,6 +278,9 @@ public class ParserEngine implements Parser {
     return node;
   }
 
+  /**
+   * (expression (',' expression)* )?
+   */
   private Node parseExpressionList() {
     ExpressionListNode node = new ExpressionListNode();
 
@@ -295,15 +292,13 @@ public class ParserEngine implements Parser {
     throw new IllegalStateException();
   }
 
-  private Predicate<Token> isDotToken() {
-    return isSymbol(DOT);
-  }
 
-  private Predicate<Token> isDoToken() {
-    return isKeyword(DO);
-  }
 
+  /**
+   * 'let' varName ( '[' expression ']' )? '=' expression ';'
+   */
   private Node parseLetStatement() {
+    ensureValidToken(token, isLetToken());
     LetNode node = new LetNode();
     captureTokenOfType(isIdentifierToken());
     node.setVarName(token);
@@ -314,6 +309,9 @@ public class ParserEngine implements Parser {
     return node;
   }
 
+  /**
+   * 'return' expression? ';'
+   */
   private Node parseReturnStatement() {
     ReturnNode node = new ReturnNode();
 
@@ -322,6 +320,9 @@ public class ParserEngine implements Parser {
     return node;
   }
 
+  /**
+   * term (op term)*
+   */
   private Node parseExpression() {
     ExpressionNode node = new ExpressionNode();
     Node term = parseTerm();
@@ -336,11 +337,11 @@ public class ParserEngine implements Parser {
     return node;
   }
 
-  private Predicate<Token> isEqualToken() {
-    return isSymbol(EQ);
-  }
 
 
+  /**
+   * ('static' | 'field') type varName (',' varName)* ';'
+   */
   private Node parseClassVarDec() {
     ClassVarDecNode node = new ClassVarDecNode();
     node.setScope(token);
@@ -368,6 +369,9 @@ public class ParserEngine implements Parser {
     return identifiers;
   }
 
+  /**
+   * 'class' className '{' classVarDec* subroutineDec* '}'
+   */
   private Node parseClass() {
     captureTokenOfType(isIdentifierToken());
     ClassNode node = new ClassNode();
@@ -402,6 +406,26 @@ public class ParserEngine implements Parser {
     token = tokenizer.peekToken();
   }
 
+  private Predicate<Token> isDotToken() {
+    return isSymbol(DOT);
+  }
+
+  private Predicate<Token> isDoToken() {
+    return isKeyword(DO);
+  }
+
+  private Predicate<Token> isEqualToken() {
+    return isSymbol(EQ);
+  }
+
+  private Predicate<Token> isElseToken() {
+    return isKeyword(ELSE);
+  }
+
+  private Predicate<Token> isIfToken() {
+    return isKeyword(Keyword.IF);
+  }
+
   private Predicate<Token> isReturnToken() {
     return isKeyword(RETURN);
   }
@@ -410,6 +434,9 @@ public class ParserEngine implements Parser {
     return isKeyword(CONSTRUCTOR);
   }
 
+  /**
+   * 'int' | 'char' | 'boolean' | className
+   */
   private Predicate<Token> isTypeToken() {
     return isIntToken().or(isCharToken()).or(isBooleanToken()).or(
         isIdentifierToken());

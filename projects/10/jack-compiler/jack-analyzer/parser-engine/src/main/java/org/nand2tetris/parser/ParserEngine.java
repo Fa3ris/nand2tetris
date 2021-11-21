@@ -15,6 +15,7 @@ import static org.nand2tetris.tokenizer.Keyword.RETURN;
 import static org.nand2tetris.tokenizer.Keyword.STATIC;
 import static org.nand2tetris.tokenizer.Keyword.VAR;
 import static org.nand2tetris.tokenizer.Keyword.VOID;
+import static org.nand2tetris.tokenizer.Keyword.WHILE;
 import static org.nand2tetris.tokenizer.Symbol.CLOSE_BRACE;
 import static org.nand2tetris.tokenizer.Symbol.CLOSE_PAREN;
 import static org.nand2tetris.tokenizer.Symbol.COMMA;
@@ -44,6 +45,7 @@ import org.nand2tetris.parser.ast.SubroutineBodyNode;
 import org.nand2tetris.parser.ast.SubroutineDecNode;
 import org.nand2tetris.parser.ast.TermNode;
 import org.nand2tetris.parser.ast.VarDecNode;
+import org.nand2tetris.parser.ast.WhileNode;
 import org.nand2tetris.tokenizer.Keyword;
 import org.nand2tetris.tokenizer.Token;
 import org.nand2tetris.tokenizer.TokenType;
@@ -297,7 +299,26 @@ public class ParserEngine implements Parser {
       return parseIfStatement();
     }
 
+    if (isWhileToken().test(token)) {
+      return parseWhileStatement();
+    }
+
     return null;
+  }
+
+  /**
+   * 'while' '(' expression ')' '{' statements '}'
+   */
+  private Node parseWhileStatement() {
+    WhileNode node = new WhileNode();
+    captureTokenOfType(isOpenParen());
+    node.setExpression(parseExpression());
+    captureTokenOfType(isCloseParen());
+    captureTokenOfType(isOpenBrace());
+    captureToken();
+    node.addStatements(parseStatements());
+    ensureValidToken(token, isCloseBrace());
+    return node;
   }
 
   /**
@@ -335,6 +356,9 @@ public class ParserEngine implements Parser {
 
   /**
    * 'do' subroutineCall ';'
+   *
+   * subroutineName '(' expressionList ')' |
+   * (className | varName) '.' subroutineName '(' expressionList ')'
    */
   private Node parseDoStatement() {
     ensureValidToken(token, isDoToken());
@@ -346,8 +370,10 @@ public class ParserEngine implements Parser {
       node.addIdentifier(identifier);
       captureTokenOfType(isIdentifierToken());
       node.addSubroutineName(token);
+      captureTokenOfType(isOpenParen());
+    } else if (isOpenParen().test(token)) {
+      node.addSubroutineName(identifier);
     }
-    captureTokenOfType(isOpenParen());
     node.addExpressionList(parseExpressionList());
     ensureValidToken(token, isCloseParen());
     captureTokenOfType(isSemicolon());
@@ -442,6 +468,10 @@ public class ParserEngine implements Parser {
 
   private Predicate<Token> isEqualToken() {
     return isSymbol(EQ);
+  }
+
+  private Predicate<Token> isWhileToken() {
+    return isKeyword(WHILE);
   }
 
   private Predicate<Token> isElseToken() {

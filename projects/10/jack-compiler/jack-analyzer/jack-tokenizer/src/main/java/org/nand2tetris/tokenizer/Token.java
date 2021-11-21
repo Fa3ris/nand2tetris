@@ -117,4 +117,8 @@ public class Token {
   public static Token elseToken() {
     return Token.build(TokenType.KEYWORD, ELSE);
   }
+
+  public static Token whileToken() {
+    return Token.build(TokenType.KEYWORD, WHILE);
+  }
 }

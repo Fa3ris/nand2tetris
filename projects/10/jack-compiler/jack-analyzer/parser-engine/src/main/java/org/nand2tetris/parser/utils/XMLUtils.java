@@ -187,6 +187,10 @@ public abstract class XMLUtils {
     return keywordTag(TagNames.elseTag);
   }
 
+  public static String whileTag() {
+    return keywordTag(TagNames.whileTag);
+  };
+
   public static List<String> formatStatements(List<Node> statements) {
     return encloseInTag(TagNames.statements, formatNodes(statements));
   }

@@ -237,4 +237,48 @@ public class SubroutineBodyTest {
     assertASTXML(tokens, file);
   }
 
+  /**
+   *    {
+   *          while (key) {
+   *             let key = key;
+   *             do moveSquare();
+   *          }
+   *     }
+   */
+  @Test
+  public void whileExpression() throws Exception {
+    List<Token> tokens = new ArrayList<>();
+    String id = "key";
+    String functionName = "moveSquare";
+
+    tokens.add(openBrace());
+    tokens.add(Token.whileToken());
+    tokens.add(openParen());
+    tokens.add(identifierToken(id));
+    tokens.add(closeParen());
+
+    tokens.add(openBrace());
+
+    tokens.add(Token.letToken());
+    tokens.add(identifierToken(id));
+    tokens.add(Token.equalToken());
+    tokens.add(identifierToken(id));
+    tokens.add(semicolon());
+
+    tokens.add(Token.doToken());
+    tokens.add(identifierToken(functionName));
+    tokens.add(openParen());
+    tokens.add(closeParen());
+    tokens.add(semicolon());
+
+    tokens.add(closeBrace());
+
+    tokens.add(closeBrace());
+
+    URL url = getClass().getResource("subroutinebody-8.xml");
+    File file = new File(url.getFile());
+
+    assertASTXML(tokens, file);
+  }
+
 }

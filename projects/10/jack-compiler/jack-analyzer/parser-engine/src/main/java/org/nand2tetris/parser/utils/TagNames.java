@@ -34,4 +34,6 @@ public abstract class TagNames {
   public static final String doStatement = "doStatement";
   public static final String expressionListTag = "expressionList";
   public static final String ifStatement = "ifStatement";
+  public static final String whileStatement = "whileStatement";
+  public static final String whileTag = Keyword.WHILE;
 }

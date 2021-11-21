@@ -86,6 +86,7 @@ public class ParserEngine implements Parser {
     }
 
     if (isSubroutineDecFirstToken().test(token)) {
+      pushBackToken();
       return parseSubroutineDec();
     }
 
@@ -124,13 +125,12 @@ public class ParserEngine implements Parser {
       }
     }
     while (true) {
-      captureToken();
-
-      if (isSubroutineDecFirstToken().test(token)) {
-        node.addSubroutineDec(parseSubroutineDec());
-        continue;
+      Node subroutineDec = parseSubroutineDec();
+      if (subroutineDec != null) {
+        node.addSubroutineDec(subroutineDec);
+      } else {
+        break;
       }
-      break;
     }
     ensureValidToken(token, isCloseBrace());
     return node;
@@ -177,16 +177,17 @@ public class ParserEngine implements Parser {
    * '(' parameterList ')' subroutineBody
    */
   private Node parseSubroutineDec() {
-    ensureValidToken(token, isFunctionToken().or(isConstructorToken()).or(isMethodToken()));
+    captureToken();
+    if (!isSubroutineDecFirstToken().test(token)) {
+      pushBackToken();
+      return null;
+    }
     SubroutineDecNode node = new SubroutineDecNode();
     node.setRoutineType(token);
-    captureTokenOfType(isVoidToken().or(isTypeToken()));
-    node.setReturnType(token);
-    captureTokenOfType(isSubroutineName());
-    node.setRoutineName(token);
+    node.setReturnType(captureTokenOfType(isVoidToken().or(isTypeToken())));
+    node.setRoutineName(captureTokenOfType(isSubroutineName()));
     captureTokenOfType(isOpenParen());
-    Node parameterList = parseParameterList();
-    node.setParameterListNode(parameterList);
+    node.setParameterListNode(parseParameterList());
     ensureValidToken(token, isCloseParen());
     captureToken();
     Node subroutineBody = parseSubroutineBody();

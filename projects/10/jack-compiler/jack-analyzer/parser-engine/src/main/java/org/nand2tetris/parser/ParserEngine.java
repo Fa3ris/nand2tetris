@@ -98,6 +98,7 @@ public class ParserEngine implements Parser {
     }
 
     if (isOpenBrace().test(token)) {
+      pushBackToken();
       return parseSubroutineBody();
     }
     return null;
@@ -189,7 +190,6 @@ public class ParserEngine implements Parser {
     captureTokenOfType(isOpenParen());
     node.setParameterListNode(parseParameterList());
     ensureValidToken(token, isCloseParen());
-    captureToken();
     node.setSubroutineBodyNode(parseSubroutineBody());
     return node;
   }
@@ -229,7 +229,7 @@ public class ParserEngine implements Parser {
    * '{' varDec* statements '}'
    */
   private Node parseSubroutineBody() {
-    ensureValidToken(token, isOpenBrace());
+    captureTokenOfType(isOpenBrace());
     SubroutineBodyNode node = new SubroutineBodyNode();
     for (Node varDec : parseVarDecs()) {
       node.addVarDec(varDec);

@@ -295,22 +295,27 @@ public class ParserEngine implements Parser {
   private Node parseStatement() {
     captureToken();
     if (isLetToken().test(token)) {
+      pushBackToken();
       return parseLetStatement();
     }
 
     if (isReturnToken().test(token)) {
+      pushBackToken();
       return parseReturnStatement();
     }
 
     if (isDoToken().test(token)) {
+      pushBackToken();
       return parseDoStatement();
     }
 
     if (isIfToken().test(token)) {
+      pushBackToken();
       return parseIfStatement();
     }
 
     if (isWhileToken().test(token)) {
+      pushBackToken();
       return parseWhileStatement();
     }
 
@@ -322,7 +327,7 @@ public class ParserEngine implements Parser {
    * 'while' '(' expression ')' '{' statements '}'
    */
   private Node parseWhileStatement() {
-    ensureValidToken(token, isWhileToken());
+    captureTokenOfType(isWhileToken());
     WhileNode node = new WhileNode();
     captureTokenOfType(isOpenParen());
     node.setExpression(parseExpression());
@@ -337,7 +342,7 @@ public class ParserEngine implements Parser {
    * 'if' '(' expression ')' '{' statements '}' ( else '{' statements '}' )?
    */
   private Node parseIfStatement() {
-    ensureValidToken(token, isIfToken());
+    captureTokenOfType(isIfToken());
     IfNode node = new IfNode();
     captureTokenOfType(isOpenParen());
     node.addExpression(parseExpression());
@@ -372,7 +377,7 @@ public class ParserEngine implements Parser {
    * (className | varName) '.' subroutineName '(' expressionList ')'
    */
   private Node parseDoStatement() {
-    ensureValidToken(token, isDoToken());
+    captureTokenOfType(isDoToken());
     DoNode node = new DoNode();
     Token identifier = captureTokenOfType(isIdentifierToken());
     captureToken();
@@ -394,7 +399,7 @@ public class ParserEngine implements Parser {
    * 'let' varName ( '[' expression ']' )? '=' expression ';'
    */
   private Node parseLetStatement() {
-    ensureValidToken(token, isLetToken());
+    captureTokenOfType(isLetToken());
     LetNode node = new LetNode();
     node.setVarName(captureTokenOfType(isIdentifierToken()));
     captureTokenOfType(isEqualToken());
@@ -407,7 +412,7 @@ public class ParserEngine implements Parser {
    * 'return' expression? ';'
    */
   private Node parseReturnStatement() {
-    ensureValidToken(token, isReturnToken());
+    captureTokenOfType(isReturnToken());
     ReturnNode node = new ReturnNode();
 
     captureToken();

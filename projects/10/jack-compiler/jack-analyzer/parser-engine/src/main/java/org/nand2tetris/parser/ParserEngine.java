@@ -153,7 +153,7 @@ public class ParserEngine implements Parser {
     node.setScope(token);
     node.setType(captureTokenOfType(isTypeToken()));
     node.addVarNames(parseIdentifiers());
-    ensureValidToken(token, isSemicolon());
+    captureTokenOfType(isSemicolon());
     return node;
   }
 
@@ -167,9 +167,10 @@ public class ParserEngine implements Parser {
       captureToken();
       if (isComma().test(token)) {
         identifiers.add(captureTokenOfType(isIdentifierToken()));
-        continue;
+      } else {
+        pushBackToken();
+        return identifiers;
       }
-      return identifiers;
     }
   }
 
@@ -269,7 +270,7 @@ public class ParserEngine implements Parser {
     VarDecNode node = new VarDecNode();
     node.setType(captureTokenOfType(isTypeToken()));
     node.addVarNames(parseIdentifiers());
-    ensureValidToken(token, isSemicolon());
+    captureTokenOfType(isSemicolon());
     return node;
   }
 

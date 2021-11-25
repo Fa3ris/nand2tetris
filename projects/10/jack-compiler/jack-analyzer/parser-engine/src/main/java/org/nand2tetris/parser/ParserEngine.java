@@ -391,6 +391,7 @@ public class ParserEngine implements Parser {
       throw new IllegalStateException();
     }
     node.addExpressionList(parseExpressionList());
+    captureTokenOfType(isCloseParen());
     captureTokenOfType(isSemicolon());
     return node;
   }
@@ -415,12 +416,10 @@ public class ParserEngine implements Parser {
     captureTokenOfType(isReturnToken());
     ReturnNode node = new ReturnNode();
 
-    captureToken();
-    if (isSemicolon().test(token)) {
-      return node;
+    Node expression = parseExpression();
+    if (expression != null) {
+      node.setExpression(expression);
     }
-    pushBackToken();
-    node.setExpression(parseExpression());
     captureTokenOfType(isSemicolon());
     return node;
   }
@@ -430,28 +429,23 @@ public class ParserEngine implements Parser {
    */
   private Node parseExpressionList() {
     ExpressionListNode node = new ExpressionListNode();
-
-    captureToken();
-    if (isCloseParen().test(token)) {
-      return node;
+    Node expression = parseExpression();
+    if (expression != null) {
+      node.addExpression(expression);
     }
-    pushBackToken();
-    node.addExpression(parseExpression());
-
-    captureToken();
-    if (isCloseParen().test(token)) {
-      return node;
-    }
-
-    throw new IllegalStateException();
+    return node;
   }
 
   /**
    * term (op term)*
    */
   private Node parseExpression() {
+    Node term = parseTerm();
+    if (term == null) {
+      return null;
+    }
     ExpressionNode node = new ExpressionNode();
-    node.addTerm(parseTerm());
+    node.addTerm(term);
     return node;
   }
 
@@ -466,10 +460,14 @@ public class ParserEngine implements Parser {
    * | unaryOp term
    */
   private Node parseTerm() {
-    TermNode node = new TermNode();
-    captureTokenOfType(isIdentifierToken());
-    node.addVarName(token);
-    return node;
+    captureToken();
+    if (isIdentifierToken().test(token)) {
+      TermNode node = new TermNode();
+      node.addVarName(token);
+      return node;
+    }
+    pushBackToken();
+    return null;
   }
 
   private Token captureTokenOfType(Predicate<Token> predicate) {

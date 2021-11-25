@@ -29,6 +29,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import org.nand2tetris.parser.ast.AST;
 import org.nand2tetris.parser.ast.ClassNode;
@@ -200,19 +201,19 @@ public class ParserEngine implements Parser {
    */
   private Node parseParameterList() {
     ParameterListNode node = new ParameterListNode();
+    Node argNode = parseParameterListArgNode();
+    if (argNode == null) {
+      return node;
+    }
+    node.addArg(argNode);
     while (true) {
       captureToken();
       if (isComma().test(token)) {
-        captureToken();
-        node.addArg(parseParameterListArgNode());
-        continue;
+        node.addArg(Objects.requireNonNull(parseParameterListArgNode()));
+      } else {
+        pushBackToken();
+        return node;
       }
-      if (isTypeToken().test(token)) {
-        node.addArg(parseParameterListArgNode());
-        continue;
-      }
-      pushBackToken();
-      return node;
     }
   }
 
@@ -220,7 +221,11 @@ public class ParserEngine implements Parser {
    * type varName
    */
   private Node parseParameterListArgNode() {
-    ensureValidToken(token, isTypeToken());
+    captureToken();
+    if (!isTypeToken().test(token)) {
+      pushBackToken();
+      return null;
+    }
     ParameterArgNode arg = new ParameterArgNode();
     arg.setType(token);
     arg.setName(captureTokenOfType(isIdentifierToken()));

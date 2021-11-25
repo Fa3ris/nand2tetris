@@ -190,7 +190,7 @@ public class ParserEngine implements Parser {
     node.setRoutineName(captureTokenOfType(isSubroutineName()));
     captureTokenOfType(isOpenParen());
     node.setParameterListNode(parseParameterList());
-    ensureValidToken(token, isCloseParen());
+    captureTokenOfType(isCloseParen());
     node.setSubroutineBodyNode(parseSubroutineBody());
     return node;
   }
@@ -211,6 +211,7 @@ public class ParserEngine implements Parser {
         node.addArg(parseParameterListArgNode());
         continue;
       }
+      pushBackToken();
       return node;
     }
   }

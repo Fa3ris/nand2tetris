@@ -1,6 +1,5 @@
 package org.nand2tetris.parser.test_utils;
 
-import static com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl.INDENT_NUMBER;
 import static org.junit.Assert.assertEquals;
 import static org.nand2tetris.parser.utils.XMLUtils.closeTag;
 import static org.nand2tetris.parser.utils.XMLUtils.commaTag;
@@ -13,9 +12,11 @@ import static org.nand2tetris.tokenizer.Token.semicolon;
 import static org.nand2tetris.tokenizer.Token.varToken;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.net.URL;
+import java.io.Writer;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,40 +54,16 @@ import org.xmlunit.diff.Diff;
 
 public abstract class TestUtils {
 
-  public static void assertASTXML(List<Token> tokens,  String expectedXml) {
-    AST ast = parse(tokens);
-    assertEquals(expectedXml, ast.toXMLString());
-
+  public static void assertASTXML(List<Token> tokens, List<String> expectedTags) {
+    assertASTXML(tokens, concat(expectedTags));
   }
 
-  public static void assertASTXML(List<Token> tokens,  List<String> expectedTags) {
-    AST ast = parse(tokens);
-    assertEquals(concat(expectedTags), ast.toXMLString());
-
+  public static void assertASTXML(List<Token> tokens, String expectedXml) {
+    assertEquals(expectedXml, parse(tokens).toXMLString());
   }
 
-  public static void assertASTXML(List<Token> tokens,  File file) {
-    String actual = parse(tokens).toXMLString();
-    Source actualSource = Input.fromString(actual).build();
-    Source expectedSource = Input.fromFile(file).build();
-    try {
-      assertEqualSources(expectedSource, actualSource);
-    } catch (AssertionError e) {
-      printXML(actual);
-      throw e;
-    }
-  }
-
-  private static void assertASTXML(AST ast, File file) {
-    String actual = ast.toXMLString();
-    Source actualSource = Input.fromString(actual).build();
-    Source expectedSource = Input.fromFile(file).build();
-    try {
-      assertEqualSources(expectedSource, actualSource);
-    } catch (AssertionError e) {
-      printXML(actual);
-      throw e;
-    }
+  public static void assertASTXML(List<Token> tokens, File expectedXMLFile) {
+    assertASTXML(parse(tokens), expectedXMLFile);
   }
 
   public static void assertASTXML(File inputJackFile, File expectedXMLFile) {
@@ -104,9 +81,30 @@ public abstract class TestUtils {
           counterCharReader.getLineContent());
       throw new RuntimeException(msg, e);
     }
-    assertASTXML(ast, expectedXMLFile);
+
+    String actual = ast.toXMLString();
+    try {
+      assertXML(actual, expectedXMLFile);
+    } catch (Error e) {
+      writeActualFile(actual, expectedXMLFile);
+      throw e;
+    }
   }
 
+  private static void assertASTXML(AST ast, File file) {
+    assertXML(ast.toXMLString(), file);
+  }
+
+  private static void assertXML(String actual, File file) {
+    Source actualSource = Input.fromString(actual).build();
+    Source expectedSource = Input.fromFile(file).build();
+    try {
+      assertEqualSources(expectedSource, actualSource);
+    } catch (AssertionError e) {
+      printXML(actual);
+      throw e;
+    }
+  }
 
   private static void assertEqualSources(Source expected, Source actual) {
     Diff myDiff = DiffBuilder.compare(expected)
@@ -174,11 +172,31 @@ public abstract class TestUtils {
 
   private static void printXML(String s) {
     try {
-      System.out.println(docToString(stringToDoc(s)));
+      System.out.println(prettyFormatXml(s));
     } catch (Exception e) {
-
+      e.printStackTrace();
     }
   }
+
+  private static void writeActualFile(String actual, File expectedXMLFile) {
+    Path path = expectedXMLFile.toPath();
+    Path parentFolder = path.getParent();
+    String fileName = path.getFileName().toString();
+    String baseName = fileName.substring(0, fileName.lastIndexOf('.'));
+    String actualFileName = baseName + "-actual.xml";
+
+    Path actualPath = parentFolder.resolve(actualFileName);
+    try (Writer w =  Files.newBufferedWriter(actualPath)) {
+      w.write(prettyFormatXml(actual));
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  private static String prettyFormatXml(String s) throws Exception {
+    return docToString(stringToDoc(s));
+  }
+
   private static Document stringToDoc(String s) throws Exception {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder;
@@ -189,10 +207,12 @@ public abstract class TestUtils {
   }
 
   private static final int INDENT = 2;
+  private static final String indentNumberPropertyName = "indent-number";
   private static final String XML_OUTPUT_VALUE = "yes";
+
   private static String docToString(Document document) throws Exception {
     TransformerFactory tf = TransformerFactory.newInstance();
-    tf.setAttribute(INDENT_NUMBER, INDENT);
+    tf.setAttribute(indentNumberPropertyName, INDENT);
     Transformer transformer;
     transformer = tf.newTransformer();
     transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, XML_OUTPUT_VALUE);

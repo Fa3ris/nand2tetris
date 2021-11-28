@@ -93,12 +93,7 @@ public abstract class TestUtils {
   private static void assertXML(String actual, File file) {
     Source actualSource = Input.fromString(actual).build();
     Source expectedSource = Input.fromFile(file).build();
-    try {
-      assertEqualSources(expectedSource, actualSource);
-    } catch (AssertionError e) {
-      printXML(actual);
-      throw e;
-    }
+    assertEqualSources(expectedSource, actualSource);
   }
 
   private static void assertEqualSources(Source expected, Source actual) {
@@ -197,6 +192,7 @@ public abstract class TestUtils {
     DocumentBuilder builder;
     builder = factory.newDocumentBuilder();
     Document document = builder.parse(new InputSource(new StringReader(s)));
+    addLFPlusPaddingToEmptyNodes(document);
     return document;
   }
 
@@ -217,6 +213,39 @@ public abstract class TestUtils {
     return writer.getBuffer().toString();
   }
 
+  /**
+   * add empty textNode to print empty xml element on 2 lines
+   * ex:
+   * <p>
+   * {@code <parameterList></parameterList>}
+   * </p>
+   * is rendered as
+   * <pre>
+   * {@code
+   *  <parameterList>
+   *  </parameterList>
+   * }</pre>
+   *
+   * and indentation is respected
+   */
+  private static void addLFPlusPaddingToEmptyNodes(Node node) {
+    NodeList list = node.getChildNodes();
+    for (int i = 0; i < list.getLength(); i++) {
+      addLFPlusPaddingToEmptyNodes(list.item(i));
+    }
+    boolean emptyElement = node.getNodeType() == Node.ELEMENT_NODE
+        && node.getChildNodes().getLength() == 0;
+    if (emptyElement) {
+      int level = 0;
+      Node parent = node.getParentNode();
+      while (!(parent instanceof Document)) { // stop when reach root document
+        level++;
+        parent = parent.getParentNode();
+      }
+      String leftPadding = String.format("%" + (level * INDENT) + "s", "");
+      node.appendChild(node.getOwnerDocument().createTextNode("\n" + leftPadding));
+    }
+  }
   private static void removeNodesEmptyOrWhiteSpace(Node node) {
     NodeList list = node.getChildNodes();
     for (int i = 0; i < list.getLength(); i++) {

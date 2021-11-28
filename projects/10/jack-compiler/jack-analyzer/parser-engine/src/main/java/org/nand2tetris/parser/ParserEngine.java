@@ -8,6 +8,7 @@ import static org.nand2tetris.tokenizer.Keyword.DO;
 import static org.nand2tetris.tokenizer.Keyword.ELSE;
 import static org.nand2tetris.tokenizer.Keyword.FIELD;
 import static org.nand2tetris.tokenizer.Keyword.FUNCTION;
+import static org.nand2tetris.tokenizer.Keyword.IF;
 import static org.nand2tetris.tokenizer.Keyword.INT;
 import static org.nand2tetris.tokenizer.Keyword.LET;
 import static org.nand2tetris.tokenizer.Keyword.METHOD;
@@ -49,7 +50,6 @@ import org.nand2tetris.parser.ast.SubroutineDecNode;
 import org.nand2tetris.parser.ast.TermNode;
 import org.nand2tetris.parser.ast.VarDecNode;
 import org.nand2tetris.parser.ast.WhileNode;
-import org.nand2tetris.tokenizer.Keyword;
 import org.nand2tetris.tokenizer.Token;
 import org.nand2tetris.tokenizer.TokenType;
 import org.nand2tetris.tokenizer.Tokenizer;
@@ -187,7 +187,7 @@ public class ParserEngine implements Parser {
     }
     SubroutineDecNode node = new SubroutineDecNode();
     node.setRoutineType(token);
-    node.setReturnType(captureTokenOfType(isVoidToken().or(isTypeToken())));
+    node.setReturnType(captureTokenOfType(isVoidOrTypeToken()));
     node.setRoutineName(captureTokenOfType(isSubroutineName()));
     captureTokenOfType(isOpenParen());
     node.setParameterListNode(parseParameterList());
@@ -494,12 +494,25 @@ public class ParserEngine implements Parser {
 
   private void ensureValidToken(Token token, Predicate<Token> predicate) {
     if (!predicate.test(token)) {
-      throw new RuntimeException("invalid token " + token);
+      String error = String.format("invalid token %s - expected %s", token, predicate);
+      throw new RuntimeException(error);
     }
   }
 
   private Predicate<Token> isSubroutineName() {
     return isIdentifierToken();
+  }
+
+  /**
+   * 'void' | type
+   */
+  private Predicate<Token> isVoidOrTypeToken() {
+    return new ExplainablePredicate<>(isVoidToken().or(isTypeToken()),
+        "'void' or " + getTypeRuleDefinition());
+  }
+
+  private String getTypeRuleDefinition() {
+    return "type = 'int' | 'char' | 'boolean' | className";
   }
 
   private Predicate<Token> isDotToken() {
@@ -523,7 +536,7 @@ public class ParserEngine implements Parser {
   }
 
   private Predicate<Token> isIfToken() {
-    return isKeyword(Keyword.IF);
+    return isKeyword(IF);
   }
 
   private Predicate<Token> isReturnToken() {
@@ -538,9 +551,11 @@ public class ParserEngine implements Parser {
    * 'int' | 'char' | 'boolean' | className
    */
   private Predicate<Token> isTypeToken() {
-    return isIntToken().or(isCharToken()).or(isBooleanToken()).or(
+    Predicate<Token> p = isIntToken().or(isCharToken()).or(isBooleanToken()).or(
         isIdentifierToken());
+    return new ExplainablePredicate<>(p, getTypeRuleDefinition());
   }
+
   private Predicate<Token> isClassToken() {
     return isKeyword(CLASS);
   }
@@ -585,26 +600,6 @@ public class ParserEngine implements Parser {
     return isKeyword(BOOLEAN);
   }
 
-  private Predicate<Token> isKeyword(String lexeme) {
-    return isKeywordToken().and(isLexeme(lexeme));
-  }
-
-  private Predicate<Token> isIdentifierToken() {
-    return isTokenType(TokenType.IDENTIFIER);
-  }
-
-  private Predicate<Token> isKeywordToken() {
-    return isTokenType(TokenType.KEYWORD);
-  }
-
-  private Predicate<Token> isTokenType(TokenType type) {
-    return token -> token.getType() == type;
-  }
-
-  private Predicate<Token> isLexeme(String lexeme) {
-    return token -> token.getLexeme().equals(lexeme);
-  }
-
   private Predicate<Token> isOpenParen() {
     return isSymbol(OPEN_PAREN);
   }
@@ -628,8 +623,54 @@ public class ParserEngine implements Parser {
   private Predicate<Token> isSemicolon() {
     return isSymbol(SEMICOLON);
   }
+
   private Predicate<Token> isSymbol(String lexeme) {
-    return isTokenType(TokenType.SYMBOL).and(isLexeme(lexeme));
+    return new ExplainablePredicate<>(isSymbolToken().and(isLexeme(lexeme)),
+        Token.symbolToken(lexeme).toString());
   }
 
+  private Predicate<Token> isKeyword(String lexeme) {
+    return new ExplainablePredicate<>(isKeywordToken().and(isLexeme(lexeme)),
+        Token.keywordToken(lexeme).toString());
+  }
+
+  private Predicate<Token> isLexeme(String lexeme) {
+    return token -> token.getLexeme().equals(lexeme);
+  }
+
+  private Predicate<Token> isSymbolToken() {
+    return isTokenType(TokenType.SYMBOL);
+  }
+
+  private Predicate<Token> isIdentifierToken() {
+    return isTokenType(TokenType.IDENTIFIER);
+  }
+
+  private Predicate<Token> isKeywordToken() {
+    return isTokenType(TokenType.KEYWORD);
+  }
+
+  private Predicate<Token> isTokenType(TokenType type) {
+    return token -> token.getType() == type;
+  }
+
+  private static class ExplainablePredicate<T> implements Predicate<T> {
+
+    private final Predicate<T> predicate;
+    private final String message;
+
+    ExplainablePredicate(Predicate<T> predicate, String message) {
+      this.predicate = predicate;
+      this.message = message;
+    }
+    @Override
+    public boolean test(T t) {
+      return predicate.test(t);
+    }
+
+    @Override
+    public String toString() {
+      return message;
+    }
+  }
 }

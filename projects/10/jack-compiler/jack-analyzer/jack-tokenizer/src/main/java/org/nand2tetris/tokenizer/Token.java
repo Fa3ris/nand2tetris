@@ -121,4 +121,12 @@ public class Token {
   public static Token whileToken() {
     return Token.build(TokenType.KEYWORD, WHILE);
   }
+
+  public static Token symbolToken(String lexeme) {
+    return Token.build(TokenType.SYMBOL, lexeme);
+  }
+
+  public static Token keywordToken(String lexeme) {
+    return Token.build(TokenType.KEYWORD, lexeme);
+  }
 }

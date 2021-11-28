@@ -38,6 +38,7 @@ import org.nand2tetris.parser.utils.Joiner;
 import org.nand2tetris.parser.utils.TagNames;
 import org.nand2tetris.parser.utils.XMLUtils;
 import org.nand2tetris.tokenizer.CharReader;
+import org.nand2tetris.tokenizer.CounterCharReader;
 import org.nand2tetris.tokenizer.FileCharReader;
 import org.nand2tetris.tokenizer.FileTokenizer;
 import org.nand2tetris.tokenizer.Token;
@@ -76,7 +77,7 @@ public abstract class TestUtils {
     }
   }
 
-  public static void assertASTXML(AST ast, File file) {
+  private static void assertASTXML(AST ast, File file) {
     String actual = ast.toXMLString();
     Source actualSource = Input.fromString(actual).build();
     Source expectedSource = Input.fromFile(file).build();
@@ -90,9 +91,20 @@ public abstract class TestUtils {
 
   public static void assertASTXML(File inputJackFile, File expectedXMLFile) {
     CharReader charReader = new FileCharReader(inputJackFile.toPath());
-    Tokenizer tokenizer = new FileTokenizer(charReader);
+    CounterCharReader counterCharReader = new CounterCharReader(charReader);
+    Tokenizer tokenizer = new FileTokenizer(counterCharReader);
     Parser parser = new ParserEngine(tokenizer);
-    assertASTXML(parser.parse(), expectedXMLFile);
+    AST ast;
+    try {
+      ast = parser.parse();
+    } catch (Exception e) {
+      String msg = String.format("parse error at line %s column %s\n%s",
+          counterCharReader.getLineNumber() + 1,
+          counterCharReader.getColumnNumber() + 1,
+          counterCharReader.getLineContent());
+      throw new RuntimeException(msg, e);
+    }
+    assertASTXML(ast, expectedXMLFile);
   }
 
 

@@ -12,7 +12,6 @@ import static org.nand2tetris.tokenizer.Token.semicolon;
 import static org.nand2tetris.tokenizer.Token.varToken;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -83,12 +82,8 @@ public abstract class TestUtils {
     }
 
     String actual = ast.toXMLString();
-    try {
-      assertXML(actual, expectedXMLFile);
-    } catch (Error e) {
-      writeActualFile(actual, expectedXMLFile);
-      throw e;
-    }
+    writeActualFile(actual, expectedXMLFile);
+    assertXML(actual, expectedXMLFile);
   }
 
   private static void assertASTXML(AST ast, File file) {
@@ -202,7 +197,6 @@ public abstract class TestUtils {
     DocumentBuilder builder;
     builder = factory.newDocumentBuilder();
     Document document = builder.parse(new InputSource(new StringReader(s)));
-    removeNodesEmptyOrWhiteSpace(document);
     return document;
   }
 
@@ -218,7 +212,6 @@ public abstract class TestUtils {
     transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, XML_OUTPUT_VALUE);
     transformer.setOutputProperty(OutputKeys.INDENT, XML_OUTPUT_VALUE);
     transformer.setOutputProperty(OutputKeys.STANDALONE, XML_OUTPUT_VALUE);
-
     StringWriter writer = new StringWriter();
     transformer.transform(new DOMSource(document), new StreamResult(writer));
     return writer.getBuffer().toString();

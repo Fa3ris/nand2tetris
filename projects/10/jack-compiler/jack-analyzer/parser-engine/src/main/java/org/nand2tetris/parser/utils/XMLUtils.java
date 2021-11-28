@@ -12,9 +12,11 @@ import static org.nand2tetris.tokenizer.Keyword.METHOD;
 import static org.nand2tetris.tokenizer.Keyword.STATIC;
 import static org.nand2tetris.tokenizer.Keyword.VOID;
 import static org.nand2tetris.tokenizer.Symbol.CLOSE_BRACE;
+import static org.nand2tetris.tokenizer.Symbol.CLOSE_BRACK;
 import static org.nand2tetris.tokenizer.Symbol.CLOSE_PAREN;
 import static org.nand2tetris.tokenizer.Symbol.COMMA;
 import static org.nand2tetris.tokenizer.Symbol.OPEN_BRACE;
+import static org.nand2tetris.tokenizer.Symbol.OPEN_BRACK;
 import static org.nand2tetris.tokenizer.Symbol.OPEN_PAREN;
 import static org.nand2tetris.tokenizer.Symbol.SEMICOLON;
 
@@ -74,8 +76,6 @@ public abstract class XMLUtils {
     return keywordTag(VOID);
   }
 
-
-
   public static String intTag() {
     return keywordTag(INT);
   }
@@ -108,6 +108,14 @@ public abstract class XMLUtils {
     return symbolTag(CLOSE_PAREN);
   }
 
+  public static String openBracketTag() {
+    return symbolTag(OPEN_BRACK);
+  }
+
+  public static String closeBracketTag() {
+    return symbolTag(CLOSE_BRACK);
+  }
+
   public static String varTag() {
     return keywordTag(TagNames.varTag);
   }
@@ -135,7 +143,27 @@ public abstract class XMLUtils {
     if (token.getType() == TokenType.IDENTIFIER) {
       return identifierTag(token.getLexeme());
     }
+
+    if (token.getType() == TokenType.STRING) {
+      return stringConstantTag(token.getLexeme());
+    }
+
+    if (token.getType() == TokenType.INTEGER) {
+      return integerConstantTag(token.getLexeme());
+    }
+
+    if (token.getType() == TokenType.SYMBOL) {
+      return symbolTag(token.getLexeme());
+    }
     return leafTag("", token.getLexeme());
+  }
+
+  private static String stringConstantTag(String lexeme) {
+    return leafTag(TagNames.stringConstant, lexeme);
+  }
+
+  private static String integerConstantTag(String lexeme) {
+    return leafTag(TagNames.integerConstant, lexeme);
   }
 
   public static String identifierTag(String innerText) {
@@ -199,4 +227,6 @@ public abstract class XMLUtils {
     return nodes.stream().map(Node::toXMLString).collect(
         Collectors.toList());
   }
+
+
 }

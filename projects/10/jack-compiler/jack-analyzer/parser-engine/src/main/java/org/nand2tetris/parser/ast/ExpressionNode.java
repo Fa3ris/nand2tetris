@@ -1,5 +1,8 @@
 package org.nand2tetris.parser.ast;
 
+import static org.nand2tetris.parser.utils.XMLUtils.formatTag;
+import static org.nand2tetris.parser.utils.XMLUtils.letTag;
+
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,9 +26,22 @@ public class ExpressionNode extends AbstractNode{
 
   @Override
   protected List<String> childrenTags() {
-    return Arrays.asList(
-        term.toXMLString()
-    );
+    List<String> tags = new LinkedList<>();
+    tags.add(term.toXMLString());
+
+    if (ops.size() != additionalTerms.size()) {
+      String msg = String.format("mismatch op [%s] and term [%s]", ops.size(),
+          additionalTerms.size());
+      throw new IllegalStateException(msg);
+    }
+
+    if (ops.size() > 0) {
+      for (int i = 0; i < ops.size(); i++) {
+        tags.add(formatTag(ops.get(i)));
+        tags.add(additionalTerms.get(i).toXMLString());
+      }
+    }
+    return tags;
   }
 
   public void addOp(Token token) {

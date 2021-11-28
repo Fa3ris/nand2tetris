@@ -36,4 +36,6 @@ public abstract class TagNames {
   public static final String ifStatement = "ifStatement";
   public static final String whileStatement = "whileStatement";
   public static final String whileTag = Keyword.WHILE;
+  public static final String stringConstant = "stringConstant";
+  public static final String integerConstant = "integerConstant";
 }

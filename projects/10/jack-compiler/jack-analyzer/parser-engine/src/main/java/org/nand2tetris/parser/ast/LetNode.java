@@ -1,8 +1,10 @@
 package org.nand2tetris.parser.ast;
 
+import static org.nand2tetris.parser.utils.XMLUtils.closeBracketTag;
 import static org.nand2tetris.parser.utils.XMLUtils.equalTag;
 import static org.nand2tetris.parser.utils.XMLUtils.formatTag;
 import static org.nand2tetris.parser.utils.XMLUtils.letTag;
+import static org.nand2tetris.parser.utils.XMLUtils.openBracketTag;
 import static org.nand2tetris.parser.utils.XMLUtils.semicolonTag;
 
 import java.util.LinkedList;
@@ -38,6 +40,11 @@ public class LetNode extends AbstractNode {
     List<String> tags = new LinkedList<>();
     tags.add(letTag());
     tags.add(formatTag(varName));
+    if (leftExpression != null) {
+      tags.add(openBracketTag());
+      tags.add(leftExpression.toXMLString());
+      tags.add(closeBracketTag());
+    }
     tags.add(equalTag());
     tags.add(rightExpression.toXMLString());
     tags.add(semicolonTag());

@@ -6,12 +6,14 @@ import static org.nand2tetris.tokenizer.Keyword.CLASS;
 import static org.nand2tetris.tokenizer.Keyword.CONSTRUCTOR;
 import static org.nand2tetris.tokenizer.Keyword.DO;
 import static org.nand2tetris.tokenizer.Keyword.ELSE;
+import static org.nand2tetris.tokenizer.Keyword.FALSE;
 import static org.nand2tetris.tokenizer.Keyword.FIELD;
 import static org.nand2tetris.tokenizer.Keyword.FUNCTION;
 import static org.nand2tetris.tokenizer.Keyword.IF;
 import static org.nand2tetris.tokenizer.Keyword.INT;
 import static org.nand2tetris.tokenizer.Keyword.LET;
 import static org.nand2tetris.tokenizer.Keyword.METHOD;
+import static org.nand2tetris.tokenizer.Keyword.NULL;
 import static org.nand2tetris.tokenizer.Keyword.RETURN;
 import static org.nand2tetris.tokenizer.Keyword.STATIC;
 import static org.nand2tetris.tokenizer.Keyword.VAR;
@@ -51,6 +53,7 @@ import org.nand2tetris.parser.ast.TermNode;
 import org.nand2tetris.parser.ast.VarDecNode;
 import org.nand2tetris.parser.ast.WhileNode;
 import org.nand2tetris.tokenizer.Keyword;
+import org.nand2tetris.tokenizer.Symbol;
 import org.nand2tetris.tokenizer.Token;
 import org.nand2tetris.tokenizer.TokenType;
 import org.nand2tetris.tokenizer.Tokenizer;
@@ -409,6 +412,13 @@ public class ParserEngine implements Parser {
     captureTokenOfType(isLetToken());
     LetNode node = new LetNode();
     node.setVarName(captureTokenOfType(isIdentifierToken()));
+    captureToken();
+    if (isOpenBracket().test(token)) {
+      node.setLeftExpression(parseExpression());
+      captureTokenOfType(isCloseBracket());
+    } else {
+      pushBackToken();
+    }
     captureTokenOfType(isEqualToken());
     node.setRightExpression(parseExpression());
     captureTokenOfType(isSemicolon());
@@ -453,6 +463,9 @@ public class ParserEngine implements Parser {
 
   /**
    * term (op term)*
+   *
+   * op = '+' | '-' | '*' | '/' | '&' | '|' | '<' | '>' | '='
+   * first term may be null due to expressionList rule
    */
   private Node parseExpression() {
     Node term = parseTerm();
@@ -461,8 +474,19 @@ public class ParserEngine implements Parser {
     }
     ExpressionNode node = new ExpressionNode();
     node.addTerm(term);
-    return node;
+    while (true) {
+      captureToken();
+      if (isOpToken().test(token)) {
+        node.addOp(token);
+        node.addAdditionalTerm(parseTerm());
+      } else {
+        pushBackToken();
+        return node;
+      }
+    }
   }
+
+
 
   /**
    * integerConstant
@@ -476,19 +500,121 @@ public class ParserEngine implements Parser {
    */
   private Node parseTerm() {
     captureToken();
+    // varName | subroutineCall | varName '[' expression ']'
     if (isIdentifierToken().test(token)) {
       TermNode node = new TermNode();
-      node.addVarName(token);
+      Token identifier = token;
+      captureToken();
+      node.addVarName(identifier);
+      // subroutineCall = (className | varName) '.' subroutineName '(' expressionList ')'
+      if (isDotToken().test(token)) {
+        captureTokenOfType(isIdentifierToken());
+        node.addSubroutineName(token);
+        captureTokenOfType(isOpenParen());
+        node.addExpressionList(parseExpressionList());
+        captureTokenOfType(isCloseParen());
+      // subroutineCall = subroutineName '(' expressionList ')'
+      } else if (isOpenParen().test(token)) {
+        node.addExpressionList(parseExpressionList());
+        captureTokenOfType(isCloseParen());
+      // varName '[' expression ']'
+      } else if (isOpenBracket().test(token)) {
+        node.addIndexExpression(parseExpression());
+        captureTokenOfType(isCloseBracket());
+      // varName
+      } else {
+        pushBackToken();
+      }
       return node;
     }
 
-    if (isThisToken().test(token)) {
+    // keywordConstant = 'true' | 'false' | 'null' | 'this'
+    if (isThisToken().or(isFalseToken()).or(isNullToken()).test(token)) {
       TermNode node = new TermNode();
       node.addKeywordConstant(token);
       return node;
     }
+
+    if (isStringConstant().test(token)) {
+      TermNode node = new TermNode();
+      node.addStringConstant(token);
+      return node;
+    }
+
+    if (isIntegerConstant().test(token)) {
+      TermNode node = new TermNode();
+      node.addIntegerConstant(token);
+      return node;
+    }
+
+    // '(' expression ')'
+    if (isOpenParen().test(token)) {
+      TermNode node = new TermNode();
+      node.addParenExpression(parseExpression());
+      captureTokenOfType(isCloseParen());
+      return node;
+    }
+
+    // unaryOp term
+    if (isUnaryOp().test(token)) {
+      TermNode node = new TermNode();
+      node.addUnaryOp(token);
+      node.addUnaryTerm(parseTerm());
+      return node;
+    }
     pushBackToken();
     return null;
+  }
+
+  /**
+   * op = '+' | '-' | '*' | '/' | '&' | '|' | '<' | '>' | '='
+   */
+  private Predicate<Token> isOpToken() {
+    return isStarToken().or(isSlashToken()).or(isOrToken());
+  }
+
+  private Predicate<Token> isOrToken() {
+    return isSymbol(Symbol.OR);
+  }
+
+  private Predicate<Token> isSlashToken() {
+    return isSymbol(Symbol.SLASH);
+  }
+
+  private Predicate<Token> isStarToken() {
+    return isSymbol(Symbol.STAR);
+  }
+
+  /**
+   * unaryOp = '-' | '~'
+   */
+  private Predicate<Token> isUnaryOp() {
+    return isSymbol(Symbol.MINUS);
+  }
+
+
+  private Predicate<Token> isCloseBracket() {
+    return isSymbol(Symbol.CLOSE_BRACK);
+  }
+
+  private Predicate<Token> isOpenBracket() {
+    return isSymbol(Symbol.OPEN_BRACK);
+  }
+
+  private Predicate<? super Token> isNullToken() {
+    return isKeyword(NULL);
+  }
+
+  private Predicate<Token> isStringConstant() {
+    return isTokenType(TokenType.STRING);
+  }
+
+  private Predicate<Token> isIntegerConstant() {
+    return isTokenType(TokenType.INTEGER);
+  }
+
+  private Predicate<? super Token> isFalseToken() {
+    return isKeyword(FALSE);
   }
 
   private Predicate<Token> isThisToken() {

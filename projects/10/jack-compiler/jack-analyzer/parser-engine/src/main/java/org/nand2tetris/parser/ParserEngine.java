@@ -50,6 +50,7 @@ import org.nand2tetris.parser.ast.SubroutineDecNode;
 import org.nand2tetris.parser.ast.TermNode;
 import org.nand2tetris.parser.ast.VarDecNode;
 import org.nand2tetris.parser.ast.WhileNode;
+import org.nand2tetris.tokenizer.Keyword;
 import org.nand2tetris.tokenizer.Token;
 import org.nand2tetris.tokenizer.TokenType;
 import org.nand2tetris.tokenizer.Tokenizer;
@@ -435,10 +436,19 @@ public class ParserEngine implements Parser {
   private Node parseExpressionList() {
     ExpressionListNode node = new ExpressionListNode();
     Node expression = parseExpression();
-    if (expression != null) {
-      node.addExpression(expression);
+    if (expression == null) {
+      return node;
     }
-    return node;
+    node.addExpression(expression);
+    while (true) {
+      captureToken();
+      if (isComma().test(token)) {
+        node.addExpression(parseExpression());
+      } else {
+        pushBackToken();
+        return node;
+      }
+    }
   }
 
   /**
@@ -457,7 +467,7 @@ public class ParserEngine implements Parser {
   /**
    * integerConstant
    * | stringConstant
-   * | keywordConstant
+   * | keywordConstant = 'true' | 'false' | 'null' | 'this'
    * | varName
    * | varName '[' expression ']'
    * | subroutineCall
@@ -471,8 +481,18 @@ public class ParserEngine implements Parser {
       node.addVarName(token);
       return node;
     }
+
+    if (isThisToken().test(token)) {
+      TermNode node = new TermNode();
+      node.addKeywordConstant(token);
+      return node;
+    }
     pushBackToken();
     return null;
+  }
+
+  private Predicate<Token> isThisToken() {
+    return isKeyword(Keyword.THIS);
   }
 
   private Token captureTokenOfType(Predicate<Token> predicate) {

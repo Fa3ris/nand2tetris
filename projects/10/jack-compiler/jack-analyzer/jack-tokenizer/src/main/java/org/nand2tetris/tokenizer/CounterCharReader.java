@@ -8,6 +8,8 @@ public class CounterCharReader implements CharReader {
     this.reader = reader;
   }
 
+  private final StringBuilder sb = new StringBuilder();
+
   private int lineNumber;
   private int columnNumber;
   @Override
@@ -20,11 +22,13 @@ public class CounterCharReader implements CharReader {
       if (charRead == '\n') {
         lineNumber++;
         columnNumber = 0;
+        sb.setLength(0); // reset
         return;
       }
       if (charRead == '\r') {
         return;
       }
+      sb.append(charRead);
       columnNumber++;
   }
 
@@ -44,5 +48,27 @@ public class CounterCharReader implements CharReader {
 
   public int getColumnNumber() {
     return columnNumber;
+  }
+
+  public String getLineContent() {
+    fillBufferUntilLFOrEOF();
+    return sb.toString();
+  }
+
+  private void fillBufferUntilLFOrEOF() {
+    if (reader.isEOF()) {
+      return;
+    }
+    while (true) {
+      reader.advance();
+      if (reader.isEOF()) {
+        return;
+      }
+      char charRead = reader.peekChar();
+      if (charRead == '\n' || charRead == '\r') {
+        return;
+      }
+      sb.append(charRead);
+    }
   }
 }

@@ -93,6 +93,25 @@ public class CounterCharReaderTest {
     assertEquals(content.length(), reader.getColumnNumber());
   }
 
+  @Test
+  public void getLineContentFirstLine() throws Exception {
+    String content = reader.getLineContent();
+    assertEquals("// This file is part of www.nand2tetris.org", content);
+  }
+
+  @Test
+  public void getLineContentSecondLine() throws Exception {
+    advanceNTimes(secondLineFirstChar);
+    String content = reader.getLineContent();
+    assertEquals("// and the book \"The Elements of Computing Systems\"", content);
+  }
+
+  @Test
+  public void getLineContentEOF() throws Exception {
+    toEOF();
+    assertEquals("// File name: projects/10/ExpressionLessSquare/SquareGame.jack", reader.getLineContent());
+  }
+
   private Path writeToTempFile(String content) throws Exception {
     File createdFile= folder.newFile("temp.txt");
     Path path = createdFile.toPath();

@@ -153,9 +153,22 @@ public abstract class XMLUtils {
     }
 
     if (token.getType() == TokenType.SYMBOL) {
-      return symbolTag(token.getLexeme());
+      return symbolTag(overrideLexeme(token.getLexeme()));
     }
     return leafTag("", token.getLexeme());
+  }
+
+  private static String overrideLexeme(String lexeme) {
+    switch (lexeme) {
+      case "<":
+        return "&lt;";
+      case ">":
+        return "&gt;";
+      case "&":
+        return "&amp;";
+      default:
+        return lexeme;
+    }
   }
 
   private static String stringConstantTag(String lexeme) {

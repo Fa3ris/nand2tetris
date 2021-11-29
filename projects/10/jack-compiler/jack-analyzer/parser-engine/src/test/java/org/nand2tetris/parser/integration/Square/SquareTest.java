@@ -14,13 +14,11 @@ public class SquareTest {
   }
 
   @Test
-  @Ignore
   public void SquareGame() throws Exception {
     assertEqualXML("SquareGame");
   }
 
   @Test
-  @Ignore
   public void Square() throws Exception {
     assertEqualXML("Square");
   }

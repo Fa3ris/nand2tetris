@@ -191,7 +191,13 @@ public abstract class TestUtils {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder;
     builder = factory.newDocumentBuilder();
-    Document document = builder.parse(new InputSource(new StringReader(s)));
+    Document document;
+    try {
+      document = builder.parse(new InputSource(new StringReader(s)));
+    } catch (Exception e) {
+      System.out.println(s);
+      throw e;
+    }
     addLFPlusPaddingToEmptyNodes(document);
     return document;
   }

@@ -529,7 +529,7 @@ public class ParserEngine implements Parser {
     }
 
     // keywordConstant = 'true' | 'false' | 'null' | 'this'
-    if (isThisToken().or(isFalseToken()).or(isNullToken()).test(token)) {
+    if (isThisToken().or(isFalseToken()).or(isNullToken()).or(isTrueToken()).test(token)) {
       TermNode node = new TermNode();
       node.addKeywordConstant(token);
       return node;
@@ -566,11 +566,43 @@ public class ParserEngine implements Parser {
     return null;
   }
 
+  private Predicate<? super Token> isTrueToken() {
+    return isKeyword(Keyword.TRUE);
+  }
+
   /**
    * op = '+' | '-' | '*' | '/' | '&' | '|' | '<' | '>' | '='
    */
   private Predicate<Token> isOpToken() {
-    return isStarToken().or(isSlashToken()).or(isOrToken());
+    return isStarToken()
+        .or(isSlashToken())
+        .or(isOrToken())
+        .or(isPlusToken())
+        .or(isLessThanToken())
+        .or(isAndToken())
+        .or(isGreaterThanToken())
+        .or(isMinusToken())
+        .or(isEqualToken());
+  }
+
+  private Predicate<Token> isMinusToken() {
+    return isSymbol(Symbol.MINUS);
+  }
+
+  private Predicate<? super Token> isGreaterThanToken() {
+    return isSymbol(Symbol.GT);
+  }
+
+  private Predicate<? super Token> isAndToken() {
+    return isSymbol(Symbol.AND);
+  }
+
+  private Predicate<? super Token> isLessThanToken() {
+    return isSymbol(Symbol.LT);
+  }
+
+  private Predicate<Token> isPlusToken() {
+    return isSymbol(Symbol.PLUS);
   }
 
   private Predicate<Token> isOrToken() {
@@ -589,7 +621,11 @@ public class ParserEngine implements Parser {
    * unaryOp = '-' | '~'
    */
   private Predicate<Token> isUnaryOp() {
-    return isSymbol(Symbol.MINUS);
+    return isMinusToken().or(isNotToken());
+  }
+
+  private Predicate<? super Token> isNotToken() {
+    return isSymbol(Symbol.NOT);
   }
 
 

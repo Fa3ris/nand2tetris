@@ -16,6 +16,11 @@ public abstract class AbstractNode implements Node {
     return concat(encloseInTag(parentTag(), childrenTags()));
   }
 
+  @Override
+  public void accept(NodeVisitor visitor) {
+    
+  }
+
   protected String parentTag() { return "";}
   protected List<String> childrenTags() { return Collections.emptyList(); }
 

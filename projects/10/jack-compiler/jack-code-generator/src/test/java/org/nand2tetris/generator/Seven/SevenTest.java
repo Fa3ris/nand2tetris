@@ -2,6 +2,7 @@ package org.nand2tetris.generator.Seven;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -29,8 +30,9 @@ public class SevenTest {
 
     Path actualVmPath = IOUtils.siblingPath(inputPath, "-actual.vm");
 
-    try (BufferedWriter writer = Files.newBufferedWriter(actualVmPath)) {
-      CodeGeneratorWriter generator = new CodeGeneratorWriter(writer);
+    try (BufferedWriter writer = Files.newBufferedWriter(actualVmPath);
+        PrintWriter printWriter = new PrintWriter(writer);
+        CodeGeneratorWriter generator = new CodeGeneratorWriter(printWriter)) {
       generator.generate(ast);
     }
 

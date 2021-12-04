@@ -5,13 +5,11 @@ import java.util.List;
 
 public class JackAST implements AST {
 
-  private Node root;
-
-  private List<Node> nodes = new ArrayList<>();
+  private final List<Node> nodes = new ArrayList<>();
 
   @Override
   public Node getRoot() {
-    return root;
+    return nodes.get(0);
   }
 
   @Override

@@ -44,11 +44,8 @@ public class ExpressionNode extends AbstractNode{
     return tags;
   }
 
-  public void addOp(Token token) {
-    ops.add(token);
-  }
-
-  public void addAdditionalTerm(Node term) {
+  public void addAdditionalTerm(Token op, Node term) {
+    ops.add(op);
     additionalTerms.add(term);
   }
 }

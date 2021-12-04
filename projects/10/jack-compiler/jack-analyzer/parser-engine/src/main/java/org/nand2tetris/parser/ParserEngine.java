@@ -477,8 +477,7 @@ public class ParserEngine implements Parser {
     while (true) {
       captureToken();
       if (isOpToken().test(token)) {
-        node.addOp(token);
-        node.addAdditionalTerm(parseTerm());
+        node.addAdditionalTerm(token, parseTerm());
       } else {
         pushBackToken();
         return node;

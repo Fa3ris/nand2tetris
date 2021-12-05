@@ -22,7 +22,7 @@ import org.nand2tetris.parser.ast.WhileNode;
 import org.nand2tetris.tokenizer.Symbol;
 import org.nand2tetris.tokenizer.Token;
 
-public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor, AutoCloseable {
+public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
 
   private final Command command;
 

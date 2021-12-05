@@ -25,8 +25,8 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor, AutoClos
 
   private final Command command;
 
-  public CodeGeneratorWriter(PrintWriter writer) {
-    command = new Command(writer);
+  public CodeGeneratorWriter(Command command) {
+    this.command = command;
   }
 
   @Override

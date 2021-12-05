@@ -9,6 +9,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.nand2tetris.generator.CodeGeneratorWriter;
+import org.nand2tetris.generator.command.Command;
 import org.nand2tetris.generator.test_utils.IOUtils;
 import org.nand2tetris.generator.test_utils.ParserUtils;
 import org.nand2tetris.generator.test_utils.XMLPrinter;
@@ -32,7 +33,8 @@ public class SevenTest {
 
     try (BufferedWriter writer = Files.newBufferedWriter(actualVmPath);
         PrintWriter printWriter = new PrintWriter(writer);
-        CodeGeneratorWriter generator = new CodeGeneratorWriter(printWriter)) {
+        Command command = new Command(printWriter);
+        CodeGeneratorWriter generator = new CodeGeneratorWriter(command)) {
       generator.generate(ast);
     }
 

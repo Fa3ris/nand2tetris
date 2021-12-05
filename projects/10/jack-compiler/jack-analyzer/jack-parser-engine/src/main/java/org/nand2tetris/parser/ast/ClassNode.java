@@ -14,8 +14,8 @@ import org.nand2tetris.tokenizer.Token;
 public class ClassNode extends AbstractNode {
 
   private Token className;
-  public final List<Node> classVarDecs = new ArrayList<>();
-  public final List<Node> subRoutineDecs = new ArrayList<>();
+  private final List<Node> classVarDecs = new ArrayList<>();
+  private final List<Node> subRoutineDecs = new ArrayList<>();
 
   public void setClassName(Token name) {
     className = name;
@@ -44,5 +44,20 @@ public class ClassNode extends AbstractNode {
 
   public void addSubroutineDec(Node node) {
     subRoutineDecs.add(node);
+  }
+
+  @Override
+  public void accept(NodeVisitor visitor) {
+    visitor.visit(this);
+    for (Node classVarDec : classVarDecs) {
+      classVarDec.accept(visitor);
+    }
+    for (Node subroutineDec : subRoutineDecs) {
+      subroutineDec.accept(visitor);
+    }
+  }
+
+  public String getClassName() {
+    return className.getLexeme();
   }
 }

@@ -18,7 +18,7 @@ public abstract class AbstractNode implements Node {
 
   @Override
   public void accept(NodeVisitor visitor) {
-    throw new UnsupportedOperationException("method accept(NodeVisitor) not implemented");
+    throw new UnsupportedOperationException("method accept(NodeVisitor) not implemented " + this);
   }
 
   protected String parentTag() { return "";}

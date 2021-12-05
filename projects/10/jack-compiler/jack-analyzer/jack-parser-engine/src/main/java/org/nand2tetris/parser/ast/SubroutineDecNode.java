@@ -51,4 +51,19 @@ public class SubroutineDecNode extends AbstractNode {
   public void setSubroutineBodyNode(Node subroutineBodyNode) {
     this.subroutineBodyNode = subroutineBodyNode;
   }
+
+  public String getRoutineType() {
+    return routineType.getLexeme();
+  }
+
+  public String getRoutineName() {
+    return routineName.getLexeme();
+  }
+
+  @Override
+  public void accept(NodeVisitor visitor) {
+    visitor.visit(this);
+    parameterListNode.accept(visitor);
+    subroutineBodyNode.accept(visitor);
+  }
 }

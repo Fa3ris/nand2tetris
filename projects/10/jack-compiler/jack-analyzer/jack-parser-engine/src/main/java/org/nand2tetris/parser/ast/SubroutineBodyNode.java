@@ -38,4 +38,16 @@ public class SubroutineBodyNode extends AbstractNode {
   public void addStatement(Node statement) {
     statements.add(statement);
   }
+
+  @Override
+  public void accept(NodeVisitor visitor) {
+    visitor.visit(this);
+    for (Node varDec : varDecs) {
+      varDec.accept(visitor);
+    }
+    for (Node statement : statements) {
+      statement.accept(visitor);
+    }
+  }
+
 }

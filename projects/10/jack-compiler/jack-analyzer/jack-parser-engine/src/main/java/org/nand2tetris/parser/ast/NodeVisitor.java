@@ -1,5 +1,7 @@
 package org.nand2tetris.parser.ast;
 
+import org.nand2tetris.tokenizer.Token;
+
 public interface NodeVisitor {
 
   void visit(ClassNode node);
@@ -17,5 +19,9 @@ public interface NodeVisitor {
   void visit(TermNode node);
   void visit(VarDecNode node);
   void visit(WhileNode node);
+  void visit(Token token);
 
+  void visitInteger(String integer);
+
+  void visitOperator(String operator);
 }

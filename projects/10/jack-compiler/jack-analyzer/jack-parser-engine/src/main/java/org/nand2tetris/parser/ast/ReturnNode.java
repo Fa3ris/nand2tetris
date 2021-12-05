@@ -20,7 +20,7 @@ public class ReturnNode extends AbstractNode {
   protected List<String> childrenTags() {
     List<String> tags = new ArrayList<>();
     tags.add(returnTag());
-    if (expression != null) {
+    if (hasExpression()) {
       tags.add(expression.toXMLString());
     }
     tags.add(semicolonTag());
@@ -29,5 +29,17 @@ public class ReturnNode extends AbstractNode {
 
   public void setExpression(Node node) {
     expression = node;
+  }
+
+  @Override
+  public void accept(NodeVisitor visitor) {
+    if (hasExpression()) {
+      expression.accept(visitor);
+    }
+    visitor.visit(this);
+  }
+
+  public boolean hasExpression() {
+    return expression != null;
   }
 }

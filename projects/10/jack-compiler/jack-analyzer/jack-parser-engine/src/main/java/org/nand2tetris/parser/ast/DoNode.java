@@ -4,6 +4,7 @@ import static org.nand2tetris.parser.utils.XMLUtils.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.nand2tetris.parser.utils.TagNames;
 import org.nand2tetris.tokenizer.Token;
 
@@ -43,5 +44,22 @@ public class DoNode extends AbstractNode {
 
   public void addExpressionList(Node expressionListNode) {
     this.expressionListNode = expressionListNode;
+  }
+
+  @Override
+  public void accept(NodeVisitor visitor) {
+    expressionListNode.accept(visitor);
+    visitor.visit(this);
+  }
+
+  public Optional<String> getIdentifier() {
+    if (identifier == null) {
+      return Optional.empty();
+    }
+    return Optional.of(this.identifier.getLexeme());
+  }
+
+  public String getSubRoutineName() {
+    return subroutineName.getLexeme();
   }
 }

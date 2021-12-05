@@ -27,4 +27,12 @@ public class ParameterListNode extends AbstractNode {
   public void addArg(Node arg) {
     args.add(arg);
   }
+
+  @Override
+  public void accept(NodeVisitor visitor) {
+    visitor.visit(this);
+    for (Node arg : args) {
+      arg.accept(visitor);
+    }
+  }
 }

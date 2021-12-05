@@ -26,4 +26,16 @@ public class ExpressionListNode extends AbstractNode {
   public void addExpression(Node node) {
     expressions.add(node);
   }
+
+  @Override
+  public void accept(NodeVisitor visitor) {
+    visitor.visit(this);
+    for (Node expression : expressions) {
+      expression.accept(visitor);
+    }
+  }
+
+  public int expressionsTotal() {
+    return expressions.size();
+  }
 }

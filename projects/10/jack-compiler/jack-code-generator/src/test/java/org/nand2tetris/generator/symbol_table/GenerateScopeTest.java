@@ -6,6 +6,8 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 import org.nand2tetris.generator.CodeGeneratorWriter;
@@ -44,8 +46,23 @@ public class GenerateScopeTest {
     Path expectedVmPath = new File(getClass().getResource(baseName + ".vm").getFile()).toPath();
     List<String> expectedLines = IOUtils.linesFromPath(expectedVmPath);
 
+    expectedLines = stripLineComments().apply(expectedLines);
+
     Assert.assertEquals(expectedLines, actualLines);
-    
+
   }
 
+  private Function<List<String>, List<String>> stripLineComments() {
+    return list -> list.stream().map(stripLineComment()).collect(Collectors.toList());
+  }
+
+  private Function<String, String> stripLineComment() {
+    return s -> {
+      int commentStart = s.indexOf("//");
+      if (commentStart > -1) {
+        s = s.substring(0, commentStart).trim();
+      }
+      return s;
+    };
+  }
 }

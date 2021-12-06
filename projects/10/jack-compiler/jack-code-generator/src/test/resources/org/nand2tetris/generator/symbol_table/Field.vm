@@ -1,0 +1,7 @@
+function Field.distance 2 // 2 stands for 2 local vars dx, dy
+push this 0 // x
+push this 1 // y
+sub         // x - y
+pop this 0  // x = x - y
+push constant 0
+return

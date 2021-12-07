@@ -1,7 +1,14 @@
 package org.nand2tetris.generator.symbol_table;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import org.nand2tetris.generator.Scope;
 import org.nand2tetris.generator.Type;
 
@@ -57,5 +64,16 @@ public class SymbolTable {
 
   public int getLocalCount() {
     return localCount + 1;
+  }
+
+  public String description() {
+    List<TableEntry> entries = new ArrayList<>(classTable.size() + subroutineTable.size());
+
+    entries.addAll(classTable.values());
+    entries.addAll(subroutineTable.values());
+
+    entries.sort(Comparator.comparing(TableEntry::getScope).thenComparing(TableEntry::getIndex));
+
+    return entries.stream().map(entry -> "\t\t" + entry.description()).collect(Collectors.joining("\n"));
   }
 }

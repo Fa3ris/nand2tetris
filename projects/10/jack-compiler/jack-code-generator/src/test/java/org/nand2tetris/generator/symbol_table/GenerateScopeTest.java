@@ -29,6 +29,21 @@ public class GenerateScopeTest {
 
     Path inputPath = new File(getClass().getResource(baseName + ".jack").getFile()).toPath();
 
+    assertCorrectVm(inputPath);
+
+  }
+
+  @Test
+  public void staticTest() throws Exception {
+    String baseName = "Static";
+
+    Path inputPath = new File(getClass().getResource(baseName + ".jack").getFile()).toPath();
+
+    assertCorrectVm(inputPath);
+  }
+
+
+  private void assertCorrectVm(Path inputPath) throws Exception {
     AST ast = ParserUtils.parse(inputPath);
 
     Path astXmlPath = IOUtils.siblingPath(inputPath, "-actual.xml");
@@ -45,13 +60,12 @@ public class GenerateScopeTest {
 
     List<String> actualLines = IOUtils.linesFromPath(actualVmPath);
 
-    Path expectedVmPath = new File(getClass().getResource(baseName + ".vm").getFile()).toPath();
+    Path expectedVmPath = IOUtils.siblingPath(inputPath, ".vm");
     List<String> expectedLines = IOUtils.linesFromPath(expectedVmPath);
 
     expectedLines = stripLineComments().apply(expectedLines);
 
     Assert.assertEquals(expectedLines, actualLines);
-
   }
 
   private Function<List<String>, List<String>> stripLineComments() {

@@ -16,6 +16,10 @@ public class Type {
 
   private final String name;
 
+  public String name() {
+    return name;
+  }
+
   public static Type resolve(String type) {
     if (type == null || type.isEmpty()) {
       throw new IllegalArgumentException("type cannot be empty " + type);

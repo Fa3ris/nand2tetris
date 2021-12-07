@@ -1,12 +1,14 @@
 package org.nand2tetris.generator.symbol_table;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 import org.nand2tetris.generator.Scope;
 import org.nand2tetris.generator.Type;
 
 @EqualsAndHashCode
 @ToString
+@Getter
 public class TableEntry {
 
   private final String name;
@@ -27,5 +29,9 @@ public class TableEntry {
     this.type = type;
     this.scope = scope;
     this.index = index;
+  }
+
+  public String description() {
+    return String.format("%s %s %s %s", type.name(), name, scope.name(), index);
   }
 }

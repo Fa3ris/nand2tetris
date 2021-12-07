@@ -75,7 +75,7 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
     }
 
     for (String name : node.getNames()) {
-      System.out.printf("register class var %s of type %s and scope %s %n", name, type, scope);
+      System.out.printf("\tregister class var %s of type %s and scope %s %n", name, type.name(), scope);
       symbolTable.define(name, type, scope);
     }
 
@@ -88,6 +88,7 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
     routineName = node.getRoutineName();
 
     // reset
+    System.out.printf("\treset symbol table %n%s%n", symbolTable.description());
     symbolTable.resetSubroutine();
   }
 
@@ -101,7 +102,7 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
   @Override
   public void visit(SubroutineBodyNode node) {
     System.out.println("visit SubroutineBodyNode " + String.format("%s.%s", className, routineName) + " " + symbolTable.getLocalCount());
-    System.out.printf("symbol table state %s%n", symbolTable);
+    System.out.printf("\tsymbol table state %n%s%n", symbolTable.description());
     command.function(String.format("%s.%s", className, routineName), symbolTable.getLocalCount());
 
   }
@@ -169,7 +170,7 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
     Type type = Type.resolve(node.getType());
 
     String name = node.getName();
-    System.out.printf("register argument var %s of type %s%n", name, type);
+    System.out.printf("\tregister argument var %s of type %s%n", name, type.name());
     symbolTable.define(name, type, Scope.ARGUMENT);
   }
 
@@ -185,7 +186,7 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
     Type type = Type.resolve(node.getType());
 
     for (String name : node.getNames()) {
-      System.out.printf("register local var %s of type %s%n", name, type);
+      System.out.printf("\tregister local var %s of type %s%n", name, type.name());
       symbolTable.define(name, type, Scope.LOCAL);
     }
 
@@ -234,7 +235,7 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
       throw new IllegalStateException(String.format("unresolved varName %s", varName));
     }
 
-    System.out.printf("push from var %s defined as %s%n", varName, entry);
+    System.out.printf("\tpush from var %s defined as [%s]%n", varName.getLexeme(), entry.description());
     command.push(Segment.resolve(entry.getScope()), entry.getIndex());
   }
 
@@ -247,7 +248,7 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
       throw new IllegalStateException(String.format("unresolved assignment %s", varName));
     }
 
-    System.out.printf("pop to var %s defined as %s%n", varName, entry);
+    System.out.printf("\tpop to var %s defined as [%s]%n", varName.getLexeme(), entry.description());
     command.pop(Segment.resolve(entry.getScope()), entry.getIndex());
 
   }

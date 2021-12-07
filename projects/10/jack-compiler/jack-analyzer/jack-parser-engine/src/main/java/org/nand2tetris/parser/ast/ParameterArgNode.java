@@ -25,4 +25,22 @@ public class ParameterArgNode extends AbstractNode {
   public void setName(Token name) {
     this.name = name;
   }
+
+  @Override
+  public void accept(NodeVisitor visitor) {
+    visitor.visit(this);
+  }
+
+  @Override
+  public String toString() {
+    return String.format("%s %s", type.getLexeme(), name.getLexeme());
+  }
+
+  public String getType() {
+    return type.getLexeme();
+  }
+
+  public String getName() {
+    return name.getLexeme();
+  }
 }

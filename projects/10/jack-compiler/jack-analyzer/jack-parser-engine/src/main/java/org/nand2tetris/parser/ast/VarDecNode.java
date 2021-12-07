@@ -44,4 +44,23 @@ public class VarDecNode extends AbstractNode {
   public void addVarNames(List<Token> tokens) {
     varNames.addAll(tokens);
   }
+
+  @Override
+  public void accept(NodeVisitor visitor) {
+    visitor.visit(this);
+  }
+
+  @Override
+  public String toString() {
+    return String.format("%s %s", type.getLexeme(), varNames.stream().map(Token::getLexeme).collect(
+        Collectors.joining(",")));
+  }
+
+  public String getType() {
+    return type.getLexeme();
+  }
+
+  public List<String> getNames() {
+    return varNames.stream().map(Token::getLexeme).collect(Collectors.toList());
+  }
 }

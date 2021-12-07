@@ -41,10 +41,10 @@ public class SubroutineBodyNode extends AbstractNode {
 
   @Override
   public void accept(NodeVisitor visitor) {
-    visitor.visit(this);
     for (Node varDec : varDecs) {
       varDec.accept(visitor);
     }
+    visitor.visit(this);
     for (Node statement : statements) {
       statement.accept(visitor);
     }

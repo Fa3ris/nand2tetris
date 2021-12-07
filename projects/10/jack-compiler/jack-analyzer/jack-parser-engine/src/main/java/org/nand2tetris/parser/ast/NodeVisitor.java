@@ -24,4 +24,8 @@ public interface NodeVisitor {
   void visitInteger(String integer);
 
   void visitOperator(String operator);
+
+  void visitVarName(Token varName);
+
+  void visitAssignment(Token varName);
 }

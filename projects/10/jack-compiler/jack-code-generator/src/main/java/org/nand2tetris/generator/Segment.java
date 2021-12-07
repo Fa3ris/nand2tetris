@@ -19,4 +19,19 @@ public enum Segment {
   public String value() {
     return value;
   }
+
+  public static Segment resolve(Scope scope) {
+    switch (scope) {
+      case LOCAL:
+        return LOCAL;
+      case FIELD:
+        return THIS;
+      case STATIC:
+        return STATIC;
+      case ARGUMENT:
+        return ARG;
+      default:
+        throw new IllegalArgumentException("invalid scope " + scope);
+    }
+  }
 }

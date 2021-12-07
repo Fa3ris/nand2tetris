@@ -50,4 +50,23 @@ public class LetNode extends AbstractNode {
     tags.add(semicolonTag());
     return tags;
   }
+
+  @Override
+  public void accept(NodeVisitor visitor) {
+    visitor.visit(this);
+    rightExpression.accept(visitor);
+
+    visitor.visitAssignment(varName);
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(String.format("let %s", varName.getLexeme()));
+    if (leftExpression != null) {
+      sb.append(String.format("[%s]", leftExpression));
+    }
+    sb.append(String.format(" = %s", rightExpression));
+    return sb.toString();
+  }
 }

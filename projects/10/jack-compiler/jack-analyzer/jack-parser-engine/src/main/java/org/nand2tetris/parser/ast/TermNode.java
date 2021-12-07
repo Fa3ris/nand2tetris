@@ -284,6 +284,7 @@ public class TermNode extends AbstractNode {
 
     @Override
     public Void doForVarName() {
+      visitor.visitVarName(varName);
       return null;
     }
 

@@ -14,6 +14,13 @@ public class TableEntry {
   private final Scope scope;
   private final int index;
 
+  public Scope getScope() {
+    return scope;
+  }
+
+  public int getIndex() {
+    return index;
+  }
 
   public TableEntry(String name, Type type, Scope scope, int index) {
     this.name = name;

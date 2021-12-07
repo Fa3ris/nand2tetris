@@ -26,6 +26,9 @@ public class Command implements AutoCloseable {
       case ADD:
         writer.println("add");
         break;
+      case SUB:
+        writer.println("sub");
+        break;
     }
 
   }

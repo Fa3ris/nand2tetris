@@ -1,0 +1,5 @@
+function Static.distance 2 // 2 stands for 2 local vars dx, dy
+push constant 10
+pop static 0 // pointCount = 10
+push constant 0
+return

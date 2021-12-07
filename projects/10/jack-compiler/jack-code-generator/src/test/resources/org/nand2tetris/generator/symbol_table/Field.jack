@@ -1,4 +1,4 @@
-class Point {
+class Field {
   field int x, y;
   static int pointCount;
 

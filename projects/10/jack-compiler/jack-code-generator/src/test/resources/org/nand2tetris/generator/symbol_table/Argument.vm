@@ -1,0 +1,7 @@
+function Var.distance 2 // 2 stands for 2 local vars dx, dy
+push argument 0
+pop pointer 0 // THIS = argument 0
+push argument 2
+pop argument 1 // other = pointer
+push constant 0
+return

@@ -1,0 +1,10 @@
+class Var {
+  field int x, y;
+  static int pointCount;
+
+  method int distance(Point other, Rect rect) {
+    var int dx, dy;
+    let dy = -dx;
+    return;
+  }
+}

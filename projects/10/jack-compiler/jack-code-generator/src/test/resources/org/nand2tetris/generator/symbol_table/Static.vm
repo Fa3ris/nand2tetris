@@ -1,4 +1,6 @@
 function Static.distance 2 // 2 stands for 2 local vars dx, dy
+push argument 0
+pop pointer 0 // THIS = argument 0
 push constant 10
 pop static 0 // pointCount = 10
 push constant 0

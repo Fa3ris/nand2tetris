@@ -28,4 +28,6 @@ public interface NodeVisitor {
   void visitVarName(Token varName);
 
   void visitAssignment(Token varName);
+
+  void visitUnaryOperator(Token unaryOp);
 }

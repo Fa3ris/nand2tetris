@@ -84,12 +84,17 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
   @Override
   public void visit(SubroutineDecNode node) {
     System.out.println("visit SubroutineDecNode " + className + " " + node.getRoutineType() + " " + node.getRoutineName());
-    routineType = node.getRoutineType();
-    routineName = node.getRoutineName();
-
     // reset
     System.out.printf("\treset symbol table %n%s%n", symbolTable.description());
     symbolTable.resetSubroutine();
+    routineType = node.getRoutineType();
+    routineName = node.getRoutineName();
+
+    if ("method".equals(routineType)) {
+      System.out.printf("\tdefine 'this' in symbol table of type %s%n", className);
+      symbolTable.define("this", Type.resolve(className), Scope.ARGUMENT);
+    }
+
   }
 
   @Override
@@ -104,6 +109,11 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
     System.out.println("visit SubroutineBodyNode " + String.format("%s.%s", className, routineName) + " " + symbolTable.getLocalCount());
     System.out.printf("\tsymbol table state %n%s%n", symbolTable.description());
     command.function(String.format("%s.%s", className, routineName), symbolTable.getLocalCount());
+
+    if (symbolTable.get("this") != null) {
+      System.out.println("\tbind 'this'");
+      command.bindThis();
+    }
 
   }
 
@@ -221,6 +231,17 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
         break;
       case Symbol.MINUS:
         command.operation(Operation.SUB);
+        break;
+    }
+
+  }
+
+  @Override
+  public void visitUnaryOperator(Token unaryOp) {
+    System.out.println("visit UnaryOperator " + unaryOp);
+    switch (unaryOp.getLexeme()) {
+      case Symbol.MINUS:
+        command.operation(Operation.NEG);
         break;
     }
 

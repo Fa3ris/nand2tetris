@@ -29,6 +29,9 @@ public class Command implements AutoCloseable {
       case SUB:
         writer.println("sub");
         break;
+      case NEG:
+        writer.println("neg");
+        break;
     }
 
   }
@@ -60,5 +63,10 @@ public class Command implements AutoCloseable {
   @Override
   public void close() throws Exception {
     this.writer.close();
+  }
+
+  public void bindThis() {
+    push(Segment.ARG, 0);
+    pop(Segment.POINTER, 0);
   }
 }

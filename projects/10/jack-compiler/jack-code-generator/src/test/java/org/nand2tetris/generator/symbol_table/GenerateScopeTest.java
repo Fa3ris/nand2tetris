@@ -24,21 +24,29 @@ public class GenerateScopeTest {
 
   @Test
   public void field() throws Exception {
-
     String baseName = "Field";
-
     Path inputPath = new File(getClass().getResource(baseName + ".jack").getFile()).toPath();
-
     assertCorrectVm(inputPath);
-
   }
 
   @Test
   public void staticTest() throws Exception {
     String baseName = "Static";
-
     Path inputPath = new File(getClass().getResource(baseName + ".jack").getFile()).toPath();
+    assertCorrectVm(inputPath);
+  }
 
+  @Test
+  public void varTest() throws Exception {
+    String baseName = "Var";
+    Path inputPath = new File(getClass().getResource(baseName + ".jack").getFile()).toPath();
+    assertCorrectVm(inputPath);
+  }
+
+  @Test
+  public void argumentTest() throws Exception {
+    String baseName = "Argument";
+    Path inputPath = new File(getClass().getResource(baseName + ".jack").getFile()).toPath();
     assertCorrectVm(inputPath);
   }
 

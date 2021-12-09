@@ -210,11 +210,7 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
     expressionList.accept(this);
     command.call(String.format("%s.%s", className, subroutineName.getLexeme()), argumentCount);
   }
-
-  @Override
-  public void visit(Token token) {
-    System.out.println("visit Token " + token);
-  }
+  
 
   @Override
   public void visitInteger(Token integer) {
@@ -223,10 +219,14 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
   }
 
   @Override
-  public void visitOperator(Token operator) {
-    System.out.println("visit Operator " + operator);
+  public void visitBinaryOperation(Node additionalTerm, Token binaryOp) {
+    System.out.println("visit BinaryOperation " + binaryOp + " " + additionalTerm);
+    additionalTerm.accept(this);
+    binaryOp(binaryOp);
+  }
 
-    switch (operator.getLexeme()) {
+  private void binaryOp(Token binaryOp) {
+    switch (binaryOp.getLexeme()) {
       case Symbol.PLUS:
         command.operation(Operation.ADD);
         break;
@@ -240,14 +240,18 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
   }
 
   @Override
-  public void visitUnaryOperator(Token unaryOp) {
-    System.out.println("visit UnaryOperator " + unaryOp);
+  public void visitUnaryExpression(Token unaryOp, Node unaryTerm) {
+    System.out.println("visit UnaryExpression " + unaryOp + " " + unaryTerm);
+    unaryTerm.accept(this);
+    unaryOp(unaryOp);
+  }
+
+  private void unaryOp(Token unaryOp) {
     switch (unaryOp.getLexeme()) {
       case Symbol.MINUS:
         command.operation(Operation.NEG);
         break;
     }
-
   }
 
   @Override

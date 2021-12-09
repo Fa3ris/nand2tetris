@@ -61,8 +61,7 @@ public class ExpressionNode extends AbstractNode{
 
     if (ops.size() > 0) {
       for (int i = 0; i < ops.size(); i++) {
-        additionalTerms.get(i).accept(visitor);
-        visitor.visitOperator(ops.get(i));
+        visitor.visitBinaryOperation(additionalTerms.get(i), ops.get(i));
       }
     }
 

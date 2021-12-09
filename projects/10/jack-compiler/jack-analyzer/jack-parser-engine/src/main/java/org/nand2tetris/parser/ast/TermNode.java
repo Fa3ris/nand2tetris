@@ -318,8 +318,7 @@ public class TermNode extends AbstractNode {
     @Override
     public Void doForUnaryExpression() {
       System.out.println("doForUnaryExpression");
-      unaryTerm.accept(visitor);
-      visitor.visitUnaryOperator(unaryOp);
+      visitor.visitUnaryExpression(unaryOp, unaryTerm);
       return null;
     }
 

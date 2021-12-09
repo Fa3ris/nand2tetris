@@ -19,19 +19,18 @@ public interface NodeVisitor {
   void visit(TermNode node);
   void visit(VarDecNode node);
   void visit(WhileNode node);
-  void visit(Token token);
 
   void visitInteger(Token integer);
-
-  void visitOperator(Token operator);
 
   void visitVarName(Token varName);
 
   void visitAssignment(Token varName);
 
-  void visitUnaryOperator(Token unaryOp);
-
   void visitMethodCall(Token varName, Token subroutineName, ExpressionListNode expressionList);
 
   void visitFunctionCall(Token subroutineName, ExpressionListNode expressionList);
+
+  void visitUnaryExpression(Token unaryOp, Node unaryTerm);
+
+  void visitBinaryOperation(Node additionalTerm, Token binaryOp);
 }

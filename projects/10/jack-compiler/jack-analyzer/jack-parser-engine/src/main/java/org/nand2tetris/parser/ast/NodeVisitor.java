@@ -31,7 +31,7 @@ public interface NodeVisitor {
 
   void visitUnaryOperator(Token unaryOp);
 
-  void visitMethodCall(Token varName, Token subroutineName);
+  void visitMethodCall(Token varName, Token subroutineName, ExpressionListNode expressionList);
 
-  void visitFunctionCall(Token subroutineName);
+  void visitFunctionCall(Token subroutineName, ExpressionListNode expressionList);
 }

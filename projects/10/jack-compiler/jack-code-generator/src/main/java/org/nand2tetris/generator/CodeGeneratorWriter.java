@@ -37,7 +37,6 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
   private String routineType;
   private String routineName;
 
-  private int expressionListCount;
   public CodeGeneratorWriter(Command command) {
     this.command = command;
   }
@@ -99,7 +98,7 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
 
   @Override
   public void visit(ParameterListNode node) {
-    System.out.println("visit ParameterListNode " + className + " " + routineType + " " + routineName);
+    System.out.println("visit ParameterListNode " + node + className + " " + routineType + " " + routineName);
 
 
   }
@@ -121,7 +120,7 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
 
   @Override
   public void visit(DoNode node) {
-    System.out.printf("visit DoNode %s%n", expressionListCount);
+    System.out.println("visit DoNode " + node);
     command.pop(Segment.TMP, 0);
   }
 
@@ -138,7 +137,6 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
   @Override
   public void visit(ExpressionListNode node) {
     System.out.println("visit ExpressionListNode total = " + node.expressionsTotal());
-    expressionListCount = node.expressionsTotal();
   }
 
   @Override
@@ -190,20 +188,27 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
 
   }
 
-  @Override
-  public void visitMethodCall(Token varName, Token subroutineName) {
-    System.out.println("visit MethodCall " + varName + " " + subroutineName);
 
+  @Override
+  public void visitMethodCall(Token varName, Token subroutineName,
+      ExpressionListNode expressionList) {
+    System.out.println("visit MethodCall " + varName + " " + subroutineName + " " + expressionList);
+    int argumentCount = 0;
     if (symbolTable.get(varName.getLexeme()) != null) {
       System.out.println("bind 'this for method call");
+      argumentCount++;
     }
-    command.call(String.format("%s.%s", varName.getLexeme(), subroutineName.getLexeme()), expressionListCount);
+    argumentCount += expressionList.expressionsTotal();
+    expressionList.accept(this);
+    command.call(String.format("%s.%s", varName.getLexeme(), subroutineName.getLexeme()), argumentCount);
   }
 
   @Override
-  public void visitFunctionCall(Token subroutineName) {
-    System.out.println("visit FunctionCall " + subroutineName.getLexeme());
-    command.call(String.format("%s.%s", className, subroutineName.getLexeme()), expressionListCount);
+  public void visitFunctionCall(Token subroutineName, ExpressionListNode expressionList) {
+    System.out.println("visit FunctionCall " + subroutineName.getLexeme() + " " + expressionList);
+    int argumentCount = expressionList.expressionsTotal();
+    expressionList.accept(this);
+    command.call(String.format("%s.%s", className, subroutineName.getLexeme()), argumentCount);
   }
 
   @Override

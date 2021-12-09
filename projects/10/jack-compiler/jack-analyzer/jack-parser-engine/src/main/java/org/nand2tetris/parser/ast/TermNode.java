@@ -291,7 +291,7 @@ public class TermNode extends AbstractNode {
 
     @Override
     public Void doForKeyword() {
-      System.out.println("doForStringConstant");
+      System.out.println("doForKeyword");
       return null;
     }
 
@@ -326,14 +326,14 @@ public class TermNode extends AbstractNode {
     @Override
     public Void doForMethodCall() {
       System.out.println("doForMethodCall");
-      expressionListNode.accept(visitor);
-      visitor.visitMethodCall(varName, subroutineName);
+      visitor.visitMethodCall(varName, subroutineName, (ExpressionListNode) expressionListNode);
       return null;
     }
 
     @Override
     public Void doForFunctionCall() {
       System.out.println("doForFunctionCall");
+      visitor.visitFunctionCall(subroutineName, (ExpressionListNode) expressionListNode);
       return null;
     }
 

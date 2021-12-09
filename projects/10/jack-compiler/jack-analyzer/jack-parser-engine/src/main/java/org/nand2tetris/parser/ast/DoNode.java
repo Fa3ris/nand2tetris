@@ -48,11 +48,10 @@ public class DoNode extends AbstractNode {
 
   @Override
   public void accept(NodeVisitor visitor) {
-    expressionListNode.accept(visitor);
     if (identifier != null) {
-      visitor.visitMethodCall(identifier, subroutineName);
+      visitor.visitMethodCall(identifier, subroutineName, (ExpressionListNode) expressionListNode);
     } else {
-      visitor.visitFunctionCall(subroutineName);
+      visitor.visitFunctionCall(subroutineName, (ExpressionListNode) expressionListNode);
     }
     visitor.visit(this);
   }

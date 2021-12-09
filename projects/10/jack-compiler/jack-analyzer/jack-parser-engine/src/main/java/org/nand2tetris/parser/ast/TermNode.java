@@ -284,34 +284,40 @@ public class TermNode extends AbstractNode {
 
     @Override
     public Void doForVarName() {
+      System.out.println("doForVarName");
       visitor.visitVarName(varName);
       return null;
     }
 
     @Override
     public Void doForKeyword() {
+      System.out.println("doForStringConstant");
       return null;
     }
 
     @Override
     public Void doForStringConstant() {
+      System.out.println("doForStringConstant");
       return null;
     }
 
     @Override
     public Void doForIntegerConstant() {
+      System.out.println("doForIntegerConstant");
       visitor.visitInteger(integerConstant.getLexeme());
       return null;
     }
 
     @Override
     public Void doForParenExpression() {
+      System.out.println("doForParenExpression");
       parenExpression.accept(visitor);
       return null;
     }
 
     @Override
     public Void doForUnaryExpression() {
+      System.out.println("doForUnaryExpression");
       unaryTerm.accept(visitor);
       visitor.visitUnaryOperator(unaryOp);
       return null;
@@ -319,16 +325,21 @@ public class TermNode extends AbstractNode {
 
     @Override
     public Void doForMethodCall() {
+      System.out.println("doForMethodCall");
+      expressionListNode.accept(visitor);
+      visitor.visitMethodCall(varName, subroutineName);
       return null;
     }
 
     @Override
     public Void doForFunctionCall() {
+      System.out.println("doForFunctionCall");
       return null;
     }
 
     @Override
     public Void doForIndexExpression() {
+      System.out.println("doForIndexExpression");
       return null;
     }
   }

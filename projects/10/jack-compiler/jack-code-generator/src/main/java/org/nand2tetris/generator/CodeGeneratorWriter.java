@@ -208,6 +208,16 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
   }
 
   @Override
+  public void visitMethodCall(Token varName, Token subroutineName) {
+    System.out.println("visit MethodCall " + varName + " " + subroutineName);
+
+    if (symbolTable.get(varName.getLexeme()) != null) {
+      System.out.println("bind 'this for method call");
+    }
+    command.call(String.format("%s.%s", varName.getLexeme(), subroutineName.getLexeme()), expressionListCount);
+  }
+
+  @Override
   public void visit(Token token) {
     System.out.println("visit Token " + token);
   }

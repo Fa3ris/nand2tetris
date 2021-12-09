@@ -212,16 +212,16 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
   }
 
   @Override
-  public void visitInteger(String integer) {
-    System.out.println("visit Integer " + integer);
-    command.push(Segment.CONST, Integer.parseInt(integer));
+  public void visitInteger(Token integer) {
+    System.out.println("visit Integer " + integer.getLexeme());
+    command.push(Segment.CONST, Integer.parseInt(integer.getLexeme()));
   }
 
   @Override
-  public void visitOperator(String operator) {
+  public void visitOperator(Token operator) {
     System.out.println("visit Operator " + operator);
 
-    switch (operator) {
+    switch (operator.getLexeme()) {
       case Symbol.PLUS:
         command.operation(Operation.ADD);
         break;
@@ -232,7 +232,6 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
         command.operation(Operation.SUB);
         break;
     }
-
   }
 
   @Override

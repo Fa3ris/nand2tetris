@@ -304,7 +304,7 @@ public class TermNode extends AbstractNode {
     @Override
     public Void doForIntegerConstant() {
       System.out.println("doForIntegerConstant");
-      visitor.visitInteger(integerConstant.getLexeme());
+      visitor.visitInteger(integerConstant);
       return null;
     }
 

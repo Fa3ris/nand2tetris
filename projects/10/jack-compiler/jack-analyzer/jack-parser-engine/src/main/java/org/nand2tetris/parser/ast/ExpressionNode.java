@@ -62,7 +62,7 @@ public class ExpressionNode extends AbstractNode{
     if (ops.size() > 0) {
       for (int i = 0; i < ops.size(); i++) {
         additionalTerms.get(i).accept(visitor);
-        visitor.visitOperator(ops.get(i).getLexeme());
+        visitor.visitOperator(ops.get(i));
       }
     }
 

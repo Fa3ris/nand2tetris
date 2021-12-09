@@ -21,9 +21,9 @@ public interface NodeVisitor {
   void visit(WhileNode node);
   void visit(Token token);
 
-  void visitInteger(String integer);
+  void visitInteger(Token integer);
 
-  void visitOperator(String operator);
+  void visitOperator(Token operator);
 
   void visitVarName(Token varName);
 

@@ -121,22 +121,7 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
 
   @Override
   public void visit(DoNode node) {
-
-    String identifier = node.getIdentifier().orElse("");
-
-    String routineName = node.getSubRoutineName();
-
-    StringBuilder sb = new StringBuilder();
-    if (!identifier.isEmpty()) {
-      sb.append(identifier).append(".");
-    }
-
-    sb.append(routineName);
-
-    System.out.printf("visit DoNode %s %s%n", sb, expressionListCount);
-
-    command.call(sb.toString(), expressionListCount);
-    // do not care about result
+    System.out.printf("visit DoNode %s%n", expressionListCount);
     command.pop(Segment.TMP, 0);
   }
 
@@ -154,8 +139,6 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
   public void visit(ExpressionListNode node) {
     System.out.println("visit ExpressionListNode total = " + node.expressionsTotal());
     expressionListCount = node.expressionsTotal();
-    // TODO compute expressions and put in stack and store number of expressions
-
   }
 
   @Override
@@ -165,6 +148,11 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
 
   @Override
   public void visit(IfNode node) {
+
+  }
+
+  @Override
+  public void visit(WhileNode node) {
 
   }
 
@@ -203,11 +191,6 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
   }
 
   @Override
-  public void visit(WhileNode node) {
-
-  }
-
-  @Override
   public void visitMethodCall(Token varName, Token subroutineName) {
     System.out.println("visit MethodCall " + varName + " " + subroutineName);
 
@@ -215,6 +198,12 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
       System.out.println("bind 'this for method call");
     }
     command.call(String.format("%s.%s", varName.getLexeme(), subroutineName.getLexeme()), expressionListCount);
+  }
+
+  @Override
+  public void visitFunctionCall(Token subroutineName) {
+    System.out.println("visit FunctionCall " + subroutineName.getLexeme());
+    command.call(String.format("%s.%s", className, subroutineName.getLexeme()), expressionListCount);
   }
 
   @Override

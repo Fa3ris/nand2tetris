@@ -4,6 +4,7 @@ import static org.nand2tetris.generator.Scope.FIELD;
 import static org.nand2tetris.generator.Scope.STATIC;
 
 import java.util.Arrays;
+import java.util.List;
 import org.nand2tetris.generator.command.Command;
 import org.nand2tetris.generator.symbol_table.SymbolTable;
 import org.nand2tetris.generator.symbol_table.TableEntry;
@@ -36,6 +37,7 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
 
   private String routineType;
   private String routineName;
+  private int flowControlCounter;
 
   public CodeGeneratorWriter(Command command) {
     this.command = command;
@@ -145,6 +147,33 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
 
   @Override
   public void visit(IfNode node) {
+    System.out.println("visit IfNode " + node);
+  }
+
+  @Override
+  public void visitIfElse(Node expression, List<Node> ifStatements, List<Node> elseStatements) {
+    System.out.println("visit IfElse " + expression + " " + ifStatements + " " + elseStatements);
+    expression.accept(this);
+    command.operation(Operation.NOT);
+    int counter = nextFlowControlCounter();
+    command.ifGoTo(String.format("%s.%s.%s.%s", className, routineName, "elseStart", counter));
+    for (Node ifStatement : ifStatements) {
+      ifStatement.accept(this);
+    }
+    command.goTo(String.format("%s.%s.%s.%s", className, routineName, "ifEnd", counter));
+    command.label(String.format("%s.%s.%s.%s", className, routineName, "elseStart", counter));
+    for (Node elseStatement : elseStatements) {
+      elseStatement.accept(this);
+    }
+    command.label(String.format("%s.%s.%s.%s", className, routineName, "ifEnd", counter));
+  }
+
+  private int nextFlowControlCounter() {
+    return ++flowControlCounter;
+  }
+  @Override
+  public void visitIf(Node expression, List<Node> ifStatements) {
+    System.out.println("visit If " + expression + " " + ifStatements);
 
   }
 
@@ -242,6 +271,7 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
   }
 
   private void binaryOp(Token binaryOp) {
+    System.out.println("bin op is " + binaryOp.getLexeme());
     switch (binaryOp.getLexeme()) {
       case Symbol.PLUS:
         command.operation(Operation.ADD);
@@ -252,6 +282,8 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
       case Symbol.MINUS:
         command.operation(Operation.SUB);
         break;
+      case Symbol.EQ:
+        command.operation(Operation.EQ);
     }
   }
 

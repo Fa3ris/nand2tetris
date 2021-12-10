@@ -30,6 +30,9 @@ public class IfNode extends AbstractNode {
     ifStatements.add(statement);
   }
 
+  /**
+   * need to set external to else statement because else block can be empty
+   */
   public void setElseBlockPresent() {
     elseBlockPresent = true;
   }
@@ -61,4 +64,12 @@ public class IfNode extends AbstractNode {
     tags.add(closeBraceTag());
     return tags;
   }
-}
+
+  @Override
+  public void accept(NodeVisitor visitor) {
+    if (elseBlockPresent) {
+      visitor.visitIfElse(expression, ifStatements, elseStatements);
+    } else
+      visitor.visitIf(expression, ifStatements);
+    }
+  }

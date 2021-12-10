@@ -1,0 +1,11 @@
+class IfElse {
+
+  function int nextMask(int mask) {
+    if (mask = 0) {
+        return 1;
+    }
+    else {
+    return mask * 2;
+    }
+  }
+}

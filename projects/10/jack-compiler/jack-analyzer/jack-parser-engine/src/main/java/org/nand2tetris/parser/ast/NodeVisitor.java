@@ -1,5 +1,6 @@
 package org.nand2tetris.parser.ast;
 
+import java.util.List;
 import org.nand2tetris.tokenizer.Token;
 
 public interface NodeVisitor {
@@ -33,4 +34,8 @@ public interface NodeVisitor {
   void visitUnaryExpression(Token unaryOp, Node unaryTerm);
 
   void visitBinaryOperation(Node additionalTerm, Token binaryOp);
+
+  void visitIfElse(Node expression, List<Node> ifStatements, List<Node> elseStatements);
+
+  void visitIf(Node expression, List<Node> ifStatements);
 }

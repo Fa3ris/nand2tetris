@@ -1,0 +1,15 @@
+function IfElse.nextMask 0 // 0 stands for 0 local var
+push argument 0
+push constant 0
+eq            // mask == 0
+not
+if-goto IfElse.nextMask.elseStart.1 // if false go to else
+push constant 1
+return        // return 1
+goto IfElse.nextMask.ifEnd.1
+label IfElse.nextMask.elseStart.1
+push argument 0
+push constant 2
+call Math.multiply 2
+return        // return mask * 2
+label IfElse.nextMask.ifEnd.1

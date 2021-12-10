@@ -41,20 +41,25 @@ public class Command implements AutoCloseable {
       case NEG:
         writer.println("neg");
         break;
+      case EQ:
+        writer.println("eq");
+        break;
+      case NOT:
+        writer.println("not");
     }
 
   }
 
   public void label(String label) {
-
+    writer.println(String.format("label %s", label));
   }
 
   public void goTo(String label) {
-
+    writer.println(String.format("goto %s", label));
   }
 
   public void ifGoTo(String label) {
-
+    writer.println(String.format("if-goto %s", label));
   }
 
   public void call(String name, int nArgs) {

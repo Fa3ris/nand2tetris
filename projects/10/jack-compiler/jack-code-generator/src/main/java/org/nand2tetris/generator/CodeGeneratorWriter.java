@@ -88,6 +88,7 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
     // reset
     System.out.printf("\treset symbol table %n%s%n", symbolTable.description());
     symbolTable.resetSubroutine();
+    resetFlowCounter();
     routineType = node.getRoutineType();
     routineName = node.getRoutineName();
 
@@ -96,6 +97,14 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
       symbolTable.define("this", Type.resolve(className), Scope.ARGUMENT);
     }
 
+  }
+
+  private void resetFlowCounter() {
+    flowControlCounter = 0;
+  }
+
+  private int nextFlowControlCounter() {
+    return ++flowControlCounter;
   }
 
   @Override
@@ -151,6 +160,21 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
   }
 
   @Override
+  public void visitKeyword(Token keywordConstant) {
+    switch (keywordConstant.getLexeme()) {
+      case "true":
+        command.pushTrue();
+        break;
+      case "false":
+        command.pushFalse();
+        break;
+      default:
+        throw new UnsupportedOperationException(keywordConstant.toString());
+    }
+
+  }
+
+  @Override
   public void visitIfElse(Node expression, List<Node> ifStatements, List<Node> elseStatements) {
     System.out.println("visit IfElse " + expression + " " + ifStatements + " " + elseStatements);
     expression.accept(this);
@@ -168,12 +192,18 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
     command.label(String.format("%s.%s.%s.%s", className, routineName, "ifEnd", counter));
   }
 
-  private int nextFlowControlCounter() {
-    return ++flowControlCounter;
-  }
+
   @Override
   public void visitIf(Node expression, List<Node> ifStatements) {
     System.out.println("visit If " + expression + " " + ifStatements);
+    expression.accept(this);
+    command.operation(Operation.NOT);
+    int counter = nextFlowControlCounter();
+    command.ifGoTo(String.format("%s.%s.%s.%s", className, routineName, "ifEnd", counter));
+    for (Node ifStatement : ifStatements) {
+      ifStatement.accept(this);
+    }
+    command.label(String.format("%s.%s.%s.%s", className, routineName, "ifEnd", counter));
 
   }
 
@@ -284,6 +314,15 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
         break;
       case Symbol.EQ:
         command.operation(Operation.EQ);
+        break;
+      case Symbol.LT:
+        command.operation(Operation.LT);
+        break;
+      case Symbol.GT:
+        command.operation(Operation.GT);
+        break;
+      default:
+        throw new UnsupportedOperationException(binaryOp.toString());
     }
   }
 
@@ -295,10 +334,16 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
   }
 
   private void unaryOp(Token unaryOp) {
+    System.out.println("unaryOp is " + unaryOp);
     switch (unaryOp.getLexeme()) {
       case Symbol.MINUS:
         command.operation(Operation.NEG);
         break;
+      case Symbol.NOT:
+        command.operation(Operation.NOT);
+        break;
+      default:
+        throw new UnsupportedOperationException(unaryOp.toString());
     }
   }
 

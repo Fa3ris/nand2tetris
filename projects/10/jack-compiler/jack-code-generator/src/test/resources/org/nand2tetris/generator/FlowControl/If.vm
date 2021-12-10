@@ -1,0 +1,33 @@
+function If.noMask 0 // 0 stands for 0 local var
+push argument 0
+push constant 10
+neg
+lt            // mask < -10
+not
+if-goto If.noMask.ifEnd.1 // if false go to else
+push constant 1
+neg
+return        // return true
+label If.noMask.ifEnd.1
+push argument 0
+not           // ~mask
+not
+if-goto If.noMask.ifEnd.2
+push constant 1
+neg
+return        // return true
+label If.noMask.ifEnd.2
+push constant 0
+return        // return false
+function If.hasMask 0
+push argument 0
+push constant 15
+gt            // mask > 15
+not
+if-goto If.hasMask.ifEnd.1
+push constant 0
+return        // return false
+label If.hasMask.ifEnd.1
+push constant 1
+neg
+return        // return true

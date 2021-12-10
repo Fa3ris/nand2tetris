@@ -38,4 +38,6 @@ public interface NodeVisitor {
   void visitIfElse(Node expression, List<Node> ifStatements, List<Node> elseStatements);
 
   void visitIf(Node expression, List<Node> ifStatements);
+
+  void visitKeyword(Token keywordConstant);
 }

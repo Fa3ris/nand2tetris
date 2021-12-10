@@ -46,6 +46,15 @@ public class Command implements AutoCloseable {
         break;
       case NOT:
         writer.println("not");
+        break;
+      case LT:
+        writer.println("lt");
+        break;
+      case GT:
+        writer.println("gt");
+        break;
+      default:
+        throw new UnsupportedOperationException(op.toString());
     }
 
   }
@@ -82,5 +91,14 @@ public class Command implements AutoCloseable {
   public void bindThis() {
     push(Segment.ARG, 0);
     pop(Segment.POINTER, 0);
+  }
+
+  public void pushTrue() {
+    push(Segment.CONST, 1);
+    operation(Operation.NEG);
+  }
+
+  public void pushFalse() {
+    push(Segment.CONST, 0);
   }
 }

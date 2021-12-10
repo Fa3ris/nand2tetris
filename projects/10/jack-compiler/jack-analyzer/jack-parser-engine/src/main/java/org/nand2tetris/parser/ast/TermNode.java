@@ -291,14 +291,15 @@ public class TermNode extends AbstractNode {
 
     @Override
     public Void doForKeyword() {
-      System.out.println("doForKeyword");
+      System.out.println("doForKeyword " + keywordConstant);
+      visitor.visitKeyword(keywordConstant);
       return null;
     }
 
     @Override
     public Void doForStringConstant() {
       System.out.println("doForStringConstant");
-      return null;
+      throw new UnsupportedOperationException(stringConstant.toString());
     }
 
     @Override
@@ -339,7 +340,7 @@ public class TermNode extends AbstractNode {
     @Override
     public Void doForIndexExpression() {
       System.out.println("doForIndexExpression");
-      return null;
+      throw new UnsupportedOperationException(varName.toString() + " " + indexExpression.toString());
     }
   }
 }

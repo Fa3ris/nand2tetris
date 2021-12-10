@@ -1,0 +1,20 @@
+class If {
+
+  function boolean noMask(int mask) {
+    if (mask < -10) {
+        return true;
+    }
+
+    if (~mask) {
+        return true;
+    }
+    return false;
+  }
+
+  function boolean hasMask(int mask) {
+    if (mask > 15) {
+        return false;
+    }
+    return true;
+  }
+}

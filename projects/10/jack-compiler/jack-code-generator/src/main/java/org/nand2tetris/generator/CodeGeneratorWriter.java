@@ -99,8 +99,6 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
   @Override
   public void visit(ParameterListNode node) {
     System.out.println("visit ParameterListNode " + node + className + " " + routineType + " " + routineName);
-
-
   }
 
   @Override
@@ -109,7 +107,8 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
     System.out.printf("\tsymbol table state %n%s%n", symbolTable.description());
     command.function(String.format("%s.%s", className, routineName), symbolTable.getLocalCount());
 
-    if (symbolTable.get("this") != null) {
+    boolean isMethodBody = symbolTable.get("this") != null;
+    if (isMethodBody) {
       System.out.println("\tbind 'this'");
       command.bindThis();
     }
@@ -193,24 +192,41 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
   public void visitMethodCall(Token varName, Token subroutineName,
       ExpressionListNode expressionList) {
     System.out.println("visit MethodCall " + varName + " " + subroutineName + " " + expressionList);
-    int argumentCount = 0;
-    if (symbolTable.get(varName.getLexeme()) != null) {
-      System.out.println("bind 'this for method call");
-      argumentCount++;
+    TableEntry entry = symbolTable.get(varName.getLexeme());
+    boolean isInstanceMethodCall = entry != null;
+    if (isInstanceMethodCall) {
+      callInstanceMethod(entry, subroutineName, expressionList);
+    } else {
+      callClassFunction(varName, subroutineName, expressionList);
     }
-    argumentCount += expressionList.expressionsTotal();
+  }
+
+  private void callClassFunction(Token varName, Token subroutineName,
+      ExpressionListNode expressionList) {
+    pushArguments(expressionList);
+    command.call(String.format("%s.%s", varName.getLexeme(), subroutineName.getLexeme()),
+        expressionList.expressionsTotal());
+  }
+
+  private void callInstanceMethod(TableEntry entry, Token subroutineName,
+      ExpressionListNode expressionList) {
+    command.push(entry);
+    pushArguments(expressionList);
+    command.call(String.format("%s.%s", entry.getType().name(), subroutineName.getLexeme()),
+        1 + expressionList.expressionsTotal()); // 'this' + arguments
+  }
+
+  private void pushArguments(ExpressionListNode expressionList) {
     expressionList.accept(this);
-    command.call(String.format("%s.%s", varName.getLexeme(), subroutineName.getLexeme()), argumentCount);
   }
 
   @Override
   public void visitFunctionCall(Token subroutineName, ExpressionListNode expressionList) {
     System.out.println("visit FunctionCall " + subroutineName.getLexeme() + " " + expressionList);
-    int argumentCount = expressionList.expressionsTotal();
-    expressionList.accept(this);
-    command.call(String.format("%s.%s", className, subroutineName.getLexeme()), argumentCount);
+    pushArguments(expressionList);
+    command.call(String.format("%s.%s", className, subroutineName.getLexeme()), expressionList.expressionsTotal());
   }
-  
+
 
   @Override
   public void visitInteger(Token integer) {
@@ -264,7 +280,7 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
     }
 
     System.out.printf("\tpush from var %s defined as [%s]%n", varName.getLexeme(), entry.description());
-    command.push(Segment.resolve(entry.getScope()), entry.getIndex());
+    command.push(entry);
   }
 
   @Override
@@ -277,7 +293,6 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
     }
 
     System.out.printf("\tpop to var %s defined as [%s]%n", varName.getLexeme(), entry.description());
-    command.pop(Segment.resolve(entry.getScope()), entry.getIndex());
-
+    command.pop(entry);
   }
 }

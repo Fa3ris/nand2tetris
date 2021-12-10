@@ -3,6 +3,7 @@ package org.nand2tetris.generator.command;
 import java.io.PrintWriter;
 import org.nand2tetris.generator.Operation;
 import org.nand2tetris.generator.Segment;
+import org.nand2tetris.generator.symbol_table.TableEntry;
 
 public class Command implements AutoCloseable {
 
@@ -17,8 +18,16 @@ public class Command implements AutoCloseable {
 
   }
 
+  public void push(TableEntry entry) {
+    push(Segment.resolve(entry.getScope()), entry.getIndex());
+  }
+
   public void pop(Segment segment, int index) {
     writer.println(String.format("pop %s %s", segment.value(), index));
+  }
+
+  public void pop(TableEntry entry) {
+    pop(Segment.resolve(entry.getScope()), entry.getIndex());
   }
 
   public void operation(Operation op) {

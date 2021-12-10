@@ -16,4 +16,12 @@ public class SubroutineTest {
     
   }
 
+
+  @Test
+  public void methodCall() throws Exception {
+    String baseName = "MethodCall";
+    Path inputPath = new File(getClass().getResource(baseName + ".jack").getFile()).toPath();
+    assertCorrectVm(inputPath);
+  }
+
 }

@@ -1,0 +1,9 @@
+class MethodCall {
+
+  method void main(Ball ball) {
+    var int dt;
+    let dt = 50;
+    do ball.update(dt);
+    return;
+  }
+}

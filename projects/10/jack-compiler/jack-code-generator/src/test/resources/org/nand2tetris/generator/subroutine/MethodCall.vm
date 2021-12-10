@@ -1,0 +1,11 @@
+function MethodCall.main 1 // 1 stands for 1 local var
+push argument 0
+pop pointer 0 // THIS = argument 0
+push constant 50
+pop local 0 // let dt = 50
+push argument 1 // push ball - because it's a method argument 0 is 'this'
+push local 0 // push dt
+call Ball.update 2 // do ball.update(dt);
+pop temp 0
+push constant 0
+return

@@ -53,6 +53,11 @@ public class Command implements AutoCloseable {
       case GT:
         writer.println("gt");
         break;
+      case AND:
+        writer.println("and");
+        break;
+      case OR:
+        writer.println("or");
       default:
         throw new UnsupportedOperationException(op.toString());
     }

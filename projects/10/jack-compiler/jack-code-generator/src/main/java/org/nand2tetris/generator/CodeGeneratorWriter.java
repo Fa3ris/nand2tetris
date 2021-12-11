@@ -336,6 +336,11 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
       case Symbol.GT:
         command.operation(Operation.GT);
         break;
+      case Symbol.AND:
+        command.operation(Operation.AND);
+        break;
+      case Symbol.OR:
+        command.operation(Operation.OR);
       default:
         throw new UnsupportedOperationException(binaryOp.toString());
     }

@@ -41,4 +41,9 @@ public class WhileNode extends AbstractNode {
     tags.add(closeBraceTag());
     return tags;
   }
+
+  @Override
+  public void accept(NodeVisitor visitor) {
+    visitor.visitWhile(expression, statements);
+  }
 }

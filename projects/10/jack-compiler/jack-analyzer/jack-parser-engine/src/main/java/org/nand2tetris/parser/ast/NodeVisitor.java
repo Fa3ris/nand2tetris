@@ -40,4 +40,6 @@ public interface NodeVisitor {
   void visitIf(Node expression, List<Node> ifStatements);
 
   void visitKeyword(Token keywordConstant);
+
+  void visitWhile(Node expression, List<Node> statements);
 }

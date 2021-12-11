@@ -1,0 +1,9 @@
+class While {
+
+ function void fillMemory(int startAddress, int length, int value) {
+      while (length > 0) {
+          let length = length - 1;
+      }
+      return;
+  }
+}

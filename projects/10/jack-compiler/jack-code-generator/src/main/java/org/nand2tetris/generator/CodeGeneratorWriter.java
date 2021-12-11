@@ -208,6 +208,21 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
   }
 
   @Override
+  public void visitWhile(Node expression, List<Node> statements) {
+    System.out.println("visit While " + expression + " " + statements);
+    int counter = nextFlowControlCounter();
+    command.label(String.format("%s.%s.%s.%s", className, routineName, "whileStart", counter));
+    expression.accept(this);
+    command.operation(Operation.NOT);
+    command.ifGoTo(String.format("%s.%s.%s.%s", className, routineName, "whileEnd", counter));
+    for (Node statement : statements) {
+      statement.accept(this);
+    }
+    command.goTo(String.format("%s.%s.%s.%s", className, routineName, "whileStart", counter));
+    command.label(String.format("%s.%s.%s.%s", className, routineName, "whileEnd", counter));
+  }
+
+  @Override
   public void visit(WhileNode node) {
 
   }

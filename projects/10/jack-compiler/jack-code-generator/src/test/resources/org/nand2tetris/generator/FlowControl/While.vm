@@ -1,0 +1,15 @@
+function While.fillMemory 0 // 0 stands for 0 local var
+label While.fillMemory.whileStart.1
+push argument 1
+push constant 0
+gt              // length > 0
+not
+if-goto While.fillMemory.whileEnd.1
+push argument 1
+push constant 1
+sub
+pop argument 1  // length = length - 1
+goto While.fillMemory.whileStart.1
+label While.fillMemory.whileEnd.1
+push constant 0
+return

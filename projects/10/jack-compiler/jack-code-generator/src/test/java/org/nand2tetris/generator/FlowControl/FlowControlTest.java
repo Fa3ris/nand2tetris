@@ -23,5 +23,12 @@ public class FlowControlTest {
     Path inputPath = new File(getClass().getResource(baseName + ".jack").getFile()).toPath();
     assertCorrectVm(inputPath);
   }
+  
+  @Test
+  public void whileBlock() throws Exception {
+    String baseName = "While";
+    Path inputPath = new File(getClass().getResource(baseName + ".jack").getFile()).toPath();
+    assertCorrectVm(inputPath);
+  }
 
 }

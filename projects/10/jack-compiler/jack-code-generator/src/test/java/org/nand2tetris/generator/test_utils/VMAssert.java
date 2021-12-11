@@ -42,7 +42,7 @@ public class VMAssert {
   }
 
   public static Function<List<String>, List<String>> stripLineComments() {
-    return list -> list.stream().map(stripLineComment()).filter(s -> !s.isEmpty()).collect(
+    return list -> list.stream().map(stripLineComment().andThen(String::trim)).filter(s -> !s.isEmpty()).collect(
         Collectors.toList());
   }
 
@@ -50,7 +50,7 @@ public class VMAssert {
     return s -> {
       Matcher matcher = beforeDoubleSlash.matcher(s);
       if (matcher.find()) {
-        s = matcher.group(1).trim();
+        s = matcher.group(1);
       }
       return s;
     };

@@ -9,6 +9,7 @@ import static org.nand2tetris.parser.utils.XMLUtils.semicolonTag;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import org.nand2tetris.parser.utils.TagNames;
 import org.nand2tetris.tokenizer.Token;
 
@@ -54,9 +55,18 @@ public class LetNode extends AbstractNode {
   @Override
   public void accept(NodeVisitor visitor) {
     visitor.visit(this);
-    rightExpression.accept(visitor);
+  }
 
-    visitor.visitAssignment(varName);
+  public Node getRightExpression() {
+    return rightExpression;
+  }
+
+  public Token getVarName() {
+    return varName;
+  }
+
+  public Optional<Node> getLeftExpression() {
+    return Optional.of(leftExpression);
   }
 
   @Override

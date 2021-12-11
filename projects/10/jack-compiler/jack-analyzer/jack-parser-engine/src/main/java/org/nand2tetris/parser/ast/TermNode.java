@@ -171,12 +171,12 @@ public class TermNode extends AbstractNode {
 
         // varName '.' subroutineName '(' expressionList ')'
         if (subroutineName != null && expressionListNode != null) {
-          return templater.doForMethodCall();
+          return templater.doForMethodOrFunctionCall();
         }
 
         // varName '(' expressionList ')'
         if (expressionListNode != null) {
-          return templater.doForFunctionCall();
+          return templater.doForThisMethodCall();
         }
 
         // varName '[' expression ']'
@@ -220,8 +220,8 @@ public class TermNode extends AbstractNode {
     T doForIntegerConstant();
     T doForParenExpression();
     T doForUnaryExpression();
-    T doForMethodCall();
-    T doForFunctionCall();
+    T doForMethodOrFunctionCall();
+    T doForThisMethodCall();
     T doForIndexExpression();
   }
 
@@ -259,12 +259,12 @@ public class TermNode extends AbstractNode {
     }
 
     @Override
-    public String doForMethodCall() {
+    public String doForMethodOrFunctionCall() {
       return String.format("%s.%s(%s)", varName.getLexeme(), subroutineName.getLexeme(), expressionListNode);
     }
 
     @Override
-    public String doForFunctionCall() {
+    public String doForThisMethodCall() {
       return String.format("%s(%s)", varName.getLexeme(), expressionListNode);
     }
 
@@ -324,16 +324,16 @@ public class TermNode extends AbstractNode {
     }
 
     @Override
-    public Void doForMethodCall() {
+    public Void doForMethodOrFunctionCall() {
       System.out.println("doForMethodCall");
-      visitor.visitMethodCall(varName, subroutineName, (ExpressionListNode) expressionListNode);
+      visitor.visitMethodOrFunctionCall(varName, subroutineName, (ExpressionListNode) expressionListNode);
       return null;
     }
 
     @Override
-    public Void doForFunctionCall() {
+    public Void doForThisMethodCall() {
       System.out.println("doForFunctionCall");
-      visitor.visitFunctionCall(subroutineName, (ExpressionListNode) expressionListNode);
+      visitor.visitThisMethodCall(subroutineName, (ExpressionListNode) expressionListNode);
       return null;
     }
 

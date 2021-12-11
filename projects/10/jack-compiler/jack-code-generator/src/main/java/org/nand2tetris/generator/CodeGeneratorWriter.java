@@ -23,7 +23,6 @@ import org.nand2tetris.parser.ast.ParameterListNode;
 import org.nand2tetris.parser.ast.ReturnNode;
 import org.nand2tetris.parser.ast.SubroutineBodyNode;
 import org.nand2tetris.parser.ast.SubroutineDecNode;
-import org.nand2tetris.parser.ast.TermNode;
 import org.nand2tetris.parser.ast.VarDecNode;
 import org.nand2tetris.parser.ast.WhileNode;
 import org.nand2tetris.tokenizer.Symbol;
@@ -162,10 +161,7 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
     System.out.println("visit ExpressionNode " + node);
   }
 
-  @Override
-  public void visit(IfNode node) {
-    System.out.println("visit IfNode " + node);
-  }
+
 
   @Override
   public void visitKeyword(Token keywordConstant) {
@@ -186,7 +182,16 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
   }
 
   @Override
-  public void visitIfElse(Node expression, List<Node> ifStatements, List<Node> elseStatements) {
+  public void visit(IfNode node) {
+    System.out.println("visit IfNode " + node);
+    if (node.isElseBlockPresent()) {
+      visitIfElse(node.getExpression(), node.getIfStatements(), node.getElseStatements());
+    } else {
+      visitIf(node.getExpression(), node.getIfStatements());
+    }
+  }
+
+  private void visitIfElse(Node expression, List<Node> ifStatements, List<Node> elseStatements) {
     System.out.println("visit IfElse " + expression + " " + ifStatements + " " + elseStatements);
     expression.accept(this);
     command.operation(Operation.NOT);
@@ -204,8 +209,7 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
   }
 
 
-  @Override
-  public void visitIf(Node expression, List<Node> ifStatements) {
+  private void visitIf(Node expression, List<Node> ifStatements) {
     System.out.println("visit If " + expression + " " + ifStatements);
     expression.accept(this);
     command.operation(Operation.NOT);
@@ -219,7 +223,9 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
   }
 
   @Override
-  public void visitWhile(Node expression, List<Node> statements) {
+  public void visit(WhileNode node) {
+    Node expression = node.getExpression();
+    List<Node> statements = node.getStatements();
     System.out.println("visit While " + expression + " " + statements);
     int counter = nextFlowControlCounter();
     command.label(String.format("%s.%s.%s.%s", className, routineName, "whileStart", counter));
@@ -234,13 +240,23 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
   }
 
   @Override
-  public void visit(WhileNode node) {
-
-  }
-
-  @Override
   public void visit(LetNode node) {
     System.out.println("visit LetNode " + node);
+
+    node.getRightExpression().accept(this);
+    visitAssignment(node.getVarName());
+  }
+
+  private void visitAssignment(Token varName) {
+    System.out.println("visit Assignment " + varName.getLexeme());
+
+    TableEntry entry = symbolTable.get(varName.getLexeme());
+    if (entry == null) {
+      throw new IllegalStateException(String.format("unresolved assignment %s", varName));
+    }
+
+    System.out.printf("\tpop to var %s defined as [%s]%n", varName.getLexeme(), entry.description());
+    command.pop(entry);
   }
 
   @Override
@@ -249,14 +265,8 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
 
     Type type = Type.resolve(node.getType());
 
-    String name = node.getName();
-    System.out.printf("\tregister argument var %s of type %s%n", name, type.name());
-    symbolTable.define(name, type, Scope.ARGUMENT);
-  }
-
-  @Override
-  public void visit(TermNode node) {
-    System.out.println("visit TermNode " + node);
+    System.out.printf("\tregister argument var %s of type %s%n",  node.getName(), type.name());
+    symbolTable.define( node.getName(), type, Scope.ARGUMENT);
   }
 
   @Override
@@ -274,7 +284,7 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
 
 
   @Override
-  public void visitMethodCall(Token varName, Token subroutineName,
+  public void visitMethodOrFunctionCall(Token varName, Token subroutineName,
       ExpressionListNode expressionList) {
     System.out.println("visit MethodCall " + varName + " " + subroutineName + " " + expressionList);
     TableEntry entry = symbolTable.get(varName.getLexeme());
@@ -306,7 +316,7 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
   }
 
   @Override
-  public void visitFunctionCall(Token subroutineName, ExpressionListNode expressionList) {
+  public void visitThisMethodCall(Token subroutineName, ExpressionListNode expressionList) {
     System.out.println("visit implicit InstanceMethodCall " + subroutineName.getLexeme() + " " + expressionList);
     command.pushThis();
     pushArguments(expressionList);
@@ -390,18 +400,5 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
 
     System.out.printf("\tpush from var %s defined as [%s]%n", varName.getLexeme(), entry.description());
     command.push(entry);
-  }
-
-  @Override
-  public void visitAssignment(Token varName) {
-    System.out.println("visit Assignment " + varName.getLexeme());
-
-    TableEntry entry = symbolTable.get(varName.getLexeme());
-    if (entry == null) {
-      throw new IllegalStateException(String.format("unresolved assignment %s", varName));
-    }
-
-    System.out.printf("\tpop to var %s defined as [%s]%n", varName.getLexeme(), entry.description());
-    command.pop(entry);
   }
 }

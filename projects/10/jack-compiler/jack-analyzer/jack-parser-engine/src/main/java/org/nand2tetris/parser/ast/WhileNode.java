@@ -42,8 +42,16 @@ public class WhileNode extends AbstractNode {
     return tags;
   }
 
+  public Node getExpression() {
+    return expression;
+  }
+
+  public List<Node> getStatements() {
+    return statements;
+  }
+
   @Override
   public void accept(NodeVisitor visitor) {
-    visitor.visitWhile(expression, statements);
+    visitor.visit(this);
   }
 }

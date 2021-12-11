@@ -67,9 +67,21 @@ public class IfNode extends AbstractNode {
 
   @Override
   public void accept(NodeVisitor visitor) {
-    if (elseBlockPresent) {
-      visitor.visitIfElse(expression, ifStatements, elseStatements);
-    } else
-      visitor.visitIf(expression, ifStatements);
+    visitor.visit(this);
     }
+
+  public boolean isElseBlockPresent() {
+    return elseBlockPresent;
+  }
+
+  public Node getExpression() {
+    return expression;
+  }
+  public List<Node> getIfStatements() {
+    return ifStatements;
+  }
+
+  public List<Node> getElseStatements() {
+    return elseStatements;
+  }
   }

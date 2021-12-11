@@ -84,4 +84,19 @@ public class IfNode extends AbstractNode {
   public List<Node> getElseStatements() {
     return elseStatements;
   }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder("if (");
+    sb.append(expression).append(") {");
+    sb.append(ifStatements);
+    sb.append("}");
+    if (!elseBlockPresent) {
+      return sb.toString();
+    }
+    sb.append("else {");
+    sb.append(elseStatements);
+    sb.append("}");
+    return sb.toString();
   }
+}

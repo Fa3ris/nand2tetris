@@ -284,41 +284,41 @@ public class TermNode extends AbstractNode {
 
     @Override
     public Void doForVarName() {
-      System.out.println("doForVarName");
+      System.out.println("doForVarName " + varName.getLexeme());
       visitor.visitVarName(varName);
       return null;
     }
 
     @Override
     public Void doForKeyword() {
-      System.out.println("doForKeyword " + keywordConstant);
+      System.out.println("doForKeyword " + keywordConstant.getLexeme());
       visitor.visitKeyword(keywordConstant);
       return null;
     }
 
     @Override
     public Void doForStringConstant() {
-      System.out.println("doForStringConstant");
+      System.out.println("doForStringConstant " + stringConstant.getLexeme());
       throw new UnsupportedOperationException(stringConstant.toString());
     }
 
     @Override
     public Void doForIntegerConstant() {
-      System.out.println("doForIntegerConstant");
+      System.out.println("doForIntegerConstant " + integerConstant.getLexeme());
       visitor.visitInteger(integerConstant);
       return null;
     }
 
     @Override
     public Void doForParenExpression() {
-      System.out.println("doForParenExpression");
+      System.out.println("doForParenExpression " + parenExpression);
       parenExpression.accept(visitor);
       return null;
     }
 
     @Override
     public Void doForUnaryExpression() {
-      System.out.println("doForUnaryExpression");
+      System.out.println("doForUnaryExpression " + unaryOp.getLexeme() + " " + unaryTerm);
       visitor.visitUnaryExpression(unaryOp, unaryTerm);
       return null;
     }

@@ -303,7 +303,7 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
 
   @Override
   public void visitBinaryOperation(Node additionalTerm, Token binaryOp) {
-    System.out.println("visit BinaryOperation " + binaryOp + " " + additionalTerm);
+    System.out.println("visit BinaryOperation " + binaryOp.getLexeme() + " " + additionalTerm);
     additionalTerm.accept(this);
     binaryOp(binaryOp);
   }

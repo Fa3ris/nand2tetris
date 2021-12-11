@@ -29,7 +29,6 @@ public class ExpressionListNode extends AbstractNode {
 
   @Override
   public void accept(NodeVisitor visitor) {
-    visitor.visit(this);
     for (Node expression : expressions) {
       expression.accept(visitor);
     }

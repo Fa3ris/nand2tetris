@@ -30,7 +30,6 @@ public class ParameterListNode extends AbstractNode {
 
   @Override
   public void accept(NodeVisitor visitor) {
-    visitor.visit(this);
     for (Node arg : args) {
       arg.accept(visitor);
     }

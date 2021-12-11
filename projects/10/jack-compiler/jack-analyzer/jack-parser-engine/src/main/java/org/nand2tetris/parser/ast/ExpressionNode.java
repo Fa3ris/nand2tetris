@@ -54,7 +54,6 @@ public class ExpressionNode extends AbstractNode{
 
   @Override
   public void accept(NodeVisitor visitor) {
-    visitor.visit(this);
     term.accept(visitor);
 
     checkOpTermMatch();

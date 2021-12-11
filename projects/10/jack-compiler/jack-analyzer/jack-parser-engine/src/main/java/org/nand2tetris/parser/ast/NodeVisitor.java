@@ -6,29 +6,20 @@ public interface NodeVisitor {
 
   void visit(ClassNode node);
   void visit(ClassVarDecNode node);
+
   void visit(DoNode node);
-  /**
-   * @deprecated
-   */
-  void visit(ExpressionListNode node);
-  /**
-   * @deprecated
-   */
-  void visit(ExpressionNode node);
   void visit(IfNode node);
   void visit(LetNode node);
-  void visit(ParameterArgNode node);
-  /**
-   * @deprecated
-   */
-  void visit(ParameterListNode node);
   void visit(ReturnNode node);
-  void visit(SubroutineBodyNode node);
-  void visit(SubroutineDecNode node);
-  void visit(VarDecNode node);
   void visit(WhileNode node);
 
+  void visit(SubroutineDecNode node);
+  void visit(ParameterArgNode node);
+  void visit(SubroutineBodyNode node);
+  void visit(VarDecNode node);
+
   void visitInteger(Token integer);
+  void visitKeyword(Token keywordConstant);
 
   void visitVarName(Token varName);
 
@@ -39,6 +30,4 @@ public interface NodeVisitor {
   void visitUnaryExpression(Token unaryOp, Node unaryTerm);
 
   void visitBinaryOperation(Node additionalTerm, Token binaryOp);
-
-  void visitKeyword(Token keywordConstant);
 }

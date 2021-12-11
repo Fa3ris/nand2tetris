@@ -1,0 +1,10 @@
+class CallConstructor {
+
+   function void main() {
+     var Point p1, p2;
+     var int d;
+     let p1 = Point.new(2,3);
+     let p2 = Point.new(5,7);
+     return;
+   }
+}

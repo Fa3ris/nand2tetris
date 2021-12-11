@@ -1,0 +1,11 @@
+function CallConstructor.main 3 // 3 stands for 3 local var
+push constant 2
+push constant 3
+call Point.new 2
+pop local 0     // p1 = Point.new(2, 3)
+push constant 5
+push constant 7
+call Point.new 2
+pop local 1     // p2 = Point.new(5,7);
+push constant 0
+return

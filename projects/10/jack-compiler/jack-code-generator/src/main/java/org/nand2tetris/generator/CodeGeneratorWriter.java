@@ -13,13 +13,11 @@ import org.nand2tetris.parser.ast.ClassNode;
 import org.nand2tetris.parser.ast.ClassVarDecNode;
 import org.nand2tetris.parser.ast.DoNode;
 import org.nand2tetris.parser.ast.ExpressionListNode;
-import org.nand2tetris.parser.ast.ExpressionNode;
 import org.nand2tetris.parser.ast.IfNode;
 import org.nand2tetris.parser.ast.LetNode;
 import org.nand2tetris.parser.ast.Node;
 import org.nand2tetris.parser.ast.NodeVisitor;
 import org.nand2tetris.parser.ast.ParameterArgNode;
-import org.nand2tetris.parser.ast.ParameterListNode;
 import org.nand2tetris.parser.ast.ReturnNode;
 import org.nand2tetris.parser.ast.SubroutineBodyNode;
 import org.nand2tetris.parser.ast.SubroutineDecNode;
@@ -66,49 +64,48 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
   public void visit(ClassVarDecNode node) {
     System.out.println("visit ClassVarDecNode " + node);
     Scope scope = Scope.toScope(node.getScope());
-
     Type type = Type.resolve(node.getType());
-
     if (scope != FIELD && scope != STATIC) {
       throw new IllegalStateException(String.format("expected scope %s to be of type %s", scope,
           Arrays.toString(new Scope[]{FIELD, STATIC})));
     }
-
     for (String name : node.getNames()) {
       System.out.printf("\tregister class var %s of type %s and scope %s %n", name, type.name(), scope);
       symbolTable.define(name, type, scope);
     }
-
   }
 
   @Override
   public void visit(SubroutineDecNode node) {
-    System.out.println("visit SubroutineDecNode " + className + " " + node.getRoutineType() + " " + node.getRoutineName());
     // reset
     System.out.printf("\treset symbol table %n%s%n", symbolTable.description());
     symbolTable.resetSubroutine();
-    resetFlowCounter();
+    flowControlCounter = 0;
+
     routineType = node.getRoutineType();
     routineName = node.getRoutineName();
+    System.out.println("visit SubroutineDecNode " + className + " " + routineType + " " + routineName);
 
-    if ("method".equals(routineType)) {
+    if (isMethodSubroutine()) {
       System.out.printf("\tdefine 'this' in symbol table of type %s%n", className);
       symbolTable.define("this", Type.resolve(className), Scope.ARGUMENT);
     }
-
   }
 
-  private void resetFlowCounter() {
-    flowControlCounter = 0;
+  private boolean isMethodSubroutine() {
+    return "method".equals(routineType);
   }
 
-  private int nextFlowControlCounter() {
-    return ++flowControlCounter;
+  private boolean isConstructorSubroutine() {
+    return "constructor".equals(routineType);
   }
 
   @Override
-  public void visit(ParameterListNode node) {
-    System.out.println("visit ParameterListNode " + node + className + " " + routineType + " " + routineName);
+  public void visit(ParameterArgNode node) {
+    System.out.println("visit ParameterArgNode " + node);
+    Type type = Type.resolve(node.getType());
+    System.out.printf("\tregister argument var %s of type %s%n",  node.getName(), type.name());
+    symbolTable.define(node.getName(), type, Scope.ARGUMENT);
   }
 
   @Override
@@ -116,24 +113,32 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
     System.out.println("visit SubroutineBodyNode " + String.format("%s.%s", className, routineName) + " " + symbolTable.getLocalCount());
     System.out.printf("\tsymbol table state %n%s%n", symbolTable.description());
     command.function(String.format("%s.%s", className, routineName), symbolTable.getLocalCount());
-
-    boolean isMethodBody = symbolTable.get("this") != null;
-    if (isMethodBody) {
+    if (isMethodSubroutine()) {
       System.out.println("\tbind 'this'");
       command.bindThis();
       return;
     }
-
-    if ("new".equals(routineName)) {
-      System.out.printf("allocate %s slots for instance of %s%n", symbolTable.getFieldCount(), className);
-      command.push(Segment.CONST, symbolTable.getFieldCount());
-      command.call("Memory.alloc", 1);
-      command.pop(Segment.POINTER, 0);
+    if (isConstructorSubroutine()) {
+      allocateHeapSpace();
     }
-
   }
 
+  private void allocateHeapSpace() {
+    System.out.printf("allocate %s slots for instance of %s%n", symbolTable.getFieldCount(), className);
+    command.push(Segment.CONST, symbolTable.getFieldCount());
+    command.call("Memory.alloc", 1);
+    command.pop(Segment.POINTER, 0);
+  }
 
+  @Override
+  public void visit(VarDecNode node) {
+    System.out.println("visit VarDecNode " + node);
+    Type type = Type.resolve(node.getType());
+    for (String name : node.getNames()) {
+      System.out.printf("\tregister local var %s of type %s%n", name, type.name());
+      symbolTable.define(name, type, Scope.LOCAL);
+    }
+  }
 
   @Override
   public void visit(DoNode node) {
@@ -150,18 +155,6 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
     }
     command._return();
   }
-
-  @Override
-  public void visit(ExpressionListNode node) {
-    System.out.println("visit ExpressionListNode total = " + node.expressionsTotal());
-  }
-
-  @Override
-  public void visit(ExpressionNode node) {
-    System.out.println("visit ExpressionNode " + node);
-  }
-
-
 
   @Override
   public void visitKeyword(Token keywordConstant) {
@@ -259,28 +252,7 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
     command.pop(entry);
   }
 
-  @Override
-  public void visit(ParameterArgNode node) {
-    System.out.println("visit ParameterArgNode " + node);
 
-    Type type = Type.resolve(node.getType());
-
-    System.out.printf("\tregister argument var %s of type %s%n",  node.getName(), type.name());
-    symbolTable.define( node.getName(), type, Scope.ARGUMENT);
-  }
-
-  @Override
-  public void visit(VarDecNode node) {
-    System.out.println("visit VarDecNode " + node);
-
-    Type type = Type.resolve(node.getType());
-
-    for (String name : node.getNames()) {
-      System.out.printf("\tregister local var %s of type %s%n", name, type.name());
-      symbolTable.define(name, type, Scope.LOCAL);
-    }
-
-  }
 
 
   @Override
@@ -313,6 +285,10 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
 
   private void pushArguments(ExpressionListNode expressionList) {
     expressionList.accept(this);
+  }
+
+  private int nextFlowControlCounter() {
+    return ++flowControlCounter;
   }
 
   @Override

@@ -71,7 +71,7 @@ public class IfNode extends AbstractNode {
     }
 
   public boolean isElseBlockPresent() {
-    return elseBlockPresent;
+    return elseBlockPresent && elseStatements.size() > 0;
   }
 
   public Node getExpression() {

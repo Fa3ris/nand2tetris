@@ -171,7 +171,6 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
       default:
         throw new UnsupportedOperationException(keywordConstant.toString());
     }
-
   }
 
   @Override
@@ -189,30 +188,32 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
     expression.accept(this);
     command.operation(Operation.NOT);
     int counter = nextFlowControlCounter();
-    command.ifGoTo(String.format("%s.%s.%s.%s", className, routineName, "elseStart", counter));
+    command.ifGoTo(routineLabel("elseStart", counter));
     for (Node ifStatement : ifStatements) {
       ifStatement.accept(this);
     }
-    command.goTo(String.format("%s.%s.%s.%s", className, routineName, "ifEnd", counter));
-    command.label(String.format("%s.%s.%s.%s", className, routineName, "elseStart", counter));
+    command.goTo(routineLabel("ifEnd", counter));
+    command.label(routineLabel("elseStart", counter));
     for (Node elseStatement : elseStatements) {
       elseStatement.accept(this);
     }
-    command.label(String.format("%s.%s.%s.%s", className, routineName, "ifEnd", counter));
+    command.label(routineLabel("ifEnd", counter));
   }
 
+  private String routineLabel(String suffix, int counter) {
+    return String.format("%s.%s.%s.%s", className, routineName, suffix, counter);
+  }
 
   private void visitIf(Node expression, List<Node> ifStatements) {
     System.out.println("visit If " + expression + " " + ifStatements);
     expression.accept(this);
     command.operation(Operation.NOT);
     int counter = nextFlowControlCounter();
-    command.ifGoTo(String.format("%s.%s.%s.%s", className, routineName, "ifEnd", counter));
+    command.ifGoTo(routineLabel("ifEnd", counter));
     for (Node ifStatement : ifStatements) {
       ifStatement.accept(this);
     }
-    command.label(String.format("%s.%s.%s.%s", className, routineName, "ifEnd", counter));
-
+    command.label(routineLabel("ifEnd", counter));
   }
 
   @Override
@@ -221,39 +222,33 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
     List<Node> statements = node.getStatements();
     System.out.println("visit While " + expression + " " + statements);
     int counter = nextFlowControlCounter();
-    command.label(String.format("%s.%s.%s.%s", className, routineName, "whileStart", counter));
+    command.label(routineLabel("whileStart", counter));
     expression.accept(this);
     command.operation(Operation.NOT);
-    command.ifGoTo(String.format("%s.%s.%s.%s", className, routineName, "whileEnd", counter));
+    command.ifGoTo(routineLabel("whileEnd", counter));
     for (Node statement : statements) {
       statement.accept(this);
     }
-    command.goTo(String.format("%s.%s.%s.%s", className, routineName, "whileStart", counter));
-    command.label(String.format("%s.%s.%s.%s", className, routineName, "whileEnd", counter));
+    command.goTo(routineLabel("whileStart", counter));
+    command.label(routineLabel("whileEnd", counter));
   }
 
   @Override
   public void visit(LetNode node) {
     System.out.println("visit LetNode " + node);
-
     node.getRightExpression().accept(this);
-    visitAssignment(node.getVarName());
+    assignToVarName(node.getVarName());
   }
 
-  private void visitAssignment(Token varName) {
+  private void assignToVarName(Token varName) {
     System.out.println("visit Assignment " + varName.getLexeme());
-
     TableEntry entry = symbolTable.get(varName.getLexeme());
     if (entry == null) {
       throw new IllegalStateException(String.format("unresolved assignment %s", varName));
     }
-
     System.out.printf("\tpop to var %s defined as [%s]%n", varName.getLexeme(), entry.description());
     command.pop(entry);
   }
-
-
-
 
   @Override
   public void visitMethodOrFunctionCall(Token varName, Token subroutineName,
@@ -268,19 +263,19 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
     }
   }
 
-  private void callClassFunction(Token varName, Token subroutineName,
-      ExpressionListNode expressionList) {
-    pushArguments(expressionList);
-    command.call(String.format("%s.%s", varName.getLexeme(), subroutineName.getLexeme()),
-        expressionList.expressionsTotal());
-  }
-
   private void callInstanceMethod(TableEntry entry, Token subroutineName,
       ExpressionListNode expressionList) {
     command.push(entry);
     pushArguments(expressionList);
     command.call(String.format("%s.%s", entry.getType().name(), subroutineName.getLexeme()),
         1 + expressionList.expressionsTotal()); // 'this' + arguments
+  }
+
+  private void callClassFunction(Token varName, Token subroutineName,
+      ExpressionListNode expressionList) {
+    pushArguments(expressionList);
+    command.call(String.format("%s.%s", varName.getLexeme(), subroutineName.getLexeme()),
+        expressionList.expressionsTotal());
   }
 
   private void pushArguments(ExpressionListNode expressionList) {
@@ -298,7 +293,6 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
     pushArguments(expressionList);
     command.call(String.format("%s.%s", className, subroutineName.getLexeme()), 1 + expressionList.expressionsTotal());
   }
-
 
   @Override
   public void visitInteger(Token integer) {
@@ -368,12 +362,10 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
   @Override
   public void visitVarName(Token varName) {
     System.out.println("visit VarName " + varName.getLexeme());
-
     TableEntry entry = symbolTable.get(varName.getLexeme());
     if (entry == null) {
       throw new IllegalStateException(String.format("unresolved varName %s", varName));
     }
-
     System.out.printf("\tpush from var %s defined as [%s]%n", varName.getLexeme(), entry.description());
     command.push(entry);
   }

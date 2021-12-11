@@ -55,4 +55,16 @@ public class DoNode extends AbstractNode {
     visitor.visit(this);
   }
 
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder("do ");
+    if (identifier != null) {
+      sb.append(identifier.getLexeme()).append(".");
+    }
+    sb.append(subroutineName.getLexeme());
+    sb.append("(");
+    sb.append(expressionListNode);
+    sb.append(")");
+    return sb.toString();
+  }
 }

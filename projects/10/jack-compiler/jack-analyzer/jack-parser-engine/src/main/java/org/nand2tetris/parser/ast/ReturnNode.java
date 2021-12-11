@@ -42,4 +42,13 @@ public class ReturnNode extends AbstractNode {
   public boolean hasExpression() {
     return expression != null;
   }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder("return");
+    if (hasExpression()) {
+      sb.append(" ").append(expression);
+    }
+    return sb.toString();
+  }
 }

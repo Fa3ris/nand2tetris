@@ -325,7 +325,7 @@ public class TermNode extends AbstractNode {
 
     @Override
     public Void doForMethodOrFunctionCall() {
-      System.out.println("doForMethodCall");
+      System.out.println("doForMethodOrFunctionCall");
       visitor.visitMethodOrFunctionCall(varName, subroutineName, (ExpressionListNode) expressionListNode);
       return null;
     }

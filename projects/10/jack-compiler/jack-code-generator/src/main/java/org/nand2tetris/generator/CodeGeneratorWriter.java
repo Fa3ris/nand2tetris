@@ -148,8 +148,7 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
 
   @Override
   public void visit(ReturnNode node) {
-    String particle = node.hasExpression() ? "with" : "without";
-    System.out.println("visit ReturnNode " + particle + " expression");
+    System.out.println("visit ReturnNode " + node);
     if (!node.hasExpression()) {
       command.push(Segment.CONST, 0);
     }
@@ -241,24 +240,26 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
   }
 
   private void assignToVarName(Token varName) {
-    System.out.println("visit Assignment " + varName.getLexeme());
     TableEntry entry = symbolTable.get(varName.getLexeme());
     if (entry == null) {
       throw new IllegalStateException(String.format("unresolved assignment %s", varName));
     }
-    System.out.printf("\tpop to var %s defined as [%s]%n", varName.getLexeme(), entry.description());
+    System.out.print("assign to varName " + varName.getLexeme());
+    System.out.printf(" -> pop to var %s defined as [%s]%n", varName.getLexeme(), entry.description());
     command.pop(entry);
   }
 
   @Override
   public void visitMethodOrFunctionCall(Token varName, Token subroutineName,
       ExpressionListNode expressionList) {
-    System.out.println("visit MethodCall " + varName + " " + subroutineName + " " + expressionList);
+    System.out.println("visit visitMethodOrFunctionCall " + varName.getLexeme() + "." + subroutineName.getLexeme() + "(" + expressionList + ")");
     TableEntry entry = symbolTable.get(varName.getLexeme());
     boolean isInstanceMethodCall = entry != null;
     if (isInstanceMethodCall) {
+      System.out.println("it is InstanceMethod");
       callInstanceMethod(entry, subroutineName, expressionList);
     } else {
+      System.out.println("it is ClassFunction");
       callClassFunction(varName, subroutineName, expressionList);
     }
   }

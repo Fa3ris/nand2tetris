@@ -4,6 +4,8 @@ import static org.nand2tetris.parser.utils.XMLUtils.commaTag;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import org.nand2tetris.parser.utils.Joiner;
 import org.nand2tetris.parser.utils.TagNames;
 import org.nand2tetris.parser.utils.XMLUtils;
@@ -36,5 +38,10 @@ public class ExpressionListNode extends AbstractNode {
 
   public int expressionsTotal() {
     return expressions.size();
+  }
+
+  @Override
+  public String toString() {
+    return expressions.stream().map(Objects::toString).collect(Collectors.joining(", "));
   }
 }

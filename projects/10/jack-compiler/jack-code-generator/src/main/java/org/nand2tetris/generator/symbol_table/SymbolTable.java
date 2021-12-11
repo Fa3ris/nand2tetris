@@ -72,6 +72,9 @@ public class SymbolTable {
     entries.addAll(classTable.values());
     entries.addAll(subroutineTable.values());
 
+    if (entries.isEmpty()) {
+      return "\t\tno entry in table";
+    }
     entries.sort(Comparator.comparing(TableEntry::getScope).thenComparing(TableEntry::getIndex));
 
     return entries.stream().map(entry -> "\t\t" + entry.description()).collect(Collectors.joining("\n"));

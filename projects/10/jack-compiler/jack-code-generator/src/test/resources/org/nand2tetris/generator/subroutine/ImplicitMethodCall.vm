@@ -1,0 +1,6 @@
+function ImplicitMethodCall.main 0 // 0 stands for 0 local var
+push argument 0
+pop pointer 0                   // bind this because in a method
+push pointer 0                 // push this
+call ImplicitMethodCall.draw 1 // call draw
+pop temp 0                      // discard result

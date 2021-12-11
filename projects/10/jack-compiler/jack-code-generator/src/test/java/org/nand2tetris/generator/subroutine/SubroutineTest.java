@@ -24,4 +24,12 @@ public class SubroutineTest {
     assertCorrectVm(inputPath);
   }
 
+
+  @Test
+  public void implicitMethodCall() throws Exception {
+    String baseName = "ImplicitMethodCall";
+    Path inputPath = new File(getClass().getResource(baseName + ".jack").getFile()).toPath();
+    assertCorrectVm(inputPath);
+  }
+
 }

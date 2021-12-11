@@ -1,0 +1,6 @@
+class ImplicitMethodCall {
+
+  method void main() {
+    do draw();
+  }
+}

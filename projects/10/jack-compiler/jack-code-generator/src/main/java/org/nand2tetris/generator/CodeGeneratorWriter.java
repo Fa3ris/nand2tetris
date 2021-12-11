@@ -307,9 +307,10 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
 
   @Override
   public void visitFunctionCall(Token subroutineName, ExpressionListNode expressionList) {
-    System.out.println("visit FunctionCall " + subroutineName.getLexeme() + " " + expressionList);
+    System.out.println("visit implicit InstanceMethodCall " + subroutineName.getLexeme() + " " + expressionList);
+    command.pushThis();
     pushArguments(expressionList);
-    command.call(String.format("%s.%s", className, subroutineName.getLexeme()), expressionList.expressionsTotal());
+    command.call(String.format("%s.%s", className, subroutineName.getLexeme()), 1 + expressionList.expressionsTotal());
   }
 
 

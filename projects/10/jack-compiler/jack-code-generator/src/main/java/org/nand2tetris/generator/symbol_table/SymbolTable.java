@@ -76,4 +76,8 @@ public class SymbolTable {
 
     return entries.stream().map(entry -> "\t\t" + entry.description()).collect(Collectors.joining("\n"));
   }
+
+  public int getFieldCount() {
+    return fieldCount + 1;
+  }
 }

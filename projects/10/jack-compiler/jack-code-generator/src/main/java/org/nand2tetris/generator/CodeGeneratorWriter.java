@@ -122,6 +122,14 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
     if (isMethodBody) {
       System.out.println("\tbind 'this'");
       command.bindThis();
+      return;
+    }
+
+    if ("new".equals(routineName)) {
+      System.out.printf("allocate %s slots for instance of %s%n", symbolTable.getFieldCount(), className);
+      command.push(Segment.CONST, symbolTable.getFieldCount());
+      command.call("Memory.alloc", 1);
+      command.pop(Segment.POINTER, 0);
     }
 
   }
@@ -167,6 +175,9 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
         break;
       case "false":
         command.pushFalse();
+        break;
+      case "this":
+        command.pushThis();
         break;
       default:
         throw new UnsupportedOperationException(keywordConstant.toString());

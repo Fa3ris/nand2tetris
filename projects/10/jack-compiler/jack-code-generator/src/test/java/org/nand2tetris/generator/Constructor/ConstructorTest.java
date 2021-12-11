@@ -16,4 +16,12 @@ public class ConstructorTest {
     assertCorrectVm(inputPath);
   }
 
+
+  @Test
+  public void compileConstructor() throws Exception {
+    String baseName = "CompileConstructor";
+    Path inputPath = new File(getClass().getResource(baseName + ".jack").getFile()).toPath();
+    assertCorrectVm(inputPath);
+  }
+
 }

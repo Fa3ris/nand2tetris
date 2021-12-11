@@ -106,4 +106,8 @@ public class Command implements AutoCloseable {
   public void pushFalse() {
     push(Segment.CONST, 0);
   }
+
+  public void pushThis() {
+    push(Segment.POINTER, 0);
+  }
 }

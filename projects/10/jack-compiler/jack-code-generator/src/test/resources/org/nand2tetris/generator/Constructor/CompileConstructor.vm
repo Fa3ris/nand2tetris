@@ -1,0 +1,14 @@
+function Point.new 0 // 0 stands for 0 local var
+push constant 2      // need space for 2 fields x, y
+call Memory.alloc 1
+pop pointer 0     // this = Memory.alloc(2)
+push argument 0
+pop this 0        // x = ax
+push argument 1
+pop this 1        // y = ay
+push static 0
+push constant 1
+add
+pop static 0      // pointCount = pointCount + 1
+push pointer 0
+return            // return this

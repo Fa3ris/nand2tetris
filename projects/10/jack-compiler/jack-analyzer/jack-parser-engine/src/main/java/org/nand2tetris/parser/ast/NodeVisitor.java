@@ -32,4 +32,6 @@ public interface NodeVisitor {
   void visitBinaryOperation(Node additionalTerm, Token binaryOp);
 
   void visitStringConstant(Token stringConstant);
+
+  void visitIndexExpression(Token varName, Node indexExpression);
 }

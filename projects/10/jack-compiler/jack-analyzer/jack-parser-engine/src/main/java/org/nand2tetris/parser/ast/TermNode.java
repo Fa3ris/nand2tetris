@@ -341,7 +341,8 @@ public class TermNode extends AbstractNode {
     @Override
     public Void doForIndexExpression() {
       System.out.println("doForIndexExpression");
-      throw new UnsupportedOperationException(varName.toString() + " " + indexExpression.toString());
+      visitor.visitIndexExpression(varName, indexExpression);
+      return null;
     }
   }
 }

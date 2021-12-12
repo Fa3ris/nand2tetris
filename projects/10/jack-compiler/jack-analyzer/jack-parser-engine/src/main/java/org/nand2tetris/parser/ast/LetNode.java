@@ -66,7 +66,7 @@ public class LetNode extends AbstractNode {
   }
 
   public Optional<Node> getLeftExpression() {
-    return Optional.of(leftExpression);
+    return Optional.ofNullable(leftExpression);
   }
 
   @Override

@@ -1,4 +1,4 @@
-function CreateString.main 1
+function CreateString.main 1 // 1 stands for 1 local var
 push constant 5
 call String.new 1 // s = new String(5) lives in stack
 push constant 104

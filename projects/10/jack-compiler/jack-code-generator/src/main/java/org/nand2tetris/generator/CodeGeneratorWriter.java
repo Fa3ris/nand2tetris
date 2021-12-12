@@ -236,8 +236,19 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
   @Override
   public void visit(LetNode node) {
     System.out.println("visit LetNode " + node);
-    node.getRightExpression().accept(this);
-    assignToVarName(node.getVarName());
+    if (node.getLeftExpression().isPresent()) {
+      visitVarName(node.getVarName());
+      node.getLeftExpression().get().accept(this);
+      command.operation(Operation.ADD);
+      node.getRightExpression().accept(this);
+      command.pop(Segment.TMP, 0); // save right expression
+      command.pop(Segment.POINTER, 1); // set THAT to varName + left expression
+      command.push(Segment.TMP, 0);
+      command.pop(Segment.THAT, 0); // (varName + left expression)* = right expression
+    } else {
+      node.getRightExpression().accept(this);
+      assignToVarName(node.getVarName());
+    }
   }
 
   private void assignToVarName(Token varName) {
@@ -382,5 +393,15 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
       command.push(Segment.CONST, aChar);
       command.call("String.appendChar", 2);
     }
+  }
+
+  @Override
+  public void visitIndexExpression(Token varName, Node indexExpression) {
+    System.out.println("visit IndexExpression " + varName.getLexeme() + " " + indexExpression);
+    visitVarName(varName);
+    indexExpression.accept(this);
+    command.operation(Operation.ADD);
+    command.pop(Segment.POINTER, 1);
+    command.push(Segment.THAT, 0);
   }
 }

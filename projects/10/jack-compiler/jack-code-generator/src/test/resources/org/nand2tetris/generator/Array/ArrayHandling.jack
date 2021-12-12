@@ -1,0 +1,6 @@
+class ArrayHandling {
+    function void assign(Array bar, Array foo) {
+        let bar[2 + 5] = foo[10 - 6];
+        return;
+    }
+}

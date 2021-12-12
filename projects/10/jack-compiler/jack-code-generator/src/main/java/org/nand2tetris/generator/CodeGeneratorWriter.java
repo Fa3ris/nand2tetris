@@ -332,6 +332,9 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
       case Symbol.MINUS:
         command.operation(Operation.SUB);
         break;
+      case Symbol.SLASH:
+        command.call("Math.divide", 2);
+        break;
       case Symbol.EQ:
         command.operation(Operation.EQ);
         break;

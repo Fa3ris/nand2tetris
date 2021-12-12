@@ -1,0 +1,16 @@
+function CreateString.main 1
+push constant 5
+call String.new 1 // s = new String(5) lives in stack
+push constant 104
+call String.appendChar 2 // s.appendChar('h') returns s
+push constant 101
+call String.appendChar 2 // s.appendChar('e') returns s
+push constant 108
+call String.appendChar 2 // s.appendChar('l') returns s
+push constant 108
+call String.appendChar 2 // s.appendChar('l') returns s
+push constant 111
+call String.appendChar 2 // s.appendChar('o') returns s
+pop local 0              // message = s
+push constant 0
+return                   // return

@@ -299,7 +299,8 @@ public class TermNode extends AbstractNode {
     @Override
     public Void doForStringConstant() {
       System.out.println("doForStringConstant " + stringConstant.getLexeme());
-      throw new UnsupportedOperationException(stringConstant.toString());
+      visitor.visitStringConstant(stringConstant);
+      return null;
     }
 
     @Override

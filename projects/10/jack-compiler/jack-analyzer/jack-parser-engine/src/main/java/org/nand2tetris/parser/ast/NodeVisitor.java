@@ -30,4 +30,6 @@ public interface NodeVisitor {
   void visitUnaryExpression(Token unaryOp, Node unaryTerm);
 
   void visitBinaryOperation(Node additionalTerm, Token binaryOp);
+
+  void visitStringConstant(Token stringConstant);
 }

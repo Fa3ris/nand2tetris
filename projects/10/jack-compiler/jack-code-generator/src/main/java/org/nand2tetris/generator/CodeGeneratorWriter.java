@@ -8,6 +8,7 @@ import java.util.List;
 import org.nand2tetris.generator.command.Command;
 import org.nand2tetris.generator.symbol_table.SymbolTable;
 import org.nand2tetris.generator.symbol_table.TableEntry;
+import org.nand2tetris.generator.utils.StringConstantUtils;
 import org.nand2tetris.parser.ast.AST;
 import org.nand2tetris.parser.ast.ClassNode;
 import org.nand2tetris.parser.ast.ClassVarDecNode;
@@ -369,5 +370,17 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
     }
     System.out.printf("\tpush from var %s defined as [%s]%n", varName.getLexeme(), entry.description());
     command.push(entry);
+  }
+
+  @Override
+  public void visitStringConstant(Token stringConstant) {
+    System.out.println("visit StringConstant " + stringConstant.getLexeme());
+    char[] chars = StringConstantUtils.toCharsArray(stringConstant.getLexeme());
+    command.push(Segment.CONST, chars.length);
+    command.call("String.new", 1);
+    for (char aChar : chars) {
+      command.push(Segment.CONST, aChar);
+      command.call("String.appendChar", 2);
+    }
   }
 }

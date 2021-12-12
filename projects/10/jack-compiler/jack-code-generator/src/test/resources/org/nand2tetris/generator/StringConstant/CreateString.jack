@@ -1,0 +1,7 @@
+class CreateString {
+    function void main() {
+        var String message;
+        let message = "hello";
+        return;
+    }
+}

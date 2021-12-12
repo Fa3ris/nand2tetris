@@ -163,6 +163,7 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
         command.pushTrue();
         break;
       case "false":
+      case "null":
         command.pushFalse();
         break;
       case "this":
@@ -349,6 +350,7 @@ public class CodeGeneratorWriter implements CodeGenerator, NodeVisitor {
         break;
       case Symbol.OR:
         command.operation(Operation.OR);
+        break;
       default:
         throw new UnsupportedOperationException(binaryOp.toString());
     }

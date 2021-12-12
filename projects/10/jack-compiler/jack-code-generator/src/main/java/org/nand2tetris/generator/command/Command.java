@@ -58,6 +58,7 @@ public class Command implements AutoCloseable {
         break;
       case OR:
         writer.println("or");
+        break;
       default:
         throw new UnsupportedOperationException(op.toString());
     }

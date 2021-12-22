@@ -10,20 +10,104 @@
  */ 
 class Memory {
 
+    static Array ram;
+    static Array heap; // no allocation made contain only int representing address
+    static Array freeList; // no allocation made contain only int representing address
+
+    /*
+        Initial state:
+            the entire heap is available
+            (freeList contains one long segment)
+    */
+
+    /*
+        The freeList can be realized using the heap array
+        The next and size properties of the memory segment
+        beginning in address addr can be realized by heap[addr1] and heap[addr-2]
+        alloc, deAlloc, and deFrag can be realized as
+        operations on the heap array. 
+    */
+
+    /*
+        alloc(size)
+        Terminology: if segment.size ≥ size + 2 we say that the segment is possible
+
+        search the freeList for:
+            the first possible segment (first fit) , or
+            the smallest possible segments (best fit)
+        carve a block of size size+2 from this segment
+        return the base address of the block’s data part
+    */
+
     /** Initializes the class. */
     function void init() {
+        let ram = 0;
+        let heap = 2048; // heapBase, heap goes from 2048 to 16383 : 16383 - 2048 + 1 = 14336 slots
+        let freeList = heap;
+        let heap[0] = 0; // next
+        let heap[1] = 14334; // length available = 14336 - 2 (metadata slots)
+        return;
     }
 
     /** Returns the RAM value at the given address. */
     function int peek(int address) {
+        return ram[address];
     }
 
     /** Sets the RAM value at the given address to the given value. */
     function void poke(int address, int value) {
+        let ram[address] = value;
+        return;
     }
 
     /** Finds an available RAM block of the given size and returns
      *  a reference to its base address. */
+     /*
+        alloc(size):
+            search freeList using best-fit or first-fit heuristics
+            to obtain a segment with segment.size ≥ size + 2
+            if no such segment is found, return failure
+            (or attempt defragmentation)
+            block = base address of the found space
+            update the freeList and the fields of block
+            to account for the allocation
+            return block
+     */
+     /*
+        var block;
+        while (true) {
+            // current freeList is big enough
+            boolean isPossible = freeList[1] >= size + 2
+
+            if (isPossible) {
+                
+
+                // set base address of block
+                block = freeList // base addr
+                    + 1       // size slot
+                    + freeList[1] // slots available - go to the end
+                    - size // retrieve necessary slots
+
+                // set block meta-info
+                block[0] = null; // next = null
+                block[1] = size;
+
+                // update available space on current freeList
+                freeList[1] = freeList[1] - size - 2 
+
+                return block
+            } else {
+            
+
+                if (freeList[0] == null) {
+                    defrag()
+                    freeList = heap
+                } else {
+                    freeList = freeList[0] // go to next
+                }
+            }
+        }
+     */
     function int alloc(int size) {
     }
 

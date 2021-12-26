@@ -29,7 +29,7 @@ class Sys {
     function void wait(int duration) {
         var int oneMs;
         while (duration > 0) {
-            let oneMs = 10; // adapt value depending on computer
+            let oneMs = 10;
             while (oneMs > 0) {
                 let oneMs = oneMs - 1;
             }

@@ -10,9 +10,22 @@
  */ 
 class Memory {
 
+    /**
+        access ram freely because JACK does not check
+        range 0..32767
+    */
     static Array ram;
-    static Array heap; // no allocation made contain only int representing address
-    static Array freeList; // no allocation made contain only int representing address
+    /**
+        range 2048..16383
+
+        no allocation made (Array.new), contain only int representing address
+    */
+    static Array heap;
+    /**
+        keep track of current freeList
+        no allocation made (Array.new), contain only int representing address
+    */
+    static Array freeList; 
 
     /*
         Initial state:
@@ -26,17 +39,6 @@ class Memory {
         beginning in address addr can be realized by heap[addr1] and heap[addr-2]
         alloc, deAlloc, and deFrag can be realized as
         operations on the heap array. 
-    */
-
-    /*
-        alloc(size)
-        Terminology: if segment.size ≥ size + 2 we say that the segment is possible
-
-        search the freeList for:
-            the first possible segment (first fit) , or
-            the smallest possible segments (best fit)
-        carve a block of size size+2 from this segment
-        return the base address of the block’s data part
     */
 
     /** Initializes the class. */
@@ -60,75 +62,63 @@ class Memory {
         return;
     }
 
-    /** Finds an available RAM block of the given size and returns
-     *  a reference to its base address. */
+
      /*
+        alloc(size)
+        Terminology: if segment.size ≥ size + 2 we say that the segment is possible
+
+        search the freeList for:
+            the first possible segment (first fit) , or
+            the smallest possible segments (best fit)
+        carve a block of size size+2 from this segment
+        return the base address of the block’s data part
+    */
+    
+    /** Finds an available RAM block of the given size and returns
+        a reference to its base address.
+
         alloc(size):
             search freeList using best-fit or first-fit heuristics
             to obtain a segment with segment.size ≥ size + 2
-            if no such segment is found, return failure
-            (or attempt defragmentation)
+
+            if no such segment is found,
+                return failure (or attempt defragmentation)
+
             block = base address of the found space
             update the freeList and the fields of block
             to account for the allocation
             return block
      */
-     /*
-        var block;
-        while (true) {
-            // current freeList is big enough
-            boolean isPossible = freeList[1] >= size + 2
-
-            if (isPossible) {
-                
-
-                // set base address of block
-                block = freeList // base addr
-                    + 1       // size slot
-                    + freeList[1] // slots available - go to the end
-                    - size // retrieve necessary slots
-
-                // set block meta-info
-                block[0] = null; // next = null
-                block[1] = size;
-
-                // update available space on current freeList
-                freeList[1] = freeList[1] - size - 2 
-
-                return block
-            } else {
-            
-
-                if (freeList[0] == null) {
-                    defrag()
-                    freeList = heap
-                } else {
-                    freeList = freeList[0] // go to next
-                }
-            }
-        }
-     */
     function int alloc(int size) {
         var int block;
 
         while (true) {
-            // boolean isPossible = freeList[1] >= size + 2
-            if (~(freeList[1] < (size + 2))) { // enough space found
+            // isPossible = freeList[1] >= size + 2
+            // enough space found
+            if (~(freeList[1] < (size + 2))) { 
                 /*
-                    set block base address
-                    block base address = (current free list base address) + 1 + (current free list size) - (size - 1) 
+                    get data block from the end of current freeList
 
-                    use (size - 1) because last slot is counted in data blocks
+                    freeList last address = (freeList base address) 
+                                            + 1 // size slot
+                                            + (freeList size)
+
+                    block base address = (freeList last address) - (size - 1) 
+
+                    (size - 1) because last address is counted in data blocks
+
+                    = > (freeList base address)  + 1 + (freeList size) - size + 1
                 */
-                let block = freeList
-                        + 2 
-                        + freeList[1] 
-                        - size;
+                let block = freeList + 2 + freeList[1] - size;
 
+                // set block metadata
                 let block[-2] = null; // next
                 let block[-1] = size; // size
 
-                // reduce current free list size;
+                /* 
+                    reduce current free list size by (size + 2) = data + metadata
+                    size = size - (size + 2)
+                */
                 let freeList[1] = freeList[1] - size - 2;
                 return block;
             } else {
@@ -142,15 +132,27 @@ class Memory {
         return -100;
     }
 
+    /**
+        TODO: implement
+    */
     function void _defrag() {
-        do Output.printString("try defrag - but not implemented");
-        do Output.println();
+        do Output.printString("defrag - not implemented");
         do Sys.error(1);
         return;
     }
 
     /** De-allocates the given object (cast as an array) by making
-     *  it available for future allocations. */
+     *  it available for future allocations. 
+     
+     TODO: keep ordering of block addresses so that it is easier to have contiguous segments in order to
+     defragment them
+    
+    if a -> b -> c
+         ^    ^
+        next  next
+    
+    then addrA < addrB < addrC
+     */
     function void deAlloc(Array o) {
         var int target;
         let target = heap;
@@ -162,7 +164,6 @@ class Memory {
             } else {
                 let target = target[0];
             }
-
         }
         return;
     }    

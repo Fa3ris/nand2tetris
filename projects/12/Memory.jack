@@ -44,7 +44,7 @@ class Memory {
         let ram = 0;
         let heap = 2048; // heapBase, heap goes from 2048 to 16383 : 16383 - 2048 + 1 = 14336 slots
         let freeList = heap;
-        let heap[0] = 0; // next
+        let heap[0] = null; // next list
         let heap[1] = 14334; // length available = 14336 - 2 (metadata slots)
         return;
     }
@@ -109,10 +109,61 @@ class Memory {
         }
      */
     function int alloc(int size) {
+        var int block;
+
+        while (true) {
+            // boolean isPossible = freeList[1] >= size + 2
+            if (~(freeList[1] < (size + 2))) { // enough space found
+                /*
+                    set block base address
+                    block base address = (current free list base address) + 1 + (current free list size) - (size - 1) 
+
+                    use (size - 1) because last slot is counted in data blocks
+                */
+                let block = freeList
+                        + 2 
+                        + freeList[1] 
+                        - size;
+
+                let block[-2] = null; // next
+                let block[-1] = size; // size
+
+                // reduce current free list size;
+                let freeList[1] = freeList[1] - size - 2;
+                return block;
+            } else {
+                if (freeList[0] = null) {
+                    do Memory._defrag();
+                } else {
+                    let freeList = freeList[0];
+                }
+            }
+        }
+        return -100;
+    }
+
+    function void _defrag() {
+        do Output.printString("try defrag - but not implemented");
+        do Output.println();
+        do Sys.error(1);
+        return;
     }
 
     /** De-allocates the given object (cast as an array) by making
      *  it available for future allocations. */
     function void deAlloc(Array o) {
+        var int target;
+        let target = heap;
+        while (true) {
+            if (target[0] = null) {
+                let target[0] = o - 2; // set next
+                let o[-2] = null; // remove next from array
+                return;
+            } else {
+                let target = target[0];
+            }
+
+        }
+        return;
     }    
 }

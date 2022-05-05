@@ -11,21 +11,113 @@
  */
 class Screen {
 
+    static boolean color;
+
+    static Array powersOfTwo;
+
     /** Initializes the Screen. */
     function void init() {
+        let color = true;
+
+        // for mask
+
+        /* 
+        mask = 0000 0000 0001 0000
+        ~mask = 1111 1111 1110 1111
+
+        masked = value & ~mask = bit set to 0 in mask sets the bit in value to 0 and the rest is unchanged
+
+        color | masked = 0000 0000 0000 0000 | masked sets the masked bit to 0
+                        OR 1111 1111 1111 1111 | masked sets the masked bit to 1
+
+
+        screen space from 16384 to 32727
+
+        each memory entry is 16 bit-wide
+        256 rows and 512 columns
+
+        row length in addresses = number of columns / word-size = 512 / 16 = 32 addresses
+
+        get corresponding start address for a column
+            integer division of column by a word = x / 16
+
+        all in all base address for (x, y) = row offset + column offset
+
+        quotient = (x / 16)
+        offset = (32 * y) + quotient
+        addr = base addr + offset 
+             = 16384 + offset
+
+             value = peek word at address
+
+        remainder = value - (quotient * 16)
+
+        indexPowerOfTwo = 16 - remainder - 1
+
+        mask = powersOfTwo[indexPowerOfTwo]
+
+        color | (value & ~mask)
+             
+        */
+        let powersOfTwo = Array.new(16);
+        let powersOfTwo[0] = 1;
+        let powersOfTwo[1] = 2;
+        let powersOfTwo[2] = 4;
+        let powersOfTwo[3] = 8;
+        let powersOfTwo[4] = 16;
+        let powersOfTwo[5] = 32;
+        let powersOfTwo[6] = 64;
+        let powersOfTwo[7] = 128;
+        let powersOfTwo[8] = 256;
+        let powersOfTwo[9] = 512;
+        let powersOfTwo[10] = 1024;
+        let powersOfTwo[11] = 2048;
+        let powersOfTwo[12] = 4096;
+        let powersOfTwo[13] = 8192;
+        let powersOfTwo[14] = 16384;
+        let powersOfTwo[15] = 32767 + 1; // else error Integer is too big
+        return;
     }
 
     /** Erases the entire screen. */
     function void clearScreen() {
+        var int addr;
+
+        let addr = 16384;
+        while (~(addr > 32727)) {
+            Memory.poke(addr, 0);
+            let addr = addr + 1;
+        }
+
+        return;
     }
 
     /** Sets the current color, to be used for all subsequent drawXXX commands.
      *  Black is represented by true, white by false. */
     function void setColor(boolean b) {
+        let color = b;
+        return;
     }
 
     /** Draws the (x,y) pixel, using the current color. */
     function void drawPixel(int x, int y) {
+        var int addr, quotient, remainder, value, mask;
+
+        let quotient = x / 16;
+
+        let addr = 16384 + (32 * y) + quotient;
+
+        let value = Memory.peek(addr);
+
+        let remainder = value - (quotient * 16);
+
+        let mask = powersOfTwo[16 - remainder - 1];
+
+        let value = color | (value & ~mask);
+
+        Memory.poke(addr, value);
+
+        return;
     }
 
     /** Draws a line from pixel (x1,y1) to pixel (x2,y2), using the current color. */

@@ -11,13 +11,13 @@
  */
 class Screen {
 
-    static boolean color;
+    static int color;
 
     static Array powersOfTwo;
 
     /** Initializes the Screen. */
     function void init() {
-        let color = true;
+        let color = -1;
 
         // for mask
 
@@ -85,7 +85,7 @@ class Screen {
 
         let addr = 16384;
         while (~(addr > 32727)) {
-            Memory.poke(addr, 0);
+            do Memory.poke(addr, 0);
             let addr = addr + 1;
         }
 
@@ -95,13 +95,18 @@ class Screen {
     /** Sets the current color, to be used for all subsequent drawXXX commands.
      *  Black is represented by true, white by false. */
     function void setColor(boolean b) {
-        let color = b;
+        if (b) {
+
+            let color = -1;
+        } else {
+            let color = 0;
+        }
         return;
     }
 
     /** Draws the (x,y) pixel, using the current color. */
     function void drawPixel(int x, int y) {
-        var int addr, quotient, remainder, value, mask;
+        var int addr, quotient, remainder, value, mask, index;
 
         let quotient = x / 16;
 
@@ -111,25 +116,30 @@ class Screen {
 
         let remainder = value - (quotient * 16);
 
-        let mask = powersOfTwo[16 - remainder - 1];
+        let index = 16 - remainder - 1;
 
-        let value = color | (value & ~mask);
+        let mask = powersOfTwo[index];
 
-        Memory.poke(addr, value);
+        let value = color | (value & (~mask));
+
+        do Memory.poke(addr, value);
 
         return;
     }
 
     /** Draws a line from pixel (x1,y1) to pixel (x2,y2), using the current color. */
     function void drawLine(int x1, int y1, int x2, int y2) {
+         return;
     }
 
     /** Draws a filled rectangle whose top left corner is (x1, y1)
      * and bottom right corner is (x2,y2), using the current color. */
     function void drawRectangle(int x1, int y1, int x2, int y2) {
+         return;
     }
 
     /** Draws a filled circle of radius r<=181 around (x,y), using the current color. */
     function void drawCircle(int x, int y, int r) {
+         return;
     }
 }

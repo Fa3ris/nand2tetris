@@ -75,7 +75,7 @@ class Screen {
         let powersOfTwo[12] = 4096;
         let powersOfTwo[13] = 8192;
         let powersOfTwo[14] = 16384;
-        let powersOfTwo[15] = 32767 + 1; // else error Integer is too big
+        let powersOfTwo[15] = 32767 + 1; // else error Integer is too big = -32768 in 2's complement
         return;
     }
 
@@ -106,21 +106,41 @@ class Screen {
 
     /** Draws the (x,y) pixel, using the current color. */
     function void drawPixel(int x, int y) {
-        var int addr, quotient, remainder, value, mask, index;
+        var int addr, quotient, remainder, value, mask;
 
-        let quotient = x / 16;
+        let quotient = x / 16; // division entiere
 
         let addr = 16384 + (32 * y) + quotient;
 
         let value = Memory.peek(addr);
 
-        let remainder = value - (quotient * 16);
+        // reste  de la division x / 16
+        let remainder = x - (quotient * 16);
 
-        let index = 16 - remainder - 1;
+        // !!!!! IMPORTANT !!!!!
+        // pour un word à une adresse donnée, les bits de poids faible correspondent aux pixels les plus à gauche
+        /* 
+            ( B stands for black , which is true bit, W for white):
 
-        let mask = powersOfTwo[index];
+            BBBBBWWWWWWWWWWW
 
-        let value = color | (value & (~mask));
+            you actually have to write the  16-bit  binary value as :
+
+            0000000000011111
+        
+
+            il suffit donc d'utiliser le reste de la division pour connaitre l'index de la puissance de 2 voulue
+        */
+
+        let mask = powersOfTwo[remainder];
+
+
+        /* 
+         (color & mask) = ne garde que la couleur pour le bit a appliquer
+         (value & (~mask)) = set a 0 le bit à colorer et conserve les autres intacts
+         (value & (~mask)) | (color & mask) = applique la couleur garder au bit à colorer uniquement
+        */
+        let value = (value & (~mask)) | (color & mask);
 
         do Memory.poke(addr, value);
 

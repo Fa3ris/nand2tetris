@@ -149,6 +149,54 @@ class Screen {
 
     /** Draws a line from pixel (x1,y1) to pixel (x2,y2), using the current color. */
     function void drawLine(int x1, int y1, int x2, int y2) {
+
+        /*
+            Origin is different from example
+
+            example, origin is bottom-left
+
+            implementation, origin is top-left 
+        */
+
+        var int a, b, diff, dx, dy;
+        let a = 0;
+        let b = 0;
+        let diff = 0;
+        let dx = Math.abs(x2 - x1);
+        let dy = Math.abs(y2 - y1); // abs
+
+
+        while ( (~(a > dx)) & (~(b > dy)) ) {
+            if (y1 > y2) {
+                do Screen.drawPixel(x1 + a, y1 - b); // go north east
+            } else {
+                do Screen.drawPixel(x1 + a, y1 + b); // go south east
+            }
+
+            /*
+            slope comparison b/a > dy/dx (= overshooting the correct slope => correct by increasing a by 1)
+                <=> a*dy - b*dx < 0
+
+
+            slope comparison b/a <= dy/dx (= undershooting the correct slope => correct by increasing b by 1)
+                <=> a*dy - b*dx >= 0
+
+                let diff = a*dy - b*dx
+
+                diff(a + 1, b) = diff(a, b) + dy
+
+                diff(a, b + 1) = diff(a, b) - dx
+
+            */  
+            if (diff < 0) { // go right
+                let a = a + 1;
+                let diff = diff + dy;
+            } else { // go up - always begin by going up
+                let b = b + 1;
+                let diff = diff - dx;
+            }
+        }
+
          return;
     }
 

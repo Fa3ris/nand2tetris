@@ -165,6 +165,29 @@ class Screen {
         let dx = Math.abs(x2 - x1);
         let dy = Math.abs(y2 - y1); // abs
 
+        /* special cases compare for horizontal of vertical line
+
+        horizontal y1 == y2
+        vertical x1 == x2
+
+        else there is a slope between points
+
+        reduce the problem to drawing a line going north-east or south-east
+
+        find left-most point
+        xLeft, yLeft
+        xRight, yRight
+
+        direction of slope
+
+        upward
+        yLeft < yRight
+
+        downward
+        yLeft > yRight
+
+        */
+
 
         while ( (~(a > dx)) & (~(b > dy)) ) {
             if (y1 > y2) {

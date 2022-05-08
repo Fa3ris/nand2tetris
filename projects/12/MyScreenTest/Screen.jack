@@ -158,10 +158,41 @@ class Screen {
             implementation, origin is top-left 
         */
 
-        var int a, b, diff, dx, dy;
+        var int a, b, diff, dx, dy, xLeft, xRight, yTop, yBottom;
         let a = 0;
         let b = 0;
         let diff = 0;
+
+        if (y1 = y2) { // horizontal
+            let xLeft = Math.min(x1, x2);
+            let xRight = Math.max(x1, x2);
+
+
+            while (~(xLeft > xRight)) {
+                do Screen.drawPixel(xLeft, y1);
+
+                let xLeft = xLeft + 1;
+            }
+
+            return;
+        }
+
+        if (x1 = x2) { // vertical
+
+            let yTop = Math.min(y1, y2);
+            let yBottom = Math.max(y1, y2);
+
+
+            while (~(yTop > yBottom)) {
+                do Screen.drawPixel(x1, yTop);
+
+                let yTop = yTop + 1;
+            }
+
+            return;
+
+
+        }
         let dx = Math.abs(x2 - x1);
         let dy = Math.abs(y2 - y1); // abs
 

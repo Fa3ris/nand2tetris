@@ -149,17 +149,166 @@ class Screen {
 
     /** Draws a line from pixel (x1,y1) to pixel (x2,y2), using the current color. */
     function void drawLine(int x1, int y1, int x2, int y2) {
-         return;
+
+        /*
+            Origin is different from example
+
+            example, origin is bottom-left
+
+            implementation, origin is top-left 
+        */
+
+        var int a, b, diff, dx, dy, xLeft, xRight;
+
+        var int yTop, yBottom;
+
+        var int yLeft, yRight;
+        
+
+        if (y1 = y2) { // horizontal
+            let xLeft = Math.min(x1, x2);
+            let xRight = Math.max(x1, x2);
+
+
+            while (~(xLeft > xRight)) {
+                do Screen.drawPixel(xLeft, y1);
+
+                let xLeft = xLeft + 1;
+            }
+
+            return;
+        }
+
+        if (x1 = x2) { // vertical
+
+            let yTop = Math.min(y1, y2);
+            let yBottom = Math.max(y1, y2);
+
+
+            while (~(yTop > yBottom)) {
+                do Screen.drawPixel(x1, yTop);
+
+                let yTop = yTop + 1;
+            }
+
+            return;
+
+
+        }
+
+        let a = 0;
+        let b = 0;
+        let diff = 0;
+        let dx = Math.abs(x2 - x1);
+        let dy = Math.abs(y2 - y1);
+
+        /* special cases compare for horizontal of vertical line
+
+        horizontal y1 == y2
+        vertical x1 == x2
+
+        else there is a slope between points
+
+        reduce the problem to drawing a line going north-east or south-east
+
+        find left-most point
+        xLeft, yLeft
+        xRight, yRight
+
+        direction of slope
+
+        upward
+        yLeft < yRight
+
+        downward
+        yLeft > yRight
+
+        */
+
+        if (x1 < x2) {
+            let xLeft = x1;
+            let yLeft = y1;
+
+            let xRight = x2;
+            let yRight = y2;
+
+        } else {
+            let xLeft = x2;
+            let yLeft = y2;
+
+            let xRight = x1;
+            let yRight = y1;
+        }
+
+         while ( (~(a > dx)) & (~(b > dy)) ) {
+            
+            if (yLeft > yRight) { // TODO: avoid check every time - call deterministic function
+                do Screen.drawPixel(xLeft + a, yLeft - b); // go north east
+            } else {
+                do Screen.drawPixel(xLeft + a, yLeft + b); // go south east
+            }
+
+            /*
+            slope comparison b/a > dy/dx (= overshooting the correct slope => correct by increasing a by 1)
+                <=> a*dy - b*dx < 0
+
+
+            slope comparison b/a <= dy/dx (= undershooting the correct slope => correct by increasing b by 1)
+                <=> a*dy - b*dx >= 0
+
+                let diff = a*dy - b*dx
+
+                diff(a + 1, b) = diff(a, b) + dy
+
+                diff(a, b + 1) = diff(a, b) - dx
+
+            */  
+            if (diff < 0) { // go right
+                let a = a + 1;
+                let diff = diff + dy;
+            } else { // go up - always begin by going up
+                let b = b + 1;
+                let diff = diff - dx;
+            }
+        }
+
+        return;
+
     }
 
     /** Draws a filled rectangle whose top left corner is (x1, y1)
      * and bottom right corner is (x2,y2), using the current color. */
     function void drawRectangle(int x1, int y1, int x2, int y2) {
+
+        while (~(y1 > y2)) {
+
+            do Screen.drawLine(x1, y1, x2, y1);
+            let y1 = y1 + 1;
+        }
+
          return;
     }
 
     /** Draws a filled circle of radius r<=181 around (x,y), using the current color. */
     function void drawCircle(int x, int y, int r) {
+        /* 
+        for each dy = –r to r do:
+
+            drawLine (x - sqrt(r^2 - dy^2), y + dy,
+                      x + sqrt(r^2 - dy^2), y + dy)
+        */
+
+        var int dy, root;
+        let dy = -r;
+
+        while (~(dy > r)) {
+
+            let root = Math.sqrt(Math.multiply(r, r) - Math.multiply(dy, dy));
+
+            do Screen.drawLine(x - root, y + dy, x + root, y + dy);
+
+            let dy = dy + 1;
+        }
          return;
     }
 }

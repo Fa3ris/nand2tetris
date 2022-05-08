@@ -158,10 +158,12 @@ class Screen {
             implementation, origin is top-left 
         */
 
-        var int a, b, diff, dx, dy, xLeft, xRight, yTop, yBottom;
-        let a = 0;
-        let b = 0;
-        let diff = 0;
+        var int a, b, diff, dx, dy, xLeft, xRight;
+
+        var int yTop, yBottom;
+
+        var int yLeft, yRight;
+        
 
         if (y1 = y2) { // horizontal
             let xLeft = Math.min(x1, x2);
@@ -193,8 +195,12 @@ class Screen {
 
 
         }
+
+        let a = 0;
+        let b = 0;
+        let diff = 0;
         let dx = Math.abs(x2 - x1);
-        let dy = Math.abs(y2 - y1); // abs
+        let dy = Math.abs(y2 - y1);
 
         /* special cases compare for horizontal of vertical line
 
@@ -219,12 +225,27 @@ class Screen {
 
         */
 
+        if (x1 < x2) {
+            let xLeft = x1;
+            let yLeft = y1;
 
-        while ( (~(a > dx)) & (~(b > dy)) ) {
-            if (y1 > y2) {
-                do Screen.drawPixel(x1 + a, y1 - b); // go north east
+            let xRight = x2;
+            let yRight = y2;
+
+        } else {
+            let xLeft = x2;
+            let yLeft = y2;
+
+            let xRight = x1;
+            let yRight = y1;
+        }
+
+         while ( (~(a > dx)) & (~(b > dy)) ) {
+            
+            if (yLeft > yRight) { // TODO: avoid check every time - call deterministic function
+                do Screen.drawPixel(xLeft + a, yLeft - b); // go north east
             } else {
-                do Screen.drawPixel(x1 + a, y1 + b); // go south east
+                do Screen.drawPixel(xLeft + a, yLeft + b); // go south east
             }
 
             /*
@@ -251,7 +272,8 @@ class Screen {
             }
         }
 
-         return;
+        return;
+
     }
 
     /** Draws a filled rectangle whose top left corner is (x1, y1)

@@ -1,0 +1,206 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Math.jack
+
+/**
+ * A library of commonly used mathematical functions.
+ * Note: Jack compilers implement multiplication and division using OS method calls.
+ */
+ /**
+    HACK word = 16 bits in two's complement
+ */
+class Math {
+
+    static Array powersOfTwo;
+
+    /** Initializes the library. */
+    function void init() {
+        let powersOfTwo = Array.new(16);
+        let powersOfTwo[0] = 1;
+        let powersOfTwo[1] = 2;
+        let powersOfTwo[2] = 4;
+        let powersOfTwo[3] = 8;
+        let powersOfTwo[4] = 16;
+        let powersOfTwo[5] = 32;
+        let powersOfTwo[6] = 64;
+        let powersOfTwo[7] = 128;
+        let powersOfTwo[8] = 256;
+        let powersOfTwo[9] = 512;
+        let powersOfTwo[10] = 1024;
+        let powersOfTwo[11] = 2048;
+        let powersOfTwo[12] = 4096;
+        let powersOfTwo[13] = 8192;
+        let powersOfTwo[14] = 16384;
+        let powersOfTwo[15] = 32767 + 1;
+        return;
+    }
+
+    /** Returns the absolute value of x. */
+    function int abs(int x) {
+        if (x < 0) {
+            return -x;
+        }
+        return x;
+    }
+
+    /** Returns the product of x and y. 
+     *  When a Jack compiler detects the multiplication operator '*' in the 
+     *  program's code, it handles it by invoking this method. In other words,
+     *  the Jack expressions x*y and multiply(x,y) return the same value.
+     */
+     /**
+
+        Returns x*y, where x, y ≥ 0
+        multiply(x, y):
+            sum = 0
+            shiftedX = x
+            for i = 0 ... w - 1 do
+                if ((i’th bit of y) == 1)
+                    sum = sum + shiftedX
+                shiftedX = shiftedX * 2
+            return sum
+
+        edge cases 
+
+        Handling negative numbers
+            • If the inputs are two’s complement
+            values, the algorithm works fine as-is
+
+        Handling overflow
+            • this algorithm always returns the
+            correct answer modulo 216
+
+     */
+    function int multiply(int x, int y) {
+        var int sum, shiftedX, i;
+        let shiftedX = x;
+
+        let i = 0;
+
+        while (i < 16) {
+            if (powersOfTwo[i] & y) {
+                let sum = sum + shiftedX;
+            }
+
+            let shiftedX = shiftedX + shiftedX;
+            let i = i + 1;
+        }
+
+        return sum;
+    }
+
+    /** Returns the integer part of x/y.
+     *  When a Jack compiler detects the multiplication operator '/' in the 
+     *  program's code, it handles it by invoking this method. In other words,
+     *  the Jack expressions x/y and divide(x,y) return the same value.
+     */
+     /**
+        Returns the integer part of x / y,
+        where x ≥ 0 and y > 0
+
+        divide (x , y):
+            if (y > x) return 0
+            q = divide (x, 2 * y)
+            if ((x – 2 * q * y) < y)
+                return 2 * q
+            else
+            return 2 * q + 1
+
+        edge cases
+        Handling negative numbers
+            Solution: divide |x| by |y|,
+            then set the result’s sign
+        
+        Handling overflow (of y)
+            Solution: the overflow can be
+            detected when y becomes negative
+            We can change the function’s first
+            statement to:
+            if (y > x) or (y < 0) return 0
+     */
+    function int divide(int x, int y) {
+        var int res;
+        let res = Math.divideInternal(Math.abs(x), Math.abs(y));
+
+        if (x > 0) {
+            if (y > 0) {
+                return res;
+            } else { // y < 0 because y != 0
+                return -res;
+            }
+        } else { // x <= 0
+            if (y > 0) {
+                return -res;
+            } else { // y < 0 because y != 0
+                return res;
+            }
+        }
+    }
+
+    function int divideInternal(int x, int y) {
+        var int q;
+        if ((y > x) | (y < 0)) {
+            return 0;
+        }
+        let q = Math.divideInternal(x, y + y);
+        if ( (x - Math.multiply(q + q, y))  < y ) {
+            return q + q;
+        } else {
+            return q + q + 1;
+        }
+    }
+
+    /** Returns the integer part of the square root of x. */
+    /**
+    Compute the integer part of
+    Strategy: find an integer y such that y^2 <= x < (y+1)^2 ( for 0 <= x < 2^n )
+    HACH => n = 16
+    by performing a binary search in the range
+        sqrt (x):
+            y = 0
+            for j = (n/2 - 1) .. 0 do
+            if  (y + 2^j)^2 <= x then
+                y = y + 2^j
+        return y
+
+    
+    edge case
+
+    the calculation of (y + 2^j)^2 can overflow 
+    Change the condition to:
+        (y + 2^j)^2 <= x and (y + 2^j)^2 > 0
+
+    */
+    function int sqrt(int x) {
+        var int y, j, inter;
+        let y = 0;
+        let j = 7;
+        while (~(j < 0)) {
+            let inter = y + powersOfTwo[j];
+            let inter = Math.multiply(inter, inter);
+            if ( (~(inter > x)) & (inter > 0)) {
+                let y = y + powersOfTwo[j];
+            }
+            let j = j - 1;
+        }
+
+        return y;
+    }
+
+    /** Returns the greater number. */
+    function int max(int a, int b) {
+        if (a > b) {
+            return a;
+        }
+        return b;
+    }
+
+    /** Returns the smaller number. */
+    function int min(int a, int b) {
+        if (a > b) {
+            return b;
+        }
+        return a;
+    }
+}

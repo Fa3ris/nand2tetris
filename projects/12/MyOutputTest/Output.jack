@@ -22,8 +22,7 @@ class Output {
     static int outAddr; // screen address where to draw next char
 
     static int screenMask; // keep the part of screen that must not be modified when draw the char and clear the rest
-
-    static boolean columnIsOdd; // differentiate between low or high part of one screen address
+    static int fontMask; // apply correct part of the font value, either even or odd column
 
     static int row, col;
 
@@ -36,7 +35,8 @@ class Output {
         let row = 0;
         let col = 0;
 
-        let columnIsOdd = false;
+        do Output.computeState();
+
         return;
     }
 
@@ -165,17 +165,17 @@ class Output {
 	let map = Array.new(11);
         let charMaps[index] = map;
 
-        let map[0] = a;
-        let map[1] = b;
-        let map[2] = c;
-        let map[3] = d;
-        let map[4] = e;
-        let map[5] = f;
-        let map[6] = g;
-        let map[7] = h;
-        let map[8] = i;
-        let map[9] = j;
-        let map[10] = k;
+        let map[0] = (a | (a * 256)); // replicate value in higher bits
+        let map[1] = (b | (b * 256));
+        let map[2] = (c | (c * 256));
+        let map[3] = (d | (d * 256));
+        let map[4] = (e | (e * 256));
+        let map[5] = (f | (f * 256));
+        let map[6] = (g | (g * 256));
+        let map[7] = (h | (h * 256));
+        let map[8] = (i | (i * 256));
+        let map[9] = (j | (j * 256));
+        let map[10] = (k | (k * 256));
 
         return;
     }
@@ -251,11 +251,8 @@ class Output {
 
             let fontValue = map[index]; // what to draw
 
-            if (columnIsOdd) {
-                let fontValue = fontValue * 256; // shift left by 8;
-            }
 
-            let value = (value & screenMask) | (fontValue);
+            let value = (value & screenMask) | (fontValue & fontMask);
 
             // base screen + current row
             // 32 addresses by row
@@ -288,20 +285,23 @@ class Output {
 
         /* 
             EXPLANATION
-            j / 2 : each address holds two columns - so integer division by 2 to get correct address
-            i * 32 * 11 = offset based on the row =  32 addresses per row and row has a height of 11   
+            col / 2 : each address holds two columns - so integer division by 2 to get correct address
+            row * 32 * 11 = offset based on the row =  32 addresses per row and row has a height of 11   
         */
 
-        let outAddr = 16384; // beginning address of screen
 
-        let outAddr = outAddr + (col / 2) + (row * 32 * 11);
+        let outAddr = 16384 // beginning address of screen
+            + (col / 2) 
+            + (row * 32 * 11);
 
-        let columnIsOdd = col & 1; // check if unit bit is set <=> number is odd
-
-        if (columnIsOdd) {
-            let screenMask = 255; // keep the left part of screen - yes the left pixels correspond to the lower bits !!! = 0000 0000 1111 1111
+        // 255  = 0000 0000 1111 1111
+        // -256 = 1111 1111 0000 0000
+        if (col & 1) { // check if unit bit is set <=> number is odd - differentiate between low or high part of one screen address
+            let screenMask = 255; // keep the left part of screen - yes the left pixels correspond to the lower bits !!!
+            let fontMask = -256; // keep right part of char
         } else {
-            let screenMask = -256; // keep the right part of screen = 1111 1111 0000 0000
+            let screenMask = -256; // keep the right part of screen
+            let fontMask = 255; // keep left part of char
         }
 
         return;

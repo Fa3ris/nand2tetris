@@ -19,11 +19,13 @@ class Output {
     // Character map for displaying characters
     static Array charMaps; 
 
-    static int outAddr;
+    static int outAddr; // screen address where to draw next char
 
-    static int leftMask, rightMask;
+    static int screenMask; // keep the part of screen that must not be modified when draw the char and clear the rest
 
     static boolean columnIsOdd; // differentiate between low or high part of one screen address
+
+    static int row, col;
 
     /** Initializes the screen, and locates the cursor at the screen's top-left. */
     function void init() {
@@ -31,11 +33,10 @@ class Output {
 
         let outAddr = 16384; // beginning address of screen
 
-        let leftMask = -256; // 1111 1111 0000 0000
-        let rightMask = 255; // 0000 0000 1111 1111
+        let row = 0;
+        let col = 0;
 
         let columnIsOdd = false;
-
         return;
     }
 
@@ -193,6 +194,30 @@ class Output {
      *  and erases the character displayed there. */
     function void moveCursor(int i, int j) {
 
+        var int addr, value, index;
+
+        let row = i;
+        let col = j;
+
+        do Output.computeState();
+
+        /*  clear letter at this position */
+        let index = 0;
+
+        let addr = outAddr;
+
+        while (index < 11) { // 11 rows
+            
+            // previous value
+            let value = Memory.peek(addr);
+
+            let value = value & screenMask; // clear what is not part of the mask
+
+            do Memory.poke(addr, value);
+            let addr = addr + 32; // next row
+            let index = index + 1;
+        }
+
         return;
     }
 
@@ -210,7 +235,8 @@ class Output {
             for odd-column, need to shift by 8 to the left => multiply by 2^n = 256
         
         */
-        var Array map, index, addr, value, screenMask, fontMask, fontValue;
+        var Array map; 
+        var int index, addr, value, fontValue;
 
         let map = Output.getMap(c); // letter graphics
 
@@ -218,13 +244,6 @@ class Output {
 
         let index = 0;
 
-        if (columnIsOdd) {
-            let screenMask = rightMask; // keep the left part of screen - yes the left part
-            // let fontMask = leftMask; //
-        } else {
-            let screenMask = leftMask;
-            // let fontMask = rightMask;
-        }
         while (index < 11) { // 11 rows
             
             // previous value
@@ -246,11 +265,45 @@ class Output {
             let index = index + 1;
         }
 
-        if (columnIsOdd) {
-            let outAddr = outAddr + 1;
+        // advance to next position
+        let col = col + 1;
+
+        if (col > 63) { // go to next row
+            let col = 0;
+
+            let row = row + 1;
+
+            if (row > 22) { // return to beginning of screen
+                let row = 0;
+            }
         }
 
-        let columnIsOdd = ~columnIsOdd;
+
+        do Output.computeState();
+
+        return;
+    }
+
+    function void computeState() {
+
+        /* 
+            EXPLANATION
+            j / 2 : each address holds two columns - so integer division by 2 to get correct address
+            i * 32 * 11 = offset based on the row =  32 addresses per row and row has a height of 11   
+        */
+
+        let outAddr = 16384; // beginning address of screen
+
+        let outAddr = outAddr + (col / 2) + (row * 32 * 11);
+
+        let columnIsOdd = col & 1; // check if unit bit is set <=> number is odd
+
+        if (columnIsOdd) {
+            let screenMask = 255; // keep the left part of screen - yes the left pixels correspond to the lower bits !!! = 0000 0000 1111 1111
+        } else {
+            let screenMask = -256; // keep the right part of screen = 1111 1111 0000 0000
+        }
+
         return;
     }
 

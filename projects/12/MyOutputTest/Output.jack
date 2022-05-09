@@ -326,6 +326,13 @@ class Output {
     /** Advances the cursor to the beginning of the next line. */
     function void println() {
 
+        let col = 0; // beginning of next row
+        let row = row + 1;
+        if (row > 22) { // loop to beginning of screen
+            let row = 0;
+        }
+
+        do Output.computeState();
         return;
 
     }
@@ -333,6 +340,17 @@ class Output {
     /** Moves the cursor one column back. */
     function void backSpace() {
 
+        let col = col - 1;
+        if (col < 0) { // go to end of previous row
+            let col = 63; // end of row
+            let row = row - 1;
+            if (row < 0) { // loop to end of screen
+                let row = 22;
+            }
+        }
+
+         do Output.computeState();
+        
         return;
 
     }

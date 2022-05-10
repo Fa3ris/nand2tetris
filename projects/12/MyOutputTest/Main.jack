@@ -9,33 +9,76 @@ class Main {
     /** Outputs the entire character set to the screen using all the
      *  methods of the Output class. */
     function void main() {
-        // var String s;
+        var String s;
     
-    	// let s = String.new(1);
-    	// do s.appendChar(String.doubleQuote());
+        if (true) {
+
+        let s = String.new(1);
+    	do s.appendChar(String.doubleQuote());
     
-        // do Output.moveCursor(0, 63);
+        do Output.moveCursor(0, 63);
         do Output.printChar(66); // B
-        // do Output.moveCursor(22, 0);
+        do Output.moveCursor(22, 0);
         do Output.printChar(67); // C
-        // do Output.moveCursor(22, 63);
+        do Output.moveCursor(22, 63);
         do Output.printChar(68); // D
-        // do Output.printChar(65); // A - return beginning of screen
+        do Output.printChar(65); // A - return beginning of screen
         
-        // do Output.moveCursor(2, 0);
-        // do Output.printString("0123456789");
-        // do Output.println();
+        do Output.moveCursor(2, 0);
+        do Output.printString("0123456789");
+        do Output.println();
         
-        // do Output.printString("ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz");
-        // do Output.println();
+        do Output.printString("ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz");
+        do Output.println();
         
-        // do Output.printString("!#$%&'()*+,-./:;<=>?@[\]^_`{|}~");
-        // do Output.printString(s);
-        // do Output.println();
+        do Output.printString("!#$%&'()*+,-./:;<=>?@[\]^_`{|}~");
+        do Output.printString(s);
+        do Output.println();
         
-        // do Output.printInt(-12345);
-        // do Output.backSpace();
-        // do Output.printInt(6789);
+        do Output.printInt(-12345);
+        do Output.backSpace();
+        do Output.printInt(6789);
+
+        } else {
+    	let s = String.new(1);
+    	do s.appendChar(String.doubleQuote());
+    
+        do Output.printChar(66); // B
+        do Output.moveCursor(0, 63);
+        do Output.printChar(66); // B
+        do Output.moveCursor(22, 0);
+        do Output.printChar(67); // C
+        do Output.moveCursor(22, 63);
+        do Output.printChar(68); // D
+        do Output.moveCursor(0, 0); // erase first B
+        do Output.moveCursor(22, 63); // erase D
+        do Output.printChar(69); // E
+        do Output.printChar(70); // F at beginning of screen
+        do Output.printChar(71); // G
+        do Output.printChar(72); // H
+        do Output.printChar(73); // I
+        do Output.println();
+        do Output.printChar(74); // J
+        do Output.printChar(75); // K
+        do Output.backSpace();
+        do Output.printChar(76); // overwrite K with L
+        do Output.printChar(65); // A - return beginning of screen
+        
+        do Output.moveCursor(2, 0);
+        do Output.printString("0123456789");
+        do Output.println();
+        
+        do Output.printString("ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz");
+        do Output.println();
+        
+        do Output.printString("!#$%&'()*+,-./:;<=>?@[\]^_`{|}~");
+        do Output.printString(s);
+        do Output.println();
+        
+        do Output.printInt(-12345);
+        do Output.backSpace();
+        do Output.printInt(6789);
+        }
         
         return;
     }

@@ -62,8 +62,18 @@ class Keyboard {
             let key = Keyboard.keyPressed();
         }
 
-        do Output.backSpace(); // erase cursor
-        do Output.printChar(c); // replace by char - will advance cursor position
+
+        if (~((c = String.newLine()) | (c = String.backSpace()))) {
+            do Output.backSpace(); // overwrite cursor
+            do Output.printChar(c); // replace by char - will advance cursor position
+        }
+
+        /* 
+            if back space
+                F#_
+                move back twice ?
+        
+        */
 
         return c;
     }
@@ -84,13 +94,22 @@ class Keyboard {
             let c = Keyboard.readChar();
 
             if (c = String.newLine()) {
-                // do Output.println(); no need - readCchar handles call to Output
+                do Output.backSpace(); // return on displayed cursor
+                do Output.printChar(32); // print space = erase cursor
+                do Output.println();
                 return line;
             }
 
             if (c = String.backSpace()) {
+                // really weird - see if can reduce calls
                 do line.eraseLastChar();
-                // do Output.backSpace(); no need - readChar handles call to Output
+                do Output.backSpace(); // return on displayed cursor
+                do Output.backSpace(); // return on char
+                do Output.printChar(0); // print cursor and advance
+                do Output.printChar(32); // print space = erase old cursor and advance
+                do Output.backSpace(); // return on empty space
+                do Output.backSpace(); // return on displayed cursor
+
             } else {
                 do line.appendChar(c);
             }

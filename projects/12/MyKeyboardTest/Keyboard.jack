@@ -102,16 +102,28 @@ class Keyboard {
 
             if (c = String.backSpace()) {
                 // really weird - see if can reduce calls
-                do line.eraseLastChar();
-                do Output.backSpace(); // return on displayed cursor
-                do Output.backSpace(); // return on char
-                do Output.printChar(0); // print cursor and advance
-                do Output.printChar(32); // print space = erase old cursor and advance
-                do Output.backSpace(); // return on empty space
-                do Output.backSpace(); // return on displayed cursor
-
+                if (line.length() > 0) { 
+                    do line.eraseLastChar();
+                    do Output.backSpace(); // return on displayed cursor
+                    do Output.backSpace(); // return on char
+                    do Output.printChar(0); // print cursor and advance
+                    do Output.printChar(32); // print space = erase old cursor and advance
+                    do Output.backSpace(); // return on empty space
+                    do Output.backSpace(); // return on displayed cursor
+                } else {
+                    do Output.backSpace(); // return on displayed cursor
+                }
             } else {
-                do line.appendChar(c);
+
+                if (line.length() < 10) {
+
+                    do line.appendChar(c);
+                } else {
+                    do Output.backSpace(); // return on char
+                    do Output.printChar(32); // print space = erase old cursor and advance
+                    do Output.backSpace(); // return on char
+
+                }
             }
         }
 

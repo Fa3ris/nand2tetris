@@ -71,12 +71,139 @@ class String {
     /** Returns the integer value of this string, 
      *  until a non-digit character is detected. */
     method int intValue() {
-        return 0;
+        /* 
+            val = 0
+            for (i = 0 ... str.length ) do
+                d = integer value of str[i]
+                val = val * 10 + d
+            return val
+        
+        */
+
+        var int val, digit, index;
+        var boolean isNeg;
+
+        if (arr[0] = 45) { // minus sign
+            let isNeg = true;
+            let index = index + 1;
+        }
+
+        while (index < size) {
+            // '0' => 48 - so substract 48 to get value
+            let digit = arr[index] - 48;
+            if (~(digit < 0) & ~(digit > 9)) { // correct range
+                let val = (val * 10) + digit; 
+                let index = index + 1;
+            } else {
+                let index = size + 1; // break loop
+            }
+        }
+
+        if (isNeg) {
+            let val = -val;
+        }
+
+        return val;
     }
 
     /** Sets this string to hold a representation of the given value. */
     method void setInt(int val) {
+
+        /* 
+        int2String(val) 
+            lastDigit = val % 10;
+
+            c = char corresponding to lastDigit
+
+            if (val < 10) { // no more digit
+                return c as String
+            } else {
+                return int2String(val / 10).append(c)
+            }
+        */
+        var int requiredLength;
+        var int start;
+        var boolean isNeg;
+
+        do arr.dispose();
+
+        let requiredLength = 1; // at least one digit to store
+
+        if (val < 0) {
+            let val = -val;
+            let isNeg = true;
+            let start = start + 1;
+            let requiredLength = requiredLength + 1; // for minus sign
+        }
+
+        let arr = int2String(val, requiredLength, start);
+
+        if (isNeg) {
+            let arr[0] = 45; // minus sign
+        }
         return;
+    }
+
+    /**
+        val: the value to parse as string
+        requiredLength: the array length necessary to store the number
+        startIndex: position in array where to begin to store the left-most digit
+            = 0 if number >= 0, 
+            = 1 if number < 0, put minus at position 0
+     */
+    method Array int2String(int val, int requiredLength, int startIndex) {
+
+        var int quotient;
+        var int lastDigit;
+        var int c;
+        var Array res;
+
+        let quotient = val / 10; // for reuse
+        let lastDigit = val - (10 * quotient); // = remainder
+        
+        // '0' => 48 - so offset lastDigit by 48
+        let c = 48 + lastDigit;
+
+        if (val < 10) { // left-most digit reached
+            // set fields
+            let size = requiredLength;
+            let max = size;
+            // allocate final arr
+            let res = Array.new(size);
+            let res[startIndex] = c;
+            return res;
+        } else {
+            let res = int2String(quotient, requiredLength + 1, startIndex);
+            /* 
+               EXPLANATION
+
+               size - requiredLength + startIndex = where to put the char representing the digit
+
+               ex: 102
+                size = 3
+                startIndex = 0
+
+               '1' is handled in case above
+
+               decide where to put '0' and '2'
+
+                first call
+                    int2String(102, 1, 0)
+                    for '2'
+                        requiredLength = 1
+                        3 - 1 + 0 = 2
+
+                second call
+                    int2String(10, 2, 0)
+
+                    for '0'
+                        requiredLength = 2
+                        3 - 2 + 0 = 1
+            */
+            
+            let res[size - requiredLength + startIndex] = c;
+            return res;
+        }
     }
 
     /** Returns the new line character. */

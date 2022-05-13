@@ -115,21 +115,11 @@ class String {
 
             c = char corresponding to lastDigit
 
-            if (val < 10) {
-                no more digit
+            if (val < 10) { // no more digit
                 return c as String
             } else {
-                // dispose of intermediary String
-                // copy into string of length + 1
-                // and append
-                // dispose of old string
                 return int2String(val / 10).append(c)
             }
-
-            if val < 0  
-            copy into string of length + 1
-            append - at beginning then copy rest
-
         */
         var int requiredLength;
         var int start;

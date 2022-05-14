@@ -84,7 +84,7 @@ class Screen {
         var int addr;
 
         let addr = 16384;
-        while (~(addr > 32727)) {
+        while (~(addr > 24575)) {
             do Memory.poke(addr, 0);
             let addr = addr + 1;
         }
